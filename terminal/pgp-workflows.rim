@@ -11,7 +11,13 @@ install gpg2 terminal utility:
 	- installer -pkg Install.pkg -showChoicesXML
 	- sudo installer -pkg Install.pkg -target / -verbose -dumplog
 	- hdiutil unmount /dev/disk...
-	- git config --global gpg.program gpg2 // register it with git
+
+setup gpg2 with git:
+	- echo 'export GPG_TTY=$(tty)' >> ~/.bash_profile // provide ref to correct tty
+		- echo 'export GPG_TTY=$(tty)' >> ~/.zshrc // if using oh-my-zsh
+		- source ~/.zshrc // reload rc
+	- git config --global gpg.program gpg2 // provide program name
+
 
 generate pub/priv GPG key-pair:
 	- gpg2 --full-gen-key // and follow instructions
@@ -27,13 +33,34 @@ add email to existing key:
 	- gpg2 --edit-key
 	- adduid
 
-add to github:
+get keyid:
 	- keyids=$(gpg2 --list-secret-keys --keyid-format LONG) // view secret key ring
 	- keyid=$(echo "$keyids" | grep -E "^sec.*" | grep -Eo "/\w+" | cut -c 2-) // extract keyid
+
+
+use gpg2 with git:
+	// setup which key to use
+	- see "get keyid"
+	- git config --global user.signingkey $keyid
+
+	// signing
+	- git config --global commit.gpgsign true // enable sign on all commits
+		- git config commit.gpgsign true // or just in the current one
+		- git commit -S -m "..." // or just for one commit
+		- git tag -s mytag // or just for one tag
+
+	// to verify
+	- git verify-tag mytag
+	- git verify-commit a50f33a
+
+
+add to github:
+	- see "get keyid"
 	- gpg2 --armor --export $keyid | pbcopy // export and copy PGP Public key
 	- "https://github.com/settings/gpg/new" // paste + save
 
-' to check:
+
+' TODO:
 	- gen pub/priv key, share pub key (export/import)
 	- encrypt with pub, decrypt with priv
 	- sign with priv, check sign with pub
