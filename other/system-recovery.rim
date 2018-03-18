@@ -1,0 +1,15 @@
+# System recovery
+// TODO
+
+- expect that a system will break
+	-> minimize the loss
+
+- regular tests of recovery process
+	- test backup system
+	- test security breach processes
+		- check logs, how to respond, how to prevent further losses etc
+	- test uptime losses
+		- offline + p2p support + gracefull static webpage + error messages
+
+- backups
+	- the rule of three // different locations, different access ways

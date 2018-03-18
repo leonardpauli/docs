@@ -2,7 +2,16 @@
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 18 mar 2018
 
-- terminal
+// > tree -if
+
+LICENSE
+README.md
+contents
+other
+	- security-checklist
+	- security-manifest
+	- security-principles
+	- system-recovery
+terminal
 	- pgp-workflows: "cryptographic security utility"
-- README.md
-- LICENCE
+	- ssl-workflow

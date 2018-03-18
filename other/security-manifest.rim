@@ -1,0 +1,57 @@
+# Security Manifest
+// TODO
+
+- a system is only as secure as it's weakest link
+
+- see "security-checklist"
+
+- avoid "security through obscurity" as primary security
+	- could be seen as a "quick fix" // apperance of security
+		- processes are "hidden"
+		- semi works temporarily
+		- usually less maintainable
+		- harder to fix when broken
+		- harder to know if broken
+	- the opposite: "security through visibility" // functional security
+		- processes are open (for others to review)
+			- makes attacks easier if there are vulnerabilities (open for black hats)
+			- makes vulnerabilities easier to detect (open for white hats)
+		- processes are explicit and clear
+			- easier to fix when broken
+			- easier to find out where broken
+		- usually more maintainable and more sustainable
+		- usually requires more knowledge / work
+
+		- still contain secrets, but their existance is declared, + they are:
+			// https://security.stackexchange.com/a/32068
+			- small // password compared to algorithm or system setup
+			- known/accessible by fewer (ultimately just one person / secret)
+				// - eg. password or hardware authenticator, see "security-principles"
+			- easy to change // compare password to port (with many connected services)
+
+	- though it could be a perfectly valid "security layer"
+		- eg. suble non-public changes not changing the open core logic
+			- watch out to not introduce any vulnerabilities though
+				// - eg. changing from default low port (root restricted) to high port nr
+		- with goal of catching, detecting, and containing any previously unknown security leaks / holes
+		- thereby limiting the potential draw-backs of keeping processes open while retaining the benefits
+
+	- "real security"
+		- where only the ones that should have the access have the ability to get access
+		- eg. sysadmins should not be able to edit/add others posts in the database
+		- usually uses cryptographic measurements
+			- like signing and validating (for confirming author / author group) on *client side*
+			- and encryption/decryption for private and shared private data, again, on *client side*
+			- with private keys not accessable from, nor touching, the server side
+			- also prevents "support department" from reseting password
+				- if not "support department" is provided with a partial reset key,
+					with other parts being security question answers or distributed between multiple friends, etc
+
+	- Goal:
+		- 1: "real security"
+		- 2: with "security through visibility"
+		- 3: with "security through obscurity" layers
+
+
+- for decentraliced systems:
+	- make sure it has "byzantine fault tolerance"

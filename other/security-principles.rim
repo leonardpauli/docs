@@ -1,0 +1,53 @@
+# Security principles
+
+// TODO: cleanup / structure
+// TODO: see https://cto-security-checklist.sqreen.io/ (open source!)
+// TODO: overlap with "security-manifest"?
+
+- for personal accounts
+	- use multi-factor-authentication // 2FA...MFA
+		- identifier: email, username, etc
+		- factors
+			- private information
+				- password: multiple through encrypted with one password
+					- "https://www.dashlane.com/
+					- "https://www.lastpass.com/"
+					- ...
+			- physical possession
+				- phone with code gen app / hardware device with code gen
+					- "https://github.com/google/google-authenticator" (open source!)
+					- 
+					- ...
+				- hardware device with signing ability
+			
+		- avoid tel/sms as factor (providers vulnerable, see "check account recovery procedured")
+		- make sure it's effective // eg. having code gen app + saved password on same phone makes it effectively 1FA
+		- avoid getting locked out // eg. if both computer and phone gets stolen
+			-> save recovery keys
+				- either encrypted in cloud
+				- or physically (in multiple locations (eg. fire))
+				- or distributed among multiple parties (eg. where at least 2/3 required, eg. see byzantine fault)
+	- check account recovery procedured
+		- if subject to social engineering (support access), see if it can be locked down
+			-> eg. ask support to add note in caps to not allow password recovery, etc
+
+
+- for information
+	- use signing and validation
+		- see "pgp-workflows"
+	- use backups // rule of three (inc. different physical locations)
+
+- prevent social engineering // though shouldn't be as much of an issue with security-manifest."real security"
+	- possibly sensitive information:
+		- credentials, personal information, names/titles of other people
+	- never enter/give possibly sensitive information on request
+		- eg. never after clicking a link (especially not from email) -> type the URL yourself
+			- SSL and correct looking url name is not enough, see "IDN_homograph_attack"
+	- never ask for possibly sensitive information through email, phone, etc
+		-> only in person or using: see "pgp-workflows"
+	- never trust anyone "by default"
+		- even though they know the names of other trusted parties -> always confirm
+
+
+// TODO: to look into
+- "https://support.apple.com/en-us/HT204085"

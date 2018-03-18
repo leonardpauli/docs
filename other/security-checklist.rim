@@ -1,0 +1,36 @@
+# Security checklist
+
+// TODO: cleanup / structure
+// TODO: see https://cto-security-checklist.sqreen.io/
+
+- a system is only as secure as it's weakest link
+	- (which often is a human)
+		-> make UI's less prone to social engineering
+		-> never ask for possibly sensitive information after email link click, etc
+			- state this in emails
+		-> don't have links that performs actions (always validate with UI interaction first)
+		-> make people aware of attck schemes etc, especially in UI's where possibly if attack is higher
+	-> keep dependencies up to date
+	-> watch vulnerability disclosured
+	-> use automated tools for checking best security practices
+		- eg. for DNS settings, etc
+	-> have a bug bounty program in place, details can be refined \
+		/ defined after first submission / discussed with submitter
+		// better then nothing, put resources when used
+	-> utilize principle of least privilege
+		- a process / user should only have access to what it needs to perform its "legitimate" actions
+	- expect system to break
+		-> have recovery processes in place, see "system-recovery"
+	-> require MFA and security pratices to be followed by machines/people with higher access
+		- eg. deploy access etc, see "security-principles"
+	-> if multiple developers, require verified code review from other before merge to master
+	-> require tests to pass before merge to master
+		- including automated security scans
+	-> document setup steps and keep them up to date
+	-> have alert system in place with different levels // not easily preventable from attacked machine
+		- eg. highest level: automated call with custom ringtone passing do-not-disturbe + sms + email
+			- if no response by primary contact within timelimit, notify next in line, etc
+		- eg. medium level: send push notification + email
+		- eg. lowest level: log in system
+	-> use SSL: see "ssl-workflow"
+	-> ...
