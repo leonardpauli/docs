@@ -1,7 +1,6 @@
 # Docs
 *Personal collection of development related notes, snippets, and workflows*
 
-
 ### Contribute
 
 Feel free to fork and send PR's :)
