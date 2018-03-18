@@ -1,6 +1,14 @@
 # Docs
 *Personal collection of development related notes, snippets, and workflows*
 
+_See contents.rim_
+
+
+### How to read
+
+Many files are using my `rim` syntax (WIP, similar to *yaml* as base), which will soon (if not, please poke me) be available. In the meantime, it's just text :)
+
+
 ### Contribute
 
 Feel free to fork and send PR's :)

@@ -1,0 +1,51 @@
+# PGP workflows
+// GPG: Gnu Privacy Guard "complete and free implementation of the OpenPGP"
+// PGP: Pretty Good Privacy "used for signing, encrypting, and decrypting" (emails, data (files/directories, etc))
+
+install gpg2 terminal utility:
+	- "https://www.gnupg.org/download/"
+		-> "https://sourceforge.net/p/gpgosx/docu/Download/"
+	- shasum -a 256 GnuPG....dmg // check hash validity
+	- hdiutil mount GnuPG....dmg // note disk (/dev/disk...) and mountpoint (/Volume/...)
+	- cd /Volume/...
+	- installer -pkg Install.pkg -showChoicesXML
+	- sudo installer -pkg Install.pkg -target / -verbose -dumplog
+	- hdiutil unmount /dev/disk...
+	- git config --global gpg.program gpg2 // register it with git
+
+generate pub/priv GPG key-pair:
+	- gpg2 --full-gen-key // and follow instructions
+	// RSA and RSA
+	// 4096
+	// (no expire necessary)
+	// (use passphrase, can be remembered in OSX keychain at first use)
+	// Name: your name, see SenderName/ReceiverName below (can contain space)
+	// Email: has to be what you've got in github (if to be used with github)
+	// Comment: eg. "Github Key"
+
+add email to existing key:
+	- gpg2 --edit-key
+	- adduid
+
+add to github:
+	- keyids=$(gpg2 --list-secret-keys --keyid-format LONG) // view secret key ring
+	- keyid=$(echo "$keyids" | grep -E "^sec.*" | grep -Eo "/\w+" | cut -c 2-) // extract keyid
+	- gpg2 --armor --export $keyid | pbcopy // export and copy PGP Public key
+	- "https://github.com/settings/gpg/new" // paste + save
+
+' to check:
+	- gen pub/priv key, share pub key (export/import)
+	- encrypt with pub, decrypt with priv
+	- sign with priv, check sign with pub
+	- manage (move secret, edit pub info, gen/share revoke cert, delete)
+	gpg2 --gen-key
+	.
+	gpg2 --export -a SenderName > SenderName.public.key
+	gpg2 --import ReceiverName.public.key
+	.
+	gpg2 -e -u SenderName -r ReceiverName inputfile // encrypt
+	gpg2 -d somefile.tar.gpg > outputfile // decrypt
+	.
+	gpg2 --export-secret-key -a SenderName > SenderName.private.key
+	gpg2 --delete-secret-key SenderName
+	gpg2 --delete-key SenderName
