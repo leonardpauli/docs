@@ -1,0 +1,84 @@
+# admin/licensing
+' LeonardPauli/docs
+	Created by Leonard Pauli, 19 mar 2018
+
+// TODO
+
+contributions
+	// see http://unlicense.org/
+	- make sure contributions are provided under the same licence
+	- possibly have contributors sign a waiver with gpg (see "terminal/pgp-workflows"), with same key as they sign their commits?
+
+
+SPDX // Software Package Data Exchange
+	// supported by Linux foundation
+	licence identifiers // "standardised", see https://spdx.org/licenses/
+		// used in package.json licence field
+
+- be aware of "licence compatibility", ie. that dependencies licenses sometimes has to be checked...
+	// TODO
+- use a file with all acknowledgements
+
+OSS licenses: // Open Source Software licenses
+	// see https://choosealicense.com/
+	// see https://choosealicense.com/licenses/
+	permissions
+		- commercial use
+		- distribution
+		- modification
+		- patent use
+		- private use
+	conditions
+		- disclose source
+		- license and copyright notice
+		- network use is distribution
+		- same license
+		- state changes
+	limitations
+		- liability
+		- warranty
+
+
+	// see https://www.gnu.org/licenses/license-list.html
+	levels:
+		// see http://www.aaronsw.com/weblog/000360
+		// from https://rollerweblogger.org/roller/entry/gimme_credit_gimme_fixes_gimme
+		// You can use, modify and redistribute my code in your product...
+		- 1: "Gimme credit": // ...but give me credit.
+			Apache License, BSD, MIT
+		- 2: "Gimme fixes": // ...but give me the source for any fixes you make to it.
+			Mozilla Public License, CDDL, LGPL
+		- 3: "Gimme it ALL!": // ...but give me your entire product's source code.
+			GPL
+
+	MIT: "MIT"
+	Fair License: "Fair"
+	The Unlicense: "Unlicense"
+	Apache License 2.0
+		- explicit no trademark use
+	Mozilla Public License 2.0
+		- explicit no trademark use
+	BSD // Berkeley Software Distribution, unix-like os
+		// see https://en.wikipedia.org/wiki/BSD_licenses
+		// ... a bunch of variations...
+	Creative Commons // CC, 4.0
+		flags:
+			- attribution // BY
+			- non commercial // NC
+			- no derivatives // ND
+			- share alike // SA
+		variants:
+			- "CC0-1.0"
+			- "CC-BY-4.0"
+			- "CC-BY-SA-4.0"
+			- "CC-BY-ND-4.0"
+			- "CC-BY-NC-4.0"
+			- "CC-BY-NC-SA-4.0"
+			- "CC-BY-NC-ND-4.0"
+	GNU
+		Free Documentation License: "GFDL-1.3-or-later" // or "GFDL-1.3-only"
+		GPL // General Public License
+			// makes it harder for "closed-source"
+			default: "GPL-3.0-or-later" // or "GPL-3.0-only"
+			library: "LGPL-3.0-or-later" // or "LGPL-3.0-only"
+			affero: "AGPL-3.0-or-later" // or "AGPL-3.0-only"

@@ -1,0 +1,97 @@
+# terminal
+' LeonardPauli/docs
+	Created by Leonard Pauli, 19 mar 2018
+
+// text based access to os
+
+// TODO
+
+repl: // read, evaluate, print, loop
+	prompt: where you write, hit enter to evaluate
+		eg. > echo "hello"<enter> // should show hello back
+	first word is the command; an executable program, see "create executable script"
+
+acquire information:
+	- man command // show manual page for command
+		q // to exit
+		/ // to search
+			n/N // for next/prev match
+		space // page down
+		man command > file // write man page to file
+	- command -h
+	- command --help
+	- command help
+	- which command // show command location / path
+
+navigation
+	- pwd // process working directory / current directory path
+	- ls // list files/folders
+		alt: dir
+		ls -la // show all files as list
+		ls subdir // list files in subdir
+	- cd // change directory
+		cd .. // go up one level
+		cd ... // go up two levels
+		cd . // current directory
+		cd ~ // go home
+		cd / // root
+		cd some/relative/path
+		cd - // go back (to previous location)
+		cd -- // go back two times
+	- tree // how to install?
+
+files
+	- mkdir folder // make directory
+	- touch file // create empty file
+	- rm file // remove file
+		rm -rf folder // remove recurcive (all contents) force (no question, otherwise shown if not empty) folder
+	- cat file // copy file contents into terminal
+	- echo "text" // write text into terminal
+
+text processing:
+	- grep
+		cat file | grep -E "search phrase"
+		grep -o // only show output
+	- sed
+		echo "hej world" | sed "s/hej/hello/g"
+
+syntax
+	standard
+		- stdout
+		- stdin
+		- stderr
+	null device:
+		/dev/null // discards any data it receives
+	redirect:
+		a > file // (redirect) write stdout to file
+		a >> file // (redirect) append stdout to file (why files should always end with empty new line)
+		> // stdout
+		>> // append stdout
+		1> // stdout
+		2> // stderr
+		&> // stdout and stderr (newer syntax)
+		a > file 2>> err // write output to file, and append error output to err file
+		a &> /dev/null // discard both stdout and stderr output
+		a 1> /dev/null 2>&1 // same as above; redirect stdout to null device (discard), and redirect stderr to stdout (ie. also to stdout)
+
+	operators:
+		- a & b // run both "async"?
+		- a && b // run second if first ok
+		- a || b // run second if first err?
+		- a | b // "pipe" stdout from a to stdin of b
+
+create executable script:
+	- vi mycommand
+		#!/bin/bash # aka "shebang", indicating path to program to send the rest of the file to for execution
+		echo "hello there"
+	- chmod u+x file // change mode; add User eXecutable permission to file
+	- ./mycommand // run script
+	- PATH=PATH:$(pwd) // temporarily add current folder to "PATH", allows you to write mycommand directly, see "edit bashrc" for persistant
+	- mycommand // run script as any other
+
+edit bashrc:
+	// TODO
+	vi ~/.bashrc
+	vi ~/.zshrc
+		export PATH=PATH:/some/path // if no export, it will only be scoped to file?
+	source ~/.zshrc

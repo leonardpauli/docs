@@ -54,6 +54,7 @@
 			edge cases:
 				- retry on 503 "Slow Down" errors
 			aws api compatibility:
+				// see https://www.digitalocean.com/community/questions/how-to-use-digitalocean-spaces-with-the-aws-s3-sdks
 				// https://developers.digitalocean.com/documentation/spaces/
 				// ie. use aws compatible library to interact (or plain http calls)
 

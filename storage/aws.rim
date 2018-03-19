@@ -8,6 +8,10 @@ aws.s3:
 	// "highly durable and available store"
 	// 	- static assets and user uploads
 
+	pricing:
+		// see https://calculator.s3.amazonaws.com/index.html
+		// see https://blog.cloudability.com/aws-s3-understanding-cloud-storage-costs-to-save/
+
 	scaling:
 		// https://docs.aws.amazon.com/AmazonS3/latest/dev/request-rate-perf-considerations.html
 		autoscales // better than digitalocean
@@ -22,7 +26,7 @@ aws.s3:
 
 
 	- login to "https://console.aws.amazon.com"
-	- select S3
+	- select S3 // https://s3.console.aws.amazon.com/s3/home?region=eu-central-1
 
 	bucket.create {name, region}:
 		- create bucket
@@ -50,12 +54,18 @@ aws.s3:
 			- s3.getSignedUrl('putObject', {Bucket, Key, ContentType}, (err, url)=> console.log(err, url))
 			- s3.getSignedUrl('getObject', {Bucket, Key}, (err, url)=> console.log(err, url))
 			- see "object-storage-api" example, copy .env.example to .env and fill in the values
+			// see https://stackoverflow.com/questions/28018855/upload-a-file-to-amazon-s3-with-nodejs
 		- setup client script:
 			- const file = input.files[0]
 				fetch(await api.getUploadUrl({contentType: file.type}), {
 					method: 'PUT', headers: {'Content-Type': file.type}, body: file})
 			- fetch(await api.getPresignedDownloadUrl())
 
+	access control:
+		see aws.iam.policy.create.s3BucketFolderAccessFull
+		// TODO:
+		// see https://labs.detectify.com/2017/07/13/a-deep-dive-into-aws-s3-access-controls-taking-full-control-over-your-assets/
+		// see https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/s3-example-access-permissions.html
 
 aws.iam
 	- login to "https://console.aws.amazon.com"

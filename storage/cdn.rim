@@ -41,5 +41,6 @@ providers:
 			// - aws.elasticLoadBalancing
 			// - aws.ec2
 			// - aws.lambda
+				// https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-at-the-edge.html
 
 	- cloudflare // https://www.cloudflare.com/
