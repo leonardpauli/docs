@@ -6,12 +6,19 @@
 
 LICENSE
 README.md
+app
+	- spa: "single page application"
 contents
-other
+security
 	- security-checklist
 	- security-manifest
 	- security-principles
 	- system-recovery
+storage
+	- aws: "amazon web services"
+	- cdn: "content delivery network"
+	- digitalocean
+	- storage
 terminal
 	- pgp-workflows: "cryptographic security utility"
-	- ssl-workflow
+	- ssl-workflows: "secure sockets layer"

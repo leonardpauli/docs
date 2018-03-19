@@ -1,0 +1,127 @@
+# storage/digitalocean
+' LeonardPauli/docs
+	Created by Leonard Pauli, 18 mar 2018
+
+- block storage // TODO; basically mountable volumes? one droplet / time, pay per reserved space
+	// see: https://www.digitalocean.com/community/tutorials/object-storage-vs-block-storage-services
+	scaling: manual // though scriptable
+	latency: lower
+	write: bytes or files // ie. ok with db's
+	auth: manual
+
+- spaces
+	scaling: automatic
+		rate limit: 200 put/s/space // contact support for increase -> or create more spaces
+		spaces count max: 100 // contact support to increase
+	latency: higher
+		use CDN for improved, see "storage/cdn"
+	write: whole objects // ie. usually not ok for db's, though good for resources / backups
+	auth: managed through api, global + per object
+	// TODO: look into
+	- "https://www.digitalocean.com/community/tutorials/an-introduction-to-digitalocean-spaces
+	// Looks much nicer than AWS s3
+	pricing:
+		per sum of all spaces // in team?
+
+		base:
+			price: 5USD/mo
+			storage: 250GB
+			outbound traffic: 1TB
+			inbound traffic: free
+		thereafter:
+			storage: 0.02USD/GB
+			outbound traffic: 0.01USD/GB
+			perAvgUserYear {uploadMB, downloadMB}: +:
+				- uploadMB/1000*storage * sum 1..12 // 78
+					// policy about data removal necessary
+					// 	(or agressive compression if not extra pay)
+					// gets expansive pretty fast after some years
+					// also: client caching + smart and client compression will help a lot
+				- downloadMB/1000*outbound\ traffic * 12
+
+			estUserYearCost: perAvgUserYear:
+				uploadMB: 2MB*2*10 * 30 // ~1GB (seems like a lot?) (how are videos handled...?!)
+				downloadMB: (0.1MB*30 + 0.5MB*10)*8 * 30 // ~2GB
+
+		trial: 60 days free // cancelling subscribtion pauses trial time
+	regions: NYC3, AMS3, SGP1
+	protocols:
+		- Https api
+			endpoint: "region.digitaloceanspaces.com"
+			url: or:
+				- "spacename.region.digitaloceanspaces.com"
+				- "region.digitaloceanspaces.com/spacename"
+			edge cases:
+				- retry on 503 "Slow Down" errors
+			aws api compatibility:
+				// https://developers.digitalocean.com/documentation/spaces/
+				// ie. use aws compatible library to interact (or plain http calls)
+
+				migrate from aws s3: "https://www.digitalocean.com/community/tutorials/\
+					how-to-migrate-from-amazon-s3-to-digitalocean-spaces-with-rclone
+
+				object
+					crud: true
+						preSignedURLs: true // (v2 and v4 signature types)
+						create.multipart: true
+					acls: true
+					// policies: false
+					// tagging: false
+				// requestPayment: false
+				bucket
+					crud: true
+						list
+					acls: true
+					// policies: false
+					// versioning: true (API Only)
+					replication: false // TODO: do I need to manage backups myself? AWS takes somewhat care of this?
+					// notifications: false
+					// lifecycle: true // (Object expiration and removing incomplete multipart uploads)
+					// inventory: false
+					accessLogging: false
+					websites: private beta
+		- control panel // very nice UI
+			- index
+				- list of spaces
+				- manage keys // see https://cloud.digitalocean.com/settings/api
+			- 3 click create // namespace, region, default access (priv/pub)
+			- space
+				files
+					- file upload
+					- create folders
+					- manage
+						- one object (file / folder)
+						- many (selected) objects in current folder
+						actions
+							- copy url
+							- manage permissions
+								- script needed for recursive folder permission change
+							- manage metadata
+							- rename
+							- move
+							- quick share: or:
+								- is priv: generate signed private Url with expire date
+								- else: pub url
+							- download
+							- delete // permanent
+					- filter
+						- realtime
+						- possible to paste (object.url - space.url)
+				settings
+					- change global permissions (pub/priv?)
+					- Cors settings // eg. only allow access from predefined domains (if browser), or all
+					- destroy space // if < 100_000 items
+	metadata:
+		"Content-Type": usually automatically detected, but overridable
+			// "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
+		"Cache-Control": max cache age (eg. for browsers and CDNs) in seconds
+			// https://www.digitalocean.com/community/tutorials/web-caching-basics-terminology-http-headers-and-caching-strategies
+		"Content-Encoding" // see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
+		"Content-Disposition": display inline or auto-download in browser
+			// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
+		custom key-value pairs, eg. for CDNs or reverse proxies
+
+	setup:
+		prerequisite:
+			- digitalocean account
+		// TODO

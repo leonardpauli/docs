@@ -1,0 +1,53 @@
+# app/spa
+' LeonardPauli/docs
+	Created by Leonard Pauli, 18 mar 2018
+
+// single page application
+
+// TODO
+- use static client // ie. don't generate it dynamically by backend code
+	// to allow client code to be only static resources served via CDN
+- use html5 mode // together with nginx + CDN
+- use build process // necessary? yaaah, browser support, cache bust and all...
+	- eg. webpack + babel
+	-> ./dist
+- use tests
+- use linting
+- use offline support // through service workers?
+- use ssl, see terminal."ssl-workflow"
+
+// spa boilerplate
+- vue-cli // TODO: setup + custom config
+
+
+git/deploy workflow:
+	// TODO
+	on commit.pre: lint, test
+	on merge to master: do CI
+		on success: do deploy
+	on CI.trigger:
+		- run tests
+	on deploy:
+		- verify last commit signature, see security."pgp-workflow"
+		- build dist (static assets)
+			-> upload to object storage, see "storage"
+				- that uses caching layer / CDN, see "storage/cdn"
+				- force cache bust // TODO: how? does webpack solve that? but not for index.html?
+		- build docker images
+			images like
+				- like gundb sync to s3 service
+				- object storage / file upload preSignedURL generation service (serverless?)
+				- push notification service
+				- proxy for non-cors allowed requests service (serverless?)
+				- various on-demand computation not supported in browser (serverless?)
+				- webrtc p2p broker service
+				- lets encrypt ssl renewal service
+					// TODO: auto each 2.5mo + retry + email if fail
+				- nginx to route
+					- to services (for subdomains)
+					- to index.html in CDN (for /*, also allows html5 history mode)
+			-> upload to image repository
+			-> do server.deploy
+	on server.deploy: // http hook?
+		- pull new images (delta auto detected)
+		- docker-compose up

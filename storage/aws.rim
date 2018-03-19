@@ -1,0 +1,108 @@
+# storage/aws
+' LeonardPauli/docs
+	Created by Leonard Pauli, 18 mar 2018
+
+// amazon web services
+
+aws.s3:
+	// "highly durable and available store"
+	// 	- static assets and user uploads
+
+	scaling:
+		// https://docs.aws.amazon.com/AmazonS3/latest/dev/request-rate-perf-considerations.html
+		autoscales // better than digitalocean
+			- handles ~100 put/list/delete or ~300 get req/s well by default
+			- auto-re-partitions for performance if steadily rate growth
+			- else: contact support for manual preparation
+				if expecting > 300 put/list/delete or > 800 get req/s
+			- other rates applies if using server-side encryption // (SSE-KMS)
+			- if get req intensive, see "cdn"
+			- avoid sequential key names // to allow better partitioning utilization
+				- eg. prefix key name with 4 char hex hash // though this has sorting drawbacks, see link above
+
+
+	- login to "https://console.aws.amazon.com"
+	- select S3
+
+	bucket.create {name, region}:
+		- create bucket
+			name, region
+			- next
+			// - enable server access logging (optional)
+			- next
+			- no permissions
+			- next -> create
+
+
+	// examples
+	setup "backend preSignedURL service with client":
+		// see https://ademcan.net/blog/2017/11/24/uploaddownload-images-tofrom-aws-s3-in-react-native-a-step-by-step-guide/
+		prerequisite: - aws console account
+		- user: iam.apiUser.create {username: "myapp_s3_user"} (:{key.id, key.secret})
+		- bucket: bucket.create {name: "my-bucket", region: "eu-central-1"} or use existing
+		- folder: bucket.folder.create "my-app-uploads"
+		- policy: iam.policy.create.s3BucketFolderAccessFull
+			bucket.name; folder.path; name: "myapp_s3_user_access"
+		- iam.policy.attach {user, policy}
+		- setup backend script:
+			- npm i aws-sdk
+			- s3 = new require('aws-sdk').S3({accessKeyId, secretAccessKey, region})
+			- s3.getSignedUrl('putObject', {Bucket, Key, ContentType}, (err, url)=> console.log(err, url))
+			- s3.getSignedUrl('getObject', {Bucket, Key}, (err, url)=> console.log(err, url))
+			- see "object-storage-api" example, copy .env.example to .env and fill in the values
+		- setup client script:
+			- const file = input.files[0]
+				fetch(await api.getUploadUrl({contentType: file.type}), {
+					method: 'PUT', headers: {'Content-Type': file.type}, body: file})
+			- fetch(await api.getPresignedDownloadUrl())
+
+
+aws.iam
+	- login to "https://console.aws.amazon.com"
+	- select IAM
+
+	apiUser.create {username}:
+		- create IAM user
+			username
+			programmatic access: true
+			- next -> create user
+			- copy: key.id, key.secret
+
+	policy
+		- select Policies
+
+		create.s3BucketFolderAccessFull {bucket.name, folder.path, name}
+			- create policy -> JSON tab -> paste:
+				{
+					"Version": "2012-10-17",
+					"Statement": [{
+						"Effect": "Allow",
+						"Action": ["s3:ListBucket"],
+						"Resource": ["arn:aws:s3:::<bucket.name>/<folder.path>"]
+					}, {
+						"Effect": "Allow",
+						"Action": [
+							"s3:PutObject",
+							"s3:GetObject",
+							"s3:DeleteObject",
+							"s3:GetObjectAcl",
+							"s3:GetObjectVersion",
+							"s3:PutObjectAcl",
+							"s3:PutObjectVersionAcl"
+						],
+						"Resource": ["arn:aws:s3:::<bucket.name>/<folder.path>/*"]
+					}]
+				}
+			- review policy
+				name
+			- done
+
+		attach {user, policy}
+			- select policy
+			- select "Attached entities" tab
+			- attach
+			- select user
+
+
+
+

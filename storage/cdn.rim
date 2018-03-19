@@ -1,0 +1,45 @@
+# storage/cdn
+' LeonardPauli/docs
+	Created by Leonard Pauli, 19 mar 2018
+
+// TODO
+// Content Delivery Network
+
+CDN:
+	- caching
+		- improved latency // caches closer to client
+		- reliability
+		// TODO: cache busting?
+	- available
+		- also, watch out for CDN that eg. blocks wrong IPs
+			- example: one whole country proxied under one IP got blocked
+			- example: people in another country usually getting blocked because IP blocks
+			- etc
+	- support for route / CNAME
+		// https://docs.aws.amazon.com/AmazonS3/latest/dev/website-hosting-custom-domain-walkthrough.html
+	- support for SSL
+	- support for serving static spa // TODO: html5 mode?
+		// https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html
+	- support for video streaming // optimised addon?
+	- DDoS mitigation // addon?
+	- extra cost
+	- ability to point resources origin
+		// eg. to object storage
+		- integration with origin
+			digitalocean // https://www.digitalocean.com/community/questions/does-do-spaces-provide-a-cdn-in-front-of-the-storage-for-fast-global-access
+			aws
+	
+providers:
+	- fastly // https://docs.fastly.com/guides/integrations/digitalocean-spaces
+	- keycdn // https://www.keycdn.com/support/digitalocean-spaces-cdn/
+
+	- cloudfront // https://aws.amazon.com/cloudfront/
+		// see https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html
+		aws integration
+			- free aws inbound traffic, works well with s3 object storage
+			- aws.shield for DDoS mitigation
+			// - aws.elasticLoadBalancing
+			// - aws.ec2
+			// - aws.lambda
+
+	- cloudflare // https://www.cloudflare.com/

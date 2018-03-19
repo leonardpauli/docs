@@ -1,0 +1,21 @@
+# storage
+' LeonardPauli/docs
+	Created by Leonard Pauli, 18 mar 2018
+
+also see "cdn"
+
+cloud providers:
+
+	block storage
+		- digitalocean."block storage"
+
+	object storage
+		- digitalocean.spaces
+		- aws.s3
+
+
+self hosted:
+
+	object storage
+		- mino
+		- ceph
