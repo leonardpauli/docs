@@ -19,6 +19,7 @@ storage
 	- cdn: "content delivery network"
 	- digitalocean
 	- storage
+	- object-storage-api Service
 terminal
 	- pgp-workflows: "cryptographic security utility"
 	- ssl-workflows: "secure sockets layer"
