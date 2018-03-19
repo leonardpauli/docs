@@ -1,0 +1,31 @@
+# backend/api-base
+' LeonardPauli/docs
+	Created by Leonard Pauli, 19 mar 2018
+
+// TODO
+
+see storage/object-storage-api/src/utils/api-base.js
+
+goals
+	- async
+	- multiple actions per request
+	- support binary
+	- support streaming
+	- keep logic portable
+	- "simple"
+	- easy testable
+	- modular
+	- nestable modules // graph like
+	- auth structure
+
+implementation
+	- handleActions
+	- handleAction
+	- actions is Action // recursive module structure
+		actions is many Action
+		handle input<ActionInput>
+		ActionInput
+			data is Any
+			ctx is Context
+	Context // allow actions to be chained on server side? see api-base.js
+			

@@ -13,7 +13,7 @@
     "start": "node index.js"
   },
   "author": "Leonard Pauli",
-  "license": "ISC",
+  "license": "AGPL-3.0-or-later",
   "dependencies": {
     "aws-sdk": "^2.211.0",
     "dotenv": "^5.0.1",

@@ -1,0 +1,28 @@
+# backend/server-base
+' LeonardPauli/docs
+	Created by Leonard Pauli, 19 mar 2018
+
+// TODO
+
+see storage/object-storage-api/src/utils/server-base.js
+
+- communication protocol
+	- Http
+		wrapper
+			- Koa
+
+- data-in-transport format
+	- json
+		encode / decode:
+			koa-bodyparser
+			JSON.parse / JSON.stringify
+			gzip // TODO
+
+- server
+	monitoring
+		- response time
+	logging
+		- requests
+	error handling
+	caching
+		- see http etag

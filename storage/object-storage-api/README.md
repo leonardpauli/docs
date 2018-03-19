@@ -17,4 +17,4 @@ Feel free to fork and send PR's :)
 
 Copyright © Leonard Pauli, 2018
 
-Licence: GNU Affero General Public License v3.0
+Licence: GNU Affero General Public License v3.0 or later

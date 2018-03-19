@@ -1,0 +1,94 @@
+# setup
+' object-storage-api
+	Created by Leonard Pauli, 19 mar 2018
+
+import (:{lp-docs})
+lp-docs (:{storage.aws.s3.setup, admin.licensing})
+lp-docs (:{backend: {api-base, server-base}})
+
+setup
+	- setup-base
+	- actions
+		add in custom actions, see "storage.aws.s3.setup"
+		// TODO
+
+setup-base
+	project
+		- mkdir x && cd x && npm init
+		- vi README.md
+		- mkdir src
+	licence
+		- see "admin.licensing"
+	
+	config
+		- npm i dotenv
+		- vi src/config.js
+			require('dotenv').config() // loads .env to process.env
+			const { PORT = '3000' } = process.env // extract values from process.env + default values (as text)
+			const config = { app: { port: parseInt(PORT, 10) } } // parse values + into config structure
+			module.exports = config // export
+		- setup .env
+			- vi .env.example
+				# see src/config, copy as .env and provide own values
+				PORT=3000
+			- cp .env.example .env && vi .env // enter own values
+			- echo .env >> .gitignore
+	
+	actions
+		- vi actions.js
+			const actions = { doubleNr: async ctx=> ctx.data*2 }
+			module.exports = actions
+
+	server/api
+		utils
+			- mkdir utils
+			- see api-base and server-base
+		- vi server.js
+			const serverBase = require('./utils/server-base')
+			const apiBase = require('./utils/api-base')
+			const config = require('./config')
+			const actions = require('./actions')
+			const api = apiBase({actions})
+			const server = serverBase({port: config.app.port, logging: config.app.logging})
+			server.app.use(async (ctx, next)=> {
+				if (ctx.path.match(/^\/api\/?$/i)) return next()
+				ctx.response.set('Access-Control-Allow-Origin', '*')
+				if (!ctx.method==='POST') return next()
+				ctx.assert(ctx.is('application/json'), 400, 'expected application/json')
+				const sendJson = json=> {ctx.type = 'application/json'; ctx.body = JSON.stringify(json)}
+				const json = ctx.request.body
+
+				sendJson(await api.handleRequest(json))
+			})
+			module.exports = server
+
+	module
+		- vi index.js // see package.json, main
+			require('./src/server').listen()
+
+	tests
+		- npm i -D jest supertest // jest is testing tool, supertest if api testing helpers
+		- vi "package.json"
+			"scripts": { "test": "jest" },
+			"jest": { "testEnvironment": "node" }
+		- vi "src/x.test.js"
+			- simple jest test: "describe('testing', ()=> {it('works', ()=> expect(1+1).toBe(2))})"
+			- supertest example test:
+				const supertest = require('supertest')				
+				const server = require('./server') // server should be http.createServer(), ie. what (express,koa)().listen() returns
+				describe('server', ()=> {
+					let agent
+					beforeEach(()=> {server.listen(); agent = supertest(server)})
+					afterEach(done=> {server.close(done)})
+					it('post test', async ()=> expect(await agent
+							.post('/api')
+							.set('Content-Type', 'application/json')
+							.send(JSON.stringify({...}))
+						).toMatchObject({
+							status: 200, type: 'application/json', body: {...},
+						})
+					)
+				})
+			- turn off loggin
+				const config = require('./config')
+				config.app.logging = false // mod before importing server that uses config

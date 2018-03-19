@@ -1,4 +1,4 @@
-// npm i -D jest supertest // jest is testing tool, supertest if for api testing helpers
+// npm i -D jest supertest // jest is testing tool, supertest if api testing helpers
 // vi package.json
 // 	"scripts": {
 // 		"test": "jest"
