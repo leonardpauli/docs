@@ -30,11 +30,21 @@ describe('server', ()=> {
 		server.server.close(done)
 	})
 
-	it('doubleNr', async ()=> {
-		const res = await sendReq({actions: [{ type: 'doubleNr', data: 5 }]})
-		expect(res.status).toEqual(200)
-		expect(res.type).toEqual('application/json')
-		expect(res.body).toMatchObject([{res: 10}])
-	})
+	it('doubleNr', async ()=> expect(await sendReq({actions: [
+		{ type: 'doubleNr', data: 5 },
+	]})).toMatchObject({
+		status: 200,
+		type: 'application/json',
+		body: [{res: 10}],
+	}))
+
+	let res
+	it('many getPresignedUrl', async ()=> (expect(res = await sendReq({actions: [
+		{ type: 'getPresignedUrl', data: {kind: 'avatar'} },
+		{ type: 'getPresignedUrl' },
+	]})).toMatchObject({
+		status: 200,
+		type: 'application/json',
+	}), expect(res.body.length).toBe(2), expect(res.body[0].res).toMatch(/avatar/)))
 	
 })

@@ -48,11 +48,27 @@ aws.s3:
 		- policy: iam.policy.create.s3BucketFolderAccessFull
 			bucket.name; folder.path; name: "myapp_s3_user_access"
 		- iam.policy.attach {user, policy}
+		- configure aws.s3.bucket.permissions.cors to allow get, put, and options (header)
+			<CORSConfiguration>
+				<CORSRule>
+					<AllowedOrigin>*</AllowedOrigin>
+					<AllowedMethod>GET</AllowedMethod>
+					<MaxAgeSeconds>3000</MaxAgeSeconds>
+					<AllowedHeader>Authorization</AllowedHeader>
+				</CORSRule>
+				<CORSRule>
+					<AllowedOrigin>*</AllowedOrigin>
+					<AllowedMethod>PUT</AllowedMethod>
+					<MaxAgeSeconds>3000</MaxAgeSeconds>
+					<AllowedHeader>*</AllowedHeader>
+				</CORSRule>
+			</CORSConfiguration>
 		- setup backend script:
 			- npm i aws-sdk
 			- s3 = new require('aws-sdk').S3({accessKeyId, secretAccessKey, region})
 			- s3.getSignedUrl('putObject', {Bucket, Key, ContentType}, (err, url)=> console.log(err, url))
 			- s3.getSignedUrl('getObject', {Bucket, Key}, (err, url)=> console.log(err, url))
+				// auto-creates intermediate "folders"
 			- see "object-storage-api" example, copy .env.example to .env and fill in the values
 			// see https://stackoverflow.com/questions/28018855/upload-a-file-to-amazon-s3-with-nodejs
 		- setup client script:
@@ -82,13 +98,18 @@ aws.iam
 		- select Policies
 
 		create.s3BucketFolderAccessFull {bucket.name, folder.path, name}
+			// TODO: possible to limit listing ability to one folder?
+			// 	- or better to just create multiple buckets?
 			- create policy -> JSON tab -> paste:
 				{
 					"Version": "2012-10-17",
 					"Statement": [{
 						"Effect": "Allow",
 						"Action": ["s3:ListBucket"],
-						"Resource": ["arn:aws:s3:::<bucket.name>/<folder.path>"]
+						"Resource": [
+							"arn:aws:s3:::<bucket.name>",
+							"arn:aws:s3:::<bucket.name>/<folder.path>"
+						]
 					}, {
 						"Effect": "Allow",
 						"Action": [

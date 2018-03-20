@@ -15,17 +15,17 @@ const s3 = new AWS.S3({
 
 
 const rndStr = ()=> Math.random().toString(16).substr(2)
-const kindValid = k=> validKinds.indexOf(k)>=0
+const kindValid = k=> config.s3.validKinds.indexOf(k)>=0
 const escapedSuffix = s=> s.toLowerCase().replace(/[^a-z0-9\._-]+/ig, '')
 // TODO: valid content types?
 
 
 const getPresignedUrl = ({
 	contentType = 'image/jpeg', kind = 'upload', suffix = '',
-})=> new Promise((res, rej)=> !kindValid(kind)? rej('invalid kind')
+} = {})=> new Promise((res, rej)=> !kindValid(kind)? rej('invalid kind')
 	: s3.getSignedUrl('putObject', {
 		Bucket: config.s3.bucket,
-		Key: `${s3.folder}/${kind}/${rndStr()}${escapedSuffix(suffix)}`,
+		Key: `${config.s3.folder}/${kind?kind+'/':''}${rndStr()}${escapedSuffix(suffix)}`,
 		ContentType: contentType,
 	}, (err, url)=> err? rej(err): res(url)))
 

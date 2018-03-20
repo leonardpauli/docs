@@ -14,12 +14,12 @@ const {
 	S3_REGION, // eg. eu-central-1, nyc3, ...
 	S3_BUCKET,
 	S3_FOLDER,
-	S3_VALIDKINDS = 'avatar,bg,upload'.split(','),
+	S3_VALIDKINDS = ',avatar,bg,upload'.split(','),
 
 } = process.env
 
 const option = (values, value)=> {
-	if (!values.indexOf(value))
+	if (!values.includes(value))
 		throw new Error(`expected .env value in [${values.join(', ')}], got ${value}`)
 	return value
 }
