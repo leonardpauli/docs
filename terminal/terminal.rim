@@ -22,6 +22,7 @@ repl: // read, evaluate, print, loop
 	first word is the command; an executable program, see "create executable script"
 
 acquire information:
+	// see https://learnxinyminutes.com/docs/bash/
 	- man command // show manual page for command
 		q // to exit
 		/ // to search
@@ -92,11 +93,17 @@ navigation
 
 files
 	- mkdir folder // make directory
+	- mkdir -p a/path/folder // create intermediate directories as well
 	- touch file // create empty file
 	- rm file // remove file
 		rm -rf folder // remove recurcive (all contents) force (no question, otherwise shown if not empty) folder
 	- cat file // copy file contents into terminal
 	- echo "text" // write text into terminal
+
+	temporary:
+		MYTMPDIR=$(mktemp -d) // remove -d for file (path)
+		cleanup: trap "rm -rf $MYTMPDIR" EXIT
+			// makes sure it's cleaned up upon (unexpected + normal) exit
 
 text processing:
 	- grep
@@ -115,6 +122,17 @@ text processing:
 			// https://stackoverflow.com/questions/2610115/why-is-sed-not-recognizing-t-as-a-tab
 	- pbcopy // copy to clipboard
 		echo "..." | pbcopy
+
+	string manipulation:
+		// see https://www.tldp.org/LDP/abs/html/string-manipulation.html
+
+		split + map over string:
+			# usage: t="";fn(){t+="$2: $1\n";};itera fn "," "some,values,here";echo $t
+			itera () { local fn=${1:-"echo"} del=${2:-","} xs=${3:-"a,b,c"} i=0;
+				while [ "$xs" ]; do x=${xs%%$del*}
+					$fn "$x" $((i++))
+				[ "$xs" = "$x" ] && xs='' || xs="${xs#*$del}"; done
+			}
 
 syntax
 	standard
@@ -206,6 +224,9 @@ loops
 function
 	see variables.local
 	see lsoutline for example
+	see files.temporary.cleanup
 	definition styles:
 		- "function my_function { echo hello; return 'hi' }"
 		- "my_function () { echo hello; return 'hi' }"
+	arguments:
+		// see https://stackoverflow.com/a/30033822/1054573

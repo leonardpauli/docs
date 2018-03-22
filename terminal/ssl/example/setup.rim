@@ -1,0 +1,28 @@
+# terminal/ssl-workflow/examples/setup
+' LeonardPauli/docs
+	Created by Leonard Pauli, 22 mar 2018
+
+self signed certificate:
+	- mkdir output
+	- generate selfsigned: "
+		../openssl_gen "selfsigned" ";\
+		output/selfsigned;\
+		localhost,127.0.0.1,example.com;\
+		Org Name;\
+		Name shown to user;\
+		email@example.com;\
+		SE;\
+		Uppland;\
+		Stockholm;\
+		Tech Team"
+	- ls:
+		- selfsigned.cert.pem // public, eg. what you send to the browser with nginx
+		- selfsigned.conf // base configuration used to setup the cert, can be safely removed
+		- selfsigned.key.pem // keep secret! the one committed in this repo is not used for anything else than example
+			// also possible to password protect by removing -nodes from ../openssl_gen script
+			// eg. kept on the server and used to prove the cert is coming from the right one / valid...
+	- view: openssl x509 -in output/selfsigned.cert.pem -text -noout
+
+' TODO: signing request:
+	create: "./openssl_gen signingrequest [...]"
+	print: "openssl req -in example-com.req.pem -text -noout"

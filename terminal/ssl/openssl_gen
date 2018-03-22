@@ -1,0 +1,148 @@
+#!/bin/bash
+# see LeonardPauli/docs
+# otherwise: try running with no args for help page + see code
+
+# helpers
+itera () { local fn=${1:-"echo"} del=${2:-","} xs=${3:-"a,b,c"} i=0;
+	while [ "$xs" ]; do x=${xs%%$del*}
+		$fn "$x" $((i++))
+	[ "$xs" = "$x" ] && xs='' || xs="${xs#*$del}"; done
+}
+
+# usage: openssl_gen_config_file "a.com,b.com" > a.conf
+openssl_gen_config_file () {
+	domains=${1:-"localhost,127.0.0.1"}
+
+	altnames="";fn () {
+		nl=$'\n';altnames+="DNS.$2 = $1${nl}";
+	};
+	itera fn "," "$domains"
+	default_keyfile="server-key.pem"
+
+	# - "keyEncipherment" if req.ext.allowRSAKeyTransport
+	req_ext_keyUsage="digitalSignature, keyEncipherment"
+	req_ext_snippet=$(cat <<- EOF
+		subjectKeyIdentifier = hash
+		basicConstraints = CA:FALSE
+		keyUsage = ${req_ext_keyUsage} # \(req.ext.keyUsage | join ", ")
+		subjectAltName = @alternate_names
+		nsComment = "OpenSSL Generated Certificate" # CHANGE (optional)
+		# extendedKeyUsage = serverAuth, clientAuth
+		EOF)
+
+	cat <<- EOF
+	[ req ]
+	default_bits = 2048
+	default_keyfile = $default_keyfile # \(req.keyfile.default)
+	distinguished_name = subject
+	req_extensions = req_ext
+	x509_extensions = x509_ext
+	string_mask = utf8only
+
+	# seems like OpenSSL doesn't care about the contents of this section,
+	# but the certificate reader (browser) does?
+	# (why it becomes a "form", with:
+	# 	- key = description
+	# 	- key_default = default value
+	# 	- -subj="/key=actual value/key2=..."
+	[ subject ]
+	countryName = Country Name (2 letter code)
+	stateOrProvinceName = State or Province Name (full name)
+	localityName = Locality Name (eg, city)
+	organizationName = Organization Name (eg, company)
+	commonName = Common Name (e.g. server FQDN or YOUR name)
+	emailAddress = Email Address
+
+	countryName_default = US # \(subject.country)
+	stateOrProvinceName_default = NY # \(subject.stateOrProvince)
+	localityName_default = New York # \(subject.locality)
+	organizationName_default = Example, LLC # \(subject.organization)
+	commonName_default = Example Company # \(subject.commonName)
+	emailAddress_default = test@example.com # \(subject.emailAddress)
+
+	# used for self-signed certificate // openssl req -x509 ...
+	[ x509_ext ]
+	authorityKeyIdentifier = keyid,issuer
+	$req_ext_snippet # \(req.ext.snippet)
+
+	# used for certificate signing request // openssl req ...
+	[ req_ext ]
+	$req_ext_snippet # \(req.ext.snippet)
+	
+	[ alternate_names ]
+	$altnames # \(subject.alternate |> "DNS.\(index+1) = \(it)" | join "\n")
+
+	EOF
+}
+
+
+# main
+openssl_gen () {
+
+	# arguments
+	kind=$1 # selfsigned or signingrequest
+	options=$2
+	options_default=";filename;localhost,127.0.0.1,example.com;Org Name;Name shown to user;email@example.com;SE;Uppland;Stockholm;Tech Team"
+	# options_default=";out/dev;localhost,127.0.0.1;Leonard Pauli F:A;Leonard Pauli Dev;admin@localhost;SE;Uppland;Stockholm;Tech Team"
+
+	if [ ! "$kind" ] || [ ! "$options" ]
+	then
+		cat <<-EOF
+
+			openssl_gen
+
+			 	- oneliner to generate openssl self-signed certificate or certificate signing request
+			 	( see lp-docs/terminal/ssl-workflow )
+
+
+			Usage:
+
+			 	openssl_gen "signingrequest" ... # or
+				
+			 	openssl_gen "selfsigned" "$options_default"
+
+			EOF
+		exit
+	fi
+
+
+	# loadOptions
+	loadOptions () {
+		read nothing
+
+		read name
+		read domains
+
+		read organization
+		read commonName
+		
+		read emailAddress
+		
+		read country
+		read stateOrProvince
+		read locality
+		read organizationUnit
+
+	};nl=$'\n';loadOptions <<-EOF
+	$(echo "$options" | sed -e "s/;/\\${nl}/g")
+	EOF
+
+	openssl_gen_config_file "$domains" > $name.conf
+
+	if [ $kind = "selfsigned" ]
+		then middle="-out $name.cert.pem -x509"
+		else middle="-out $name.req.pem"
+	fi
+
+	# -nodes: skip password protect key file
+	openssl req \
+		-config $name.conf -new -sha256 \
+		-newkey rsa:2048 \
+		-nodes \
+		-days 365 \
+		-keyout $name.key.pem \
+		$middle \
+		-subj "/C=$country/ST=$stateOrProvince/L=$locality/O=$organization/OU=$organizationUnit/CN=$commonName/emailAddress=$emailAddress"
+}
+
+openssl_gen "$1" "$2"

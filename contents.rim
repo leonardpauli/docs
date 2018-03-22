@@ -36,6 +36,8 @@ storage
 terminal
 	- os: "operating systems"
 	- pgp-workflows: "cryptographic security utility"
-	- ssl-workflow: "secure sockets layer"
+	- ssl: "secure sockets layer"
+		workflows
+		...
 	- terminal: "text based access to os"
 	- vim
