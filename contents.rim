@@ -2,12 +2,21 @@
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 18 mar 2018
 
-// > tree -if
+// see terminal.navigation.lsoutline
+// TAB=$'\t';lsoutline | sed -E "s/\.rim|^${TAB}//g" | sed -E "s/^(${TAB})([\A-z])/\1- \2/" | pbcopy
+	
 
 LICENSE
 README.md
+admin
+	- README-template.md
+	- licensing
+	- readme
 app
 	- spa: "single page application"
+backend
+	- api-base
+	- server-base
 contents
 security
 	- security-checklist
@@ -15,11 +24,15 @@ security
 	- security-principles
 	- system-recovery
 storage
-	- aws: "amazon web services"
+	- aws: "amazon web services" // cloud service provider
 	- cdn: "content delivery network"
-	- digitalocean
+	- digitalocean // cloud service provider
+	- object-storage-api: Service
+		README.md
+		setup
 	- storage
-	- object-storage-api Service
 terminal
+	- os: "operating systems"
 	- pgp-workflows: "cryptographic security utility"
-	- ssl-workflows: "secure sockets layer"
+	- ssl-workflow: "secure sockets layer"
+	- terminal: "text based access to os"
