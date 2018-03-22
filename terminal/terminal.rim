@@ -5,6 +5,16 @@
 // text based access to os
 
 // TODO
+// https://www.tldp.org/LDP/abs/html/fto.html
+
+customize:
+	- install ohmyzsh // framework for managing zsh configuration
+		// see https://github.com/robbyrussell/oh-my-zsh
+		sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+		// probably a good idea to check its contents first? or trust the community :)
+		// see ~/.oh-my-zsh/plugins
+	- see edit bashrc
+
 
 repl: // read, evaluate, print, loop
 	prompt: where you write, hit enter to evaluate
@@ -22,6 +32,7 @@ acquire information:
 	- command --help
 	- command help
 	- which command // show command location / path
+	- alias // if using ohmyzsh
 
 navigation
 	- pwd // process working directory / current directory path
@@ -29,6 +40,26 @@ navigation
 		alt: dir
 		ls -la // show all files as list
 		ls subdir // list files in subdir
+	loop through files
+		// don't use ls in scripts, see http://mywiki.wooledge.org/ParsingLs
+		for f in *; do [[ -e $f ]] || continue; echo "$f"; done
+		flags:
+			// https://www.tldp.org/LDP/abs/html/fto.html
+			- -a: exists // -e is deprecated?
+			- -f: regular file
+			- -d: directory
+			- -s: zero size
+			
+			- -b: block device // eg. file system, /dev/sda2
+			- -c: character device // eg. tty, /dev/ttyS1
+			- -t: file descriptor accociated with terminal device
+				[ -t 0 ] // check if stdin is terminal
+				[ -t 1 ] // check if stdout is terminal
+			// TODO: p: pipe; h/L: symbolic link; S: socket; ...
+
+			- -N: was modified since last read
+			- [[ f1 -nt f2 ]]: f1 newer than f2 // ot: older than
+
 	- cd // change directory
 		cd .. // go up one level
 		cd ... // go up two levels
@@ -37,8 +68,27 @@ navigation
 		cd / // root
 		cd some/relative/path
 		cd - // go back (to previous location)
-		cd -- // go back two times
+		cd -2 // go back two times
+		d // show cd history, ohmyzsh specific
+		<Number> // jump to to cd history entry, ohmyzsh specific
+	- find
+		// https://unix.stackexchange.com/questions/314804/how-to-make-bash-glob-a-string-variable
+		array variables?
 	- tree // how to install?
+	- lsoutline: // see "edit bashrc" for how to "install"
+		// TODO: add exclude + depth flagged arguments
+		lsoutline () {
+			local p=${1:-.}
+			local indent=${2-""}
+			([[ $p = "files" ]] || [[ $p = "node_modules" ]]) && return;
+			[[ -f $p ]] && echo "$indent$p";
+			if [[ -d $p ]] then
+				local savedpwd=$(pwd); cd $p
+				echo "$indent$p"
+				for f in *; do lsoutline $f "$indent\t"; done
+				cd $savedpwd
+			fi
+		}
 
 files
 	- mkdir folder // make directory
@@ -54,6 +104,17 @@ text processing:
 		grep -o // only show output
 	- sed
 		echo "hej world" | sed "s/hej/hello/g"
+		echo "ca.b" | sed -E "s/a\.b|^c/x/g"
+			"-E": extended regex
+				- "|":  or
+				- "^": start of string
+			"g": global // match multiple time in same line
+		TAB=$'\t'; echo "..." | sed -E "s/${TAB}//g" // remove tabs
+			// "\t" doesn't always work is sed
+			// alt. (ctrl-v, tab), to insert tab char directly
+			// https://stackoverflow.com/questions/2610115/why-is-sed-not-recognizing-t-as-a-tab
+	- pbcopy // copy to clipboard
+		echo "..." | pbcopy
 
 syntax
 	standard
@@ -93,5 +154,58 @@ edit bashrc:
 	// TODO
 	vi ~/.bashrc
 	vi ~/.zshrc
-		export PATH=PATH:/some/path // if no export, it will only be scoped to file?
+		plugins=(git)
+
+		export PATH=PATH:/some/path # if no export, it will only be scoped to file?
+
+		# add sources for autocomplete
+		export CDPATH="." # ".:~/projects/client-work"
+
+		# program shortcuts
+		alias sub='open "$(ls | grep .sublime-project)"'
+		alias lint='npm run lint'
+
+		# project shortcuts
+		alias lpm='cd ~/projects/own/leonardpauli-me'
+		alias lpmd='cd ~/projects/own/leonardpauli-me && npm run dev'
+
+		# workflow
+		function gitp() {
+			branchname=$(git rev-parse --abbrev-ref HEAD)
+			issuenr=$(echo "$branchname" | grep -oE "^\d+" | head -1 | grep -oE "\d+")
+			issuenrhash=$([ -z $issuenr ] && echo "" || echo "#$issuenr ")
+			git add *
+			git commit -am "$issuenrhash$*"
+			git push -u origin "$branchname"
+		}
 	source ~/.zshrc
+
+	with ohmyzsh:
+		"> alias": show all aliases
+		// TODO: some are only with zsh, some are generic
+		"> history": view recent commands
+			<ctrl-r><phrase>: search backwards in history after phrase
+				<ctrl-r> again: next match
+		arrow (up / down): load (prev / next) executed command into prompt
+
+
+
+variables:
+	local: local x=... // global by default, pitfal in recursive loops etc
+		// http://tldp.org/LDP/abs/html/localvar.html
+		// use local as much as possible
+	default value syntax:
+		// https://stackoverflow.com/questions/9332802/how-to-write-a-bash-script-that-takes-optional-input-arguments
+		- ${1:-foo}
+		- ${myvar-defaultvalue}
+
+loops
+	see variables.local
+	// TODO
+
+function
+	see variables.local
+	see lsoutline for example
+	definition styles:
+		- "function my_function { echo hello; return 'hi' }"
+		- "my_function () { echo hello; return 'hi' }"

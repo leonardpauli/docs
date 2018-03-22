@@ -8,8 +8,15 @@ components
 	- title
 		- badges
 		- short description
+		- overview
+
+		// - alpha! expect breaking changes in all semver < 1.0.0 versions, lock down to exact version if used, and test during updates.
 	
 	- other sections
+
+	- components
+		- manifest / plan / notes
+		// - transpiler, webpack loader
 
 	- contributing
 	- sponsors / donating?

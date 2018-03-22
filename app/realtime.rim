@@ -1,0 +1,45 @@
+# app/realtime
+' LeonardPauli/docs
+	Created by Leonard Pauli, 20 mar 2018
+
+// TODO
+
+- webrtc
+- websockets
+- http keep-alive
+
+// ack - acknowledgement of receival
+
+algorithms
+	aspects
+		- deterministic, eventual consistency
+		- decentralised
+
+	conflict resolution
+		- gundb "HAM"
+		- blockchain
+		// see "https://www.youtube-nocookie.com/embed/yCcWpzY8dIA?t=29m36s
+	
+	- operational-transformation // OT
+		broadcast all changes, apply them in order
+		// https://operational-transformation.github.io/index.html
+
+	- gundb uses "HAM" // https://gun.eco/explainers/school/class.html
+		- send operations, with id + prev id
+			- resend if possibly needed // (no need for ack - overlap gets removed by id)
+			- order not important // sorted using prev id + know if first msg if no prev id
+		- vector clocks ...
+
+	' note
+		Awesome animation/explainer at https://gun.eco/explainers/school/class.html !
+		though it doesn't solve multi-directional changes deterministically, like OT?
+		eg. Alice -> insert "h",  Carl <- "h", A -> "ello", C -> "ome", A <- "ome", C <- "ello"
+		A: "helloome"
+		C: "homeello"
+		if we're editing the same string, HAM will be deterministic ("home", C wrote last?), but on an entity basis. For GD like editing, the result should deterministically be "helloome", which would require something like OT?
+		.
+		(though for the node editor, entity basis is mostly ok for starters, but will want to have eg. textareas with multiplayer deterministic live edit (w/o discarding edits))
+		.
+		However, most of all, I want branching history with operations (think photoshop, but you could go back to almost the start of the history and swap out the original image while keeping the rest of the history (so that you get the same edits, but on a new image), or make branches, merges, and reordering of otherwise destructive operations).
+		I'll probably implement something like OT for this, but feels possibly wasteful when HAM (and thereby some hidden history) already exists? Is there some good way to hook into this hidden history and revert items, or is it better to build OT on top of it? (probably will do so with modularity in mind for starters, so if a way to integrate it directly with the core comes up, it's relatively easy)
+		

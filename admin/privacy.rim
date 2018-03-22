@@ -1,0 +1,16 @@
+# admin/privacy
+' LeonardPauli/docs
+	Created by Leonard Pauli, 20 mar 2018
+
+// TODO
+
+
+GDPR
+	// https://ico.org.uk/for-organisations/education/
+	// https://logsentinel.com/gdpr-practical-guide-developers/
+	// https://stackoverflow.com/questions/48184799/how-can-startup-that-have-apps-website-products-design-a-data-model-that-does-no?rq=1
+	// https://www.eugdpr.org/key-changes.html
+	// https://ux.stackexchange.com/questions/109194/ux-implications-eu-general-data-protection-regulation
+	// https://www.gdpreu.org/the-regulation/list-of-data-rights/right-of-access/
+	// https://ico.org.uk/for-organisations/guide-to-the-general-data-protection-regulation-gdpr/lawful-basis-for-processing/consent/
+	- don't forget "automatic" request logging including ip address etc

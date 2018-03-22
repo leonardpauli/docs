@@ -11,8 +11,10 @@ README.md
 admin
 	- README-template.md
 	- licensing
+	- privacy
 	- readme
 app
+	- realtime
 	- spa: "single page application"
 backend
 	- api-base
@@ -36,3 +38,4 @@ terminal
 	- pgp-workflows: "cryptographic security utility"
 	- ssl-workflow: "secure sockets layer"
 	- terminal: "text based access to os"
+	- vim

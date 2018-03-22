@@ -6,3 +6,17 @@
 // 	- a cryptographic protocol
 
 // TODO
+
+self-signed:
+	// https://stackoverflow.com/questions/10175812/how-to-create-a-self-signed-certificate-with-openssl
+	- openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -subj '/CN=localhost'
+		// -subj "/C=US/ST=Oregon/L=Portland/O=Company Name/OU=Org/CN=www.example.com"
+		// provide a configuration file with an alternate_names section and pass it with the -config option. Also, placing a DNS name in the Common Name (CN) is deprecated (but not prohibited) by both the IETF and the CA/Browser Forums. Any DNS name in the CN must also be present in the SAN
+using lets encrypt
+	test environment
+	using docker + existing nginx for validation
+	automated renewal // cron job?
+	production environment
+nginx ssl configuration
+setup on lpm
+update deploy + server setup notes

@@ -1,0 +1,124 @@
+# terminal/vim
+' LeonardPauli/docs
+	Created by Leonard Pauli, 21 mar 2018
+
+// full-featured terminal based code/text edito
+// 	- often installed by default as vi
+// 	- works through ssh, when no GUI is available
+// 	- highly shortcut/keyboard based and scriptable
+// 	- allowes you to become very effective with time, always more to learn/master
+// 	- alternative: emacs (?)
+
+// TODO
+
+general:
+	simple flow:
+		"vi new-or-existing-file" // open file with vim
+		"i" // enter insert mode
+		"hello"
+		"<esc>" // exit insert mode to normal mode
+			alt: ctrl-c
+		":" // enter command mode
+		"wq<enter>" // write and quit
+	learn more:
+		":help"
+		":help command"
+
+
+
+navigation: // in normal mode
+	h / l: left / right // or arrow keys, but try to stick with defaults :)
+	j / k: down / up // feels a bit reversed, but was logical with keyboard layout when created for decades ago...
+	w / W: word-start / just whitespace separated
+	b / B: word-start backwards / just whitespace separated
+	G / gg: end of file / start of file
+	$ / 0: end of line / start of line
+	(f / F) <char>: goto (next / prev) occurrence of char in line
+	F <char>: goto next occurrence of char in line
+	*: see vimrc."goto next occurrence of word under cursor"
+	<Number><navigation>: do it multiple times, eg. 3w // skip three words
+	:<Number><enter>: goto (start of) line // eg. :22<enter>
+	G<Number>: goto (start of) line // eg. G22
+	.: repeat last command // eg. "i, hello, <ctrl-c>, 2." will insert "hellohellohello"
+
+in normal mode:
+	i: enter insert mode
+		o / O: add line (after / before) and enter insert mode
+	v: enter visual mode, see selecting
+	":": enter command mode, see "in command mode"
+	"/": enter search mode, see "searching"
+	see history
+	see navigation
+	commands:
+		y: yank // copy
+		d: delete // copy and remove
+		x: delete char
+		p / P: paste (after / before)
+		c: change // deletes + enters insert mode
+	<command><command>: do it for the line, eg. dd or yy
+	<command><navigation>: do it for one navigation, eg. d3w // delete three word forwards
+
+	q<char><commands>q: record macro // eg. (qqiHI<esc>q3@q)
+	<Number>@<char>: perform macro <Number> times, thats stored at <char>
+
+
+in command mode:
+	"w": write // save
+	"wq": write and quit
+	"q!": force quit without saving
+
+history:
+	u: undo
+	<ctrl-R>: redo // undo the undo
+	// TODO: view branching history
+	// TODO: multiplayer editing?
+
+selecting:
+	"v" // enter visual mode
+	move cursor like in normal mode
+	use commands
+	esc or ctrl-c to exit
+
+	// TODO: sublime text like multiple cursors / cmd-d
+	// 	- https://github.com/terryma/vim-multiple-cursors
+	// 		- 2Gfp<C-n><C-n><C-n>cname
+	// 		- seems to have issues with autocomplete, history, and harder to save as macro
+	// 	see https://medium.com/@schtoeffel/you-don-t-need-more-than-one-cursor-in-vim-2c44117d51db
+
+searching:
+	"/<phrase><enter>": search for next occurrence of <phrase>
+	then;
+	n / N: goto (next / prev) match
+
+paste:
+	":r !pbpaste" // avoids indentation to be changed
+		// https://stackoverflow.com/questions/2514445/turning-off-auto-indent-when-pasting-text-into-vim
+		linux: ":r !xsel -p"
+
+
+// TODO: window / buffer management: tabs, panels, buffers
+// TODO: collaborative editing
+// 	- see https://github.com/FredKSchott/CoVim
+
+
+vimrc:
+	// TODO: see https://github.com/floridoo/vimrc/blob/master/basic.vim
+	// comments start with "
+	editing:
+		"set so=7" // Set 7 lines to the cursor - when moving vertically using j/k
+		"set backspace=eol,start,indent" // make backspace behave (?)
+		use tabs: "set tabstop=2 shiftwidth=2 noexpandtab nosi noai ci"
+		"goto next occurrence of word under cursor":
+			" Visual mode pressing * or # searches for the current selection
+			" (from someone from an idea by Michael Naumann)
+			vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
+			vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
+	plugins: // see https://github.com/tpope/vim-pathogen
+		execute pathogen#infect()
+		filetype plugin indent on
+	visual:
+		syntax highlighting: "syntax enable"
+		line numbers: "set nu" // https://jeffkreeftmeijer.com/vim-number/
+	file:
+		"set encoding=utf8"
+		"set ffs=unix,dos,mac" // Use Unix as the standard file type
