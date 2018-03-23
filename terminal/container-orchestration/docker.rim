@@ -1,0 +1,79 @@
+# terminal/container-orchestration/docker
+' LeonardPauli/docs
+	Created by Leonard Pauli, 23 mar 2018
+
+// "A self-sufficient runtime for containers"
+
+// TODO
+
+see container-orchestration.dictionary
+
+installation:
+	osx: // TODO
+	ubuntu: // TODO
+	  // https://www.digitalocean.com/community/tutorials/webinar-series-getting-started-with-containers
+    // https://docs.docker.com/install/linux/docker-ce/debian/#install-docker-ce
+    - sudo apt-get remove docker docker-engine docker.io // uninstall possibly old versions
+    - sudo apt-get update // update the apt package index
+    - sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
+    - "curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | sudo apt-key add -" // add GPG key for official Docker repo
+    - sudo apt-key fingerprint 0EBFCD88 // verify that you now have the key with the fingerprint 9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88
+    - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable" // add to apt (Advanced Package Tool)
+    - sudo apt-get update // update apt package index (to include newly added repo)
+    - apt-cache policy docker-ce // prioritize newly added repo
+    - sudo apt-get install -y docker-ce // install docker
+    check status: sudo systemctl status docker // systemctl used also for auto start on boot
+    add user to docker group: sudo usermod -aG docker mydev // $USER
+    relogin to apply: su - ${USER}
+    test: docker
+
+
+docker-machine // manages connections to docker
+	install 
+		// https://docs.docker.com/machine/install-machine/#installing-machine-directly
+		- download, make executable, and copy in place: "curl -L https://github.com/docker/machine/releases/download/v0.12.2/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine && chmod +x /tmp/docker-machine && sudo cp /tmp/docker-machine /usr/local/bin/docker-machine"
+		- test: "docker-machine -v"
+
+
+commands:
+	docker build -t [org-name/]image-name[:some-optional-tag] path/to/dir/containing/dockerfile
+	docker build -t my-image . // build an image using ./Dockerfile, ./* as context, and name it my-name
+	
+	docker images // list images
+	docker rmi my-image // remove image
+
+	docker run -t my-container -d -p 3000:80 my-image // start a new container, in detached mode (so it keeps running when closing terminal), using my-image, attaching container port 80 (EXPOSE 80) to host port 3000, naming it my-container
+	docker logs -f --tail 10 // show last 10 log lines and counting, ctrl-c to stop
+	// docker exec -it my-container sh // or bash, get terminal connection inside container, "exit" or ctrl-c to exit
+
+	docker stop my-container
+	docker kill my-container
+	docker rm my-container
+
+	docker run --rm -it alpine bash // create a temporary container that auto-removes when exiting
+		// great for running / testing programs / scripts in relatively isolated environment
+	
+	docker pull some-remote-image // download image (including necessary intermediate layers)
+
+
+base images:
+	alpine // very light-weight setup with only the most necessary included, prefer if possible
+	- mhart/alpine-node:9.9 // https://github.com/mhart/alpine-node
+	- ...
+
+Dockerfile
+	# comment
+	FROM org/image:tag
+	RUN echo "hello" && echo "world" // each comman (RUN, FROM, etc) creates a new layer, so be mindful
+	COPY host/rel-path host/other-path /container/abs/dest/ // dist ending with / -> put all inside
+	COPY host/rel-path /container/abs/dest // not ending with / -> replace
+	WORKDIR /usr/src/app // like cd inside container, relevant for RUN, ENTRYPOINT, etc
+	ENTRYPOINT ["command", "--flag", "argument", "etc"] // run by default when starting container
+	EXPOSE 80 // allow port to be attached
+	VOLUME /abs/container/path // declare possible volume, eg. for persistent db data, or for caches between re-builds
+
+
+notes:
+	npm
+		- npm install exclusively on Host or Container OS // if shared volume; installation (native modules) isn't same
+  - lsof -n -i:PORT // list listening processes

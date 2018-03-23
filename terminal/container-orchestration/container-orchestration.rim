@@ -1,0 +1,30 @@
+# terminal/container-orchestration
+' LeonardPauli/docs
+	Created by Leonard Pauli, 23 mar 2018
+
+// ...
+
+// TODO
+
+dictionary:
+	VM: "virtual machine" // virtualisation of other OS inside host OS, more sandboxed, but slower, hard to run very many in same host
+	host // os that container / VM runs inside of 
+	container // similar to VM, but more efficient; shares more resources with main OS, though somewhat sandboxed (?), able to run many in same host
+	image // "template" for a container, either copy/snapshot of filesystem, or instruction of how to set it up
+		layer // each image only stores delta from other images, until a base image is reached
+
+image.create: see docker
+container.(create / manage): see docker
+declarative image / container setup / management: see docker-compose
+
+container orchestration: // handle containers over multiple machines etc
+	- docker-swarms // nicer UX, familar syntax + easy to setup, etc, though..
+	- kubernetes // larger community + performance, more "the way to go"
+
+' TODO
+	monitoring
+	image-registries
+	development setup
+	production setup
+	auto-deploy with CI
+	auto-scaling

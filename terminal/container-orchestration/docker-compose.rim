@@ -1,0 +1,74 @@
+# terminal/container-orchestration/docker-compose
+' LeonardPauli/docs
+	Created by Leonard Pauli, 23 mar 2018
+
+// automisation of docker management
+// 	- "Define and run multi-container applications with Docker"
+
+see docker
+
+
+installation:
+	osx: // TODO
+	ubuntu:
+		- "sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose"
+		- sudo chmod +x /usr/local/bin/docker-compose // allow run mode
+		- test: docker-compose -v
+
+
+commands: // expects a docker-compose.yml file to exist
+	- docker-compose help
+	- docker-compose help up
+	- docker-compose [-f <arg>...] [options] [COMMAND] [ARGS...]
+
+	- docker-compose up -d // execute docker commands to get current state to match docker-compose.yml file
+	- docker-compose -f docker-compose.dev.yml up // use different file
+	- docker-compose up myservice // only start myservice (declared in file) (with its dependencies)
+	- docker-compose down // bring down everything brought up with the file
+	- docker-compose logs myservice
+	- docker-compose build myservice
+	- docker-compose up --build // re-build existing images if needed
+
+
+docker-compose.yml // definition file
+	version: '2'
+	services:
+		my-service:
+			image: my-org/my-image-name:my-tag
+			build:
+				context: ./
+				dockerfile: Dockerfile
+			environment: // set environment vars, instead of using .env
+				ENVIRONMENT: production
+			// tty: false
+			// restart: always
+			// volumes:
+			//   - ./:/usr/src/app // local-dir(abs or rel) : container-dir(abs)
+			expose: [3000:80] // network : container, only attaches it to internal docker network, ie. for linking with other containers
+			ports: [80:80] // like expose, but attaches it directly to host
+			links: [other-service] // allows http://other-service:3003 to work (if 3003 is in "expose")
+			depends_on: [other-service] // have other-service become ready before starting this one
+			networks:
+				default:
+					ipv4_address: 10.100.0.2
+
+		other-service:
+			image: other-org/some-image:specific-version-tag
+				// but for production, always use own ("my-org") images, to make it more deterministik
+				// eg. docker tag other-org/some-image:specific-version-tag my-org/some-image:specific-version-tag
+			expose: [3003:3000] // for expose, why not always do 80:main-port do linked conainers can do just http://other-service/... directly?
+			networks:
+				default:
+					ipv4_address: 10.100.0.3
+
+		networks: // neat to be explicit
+			// - simpler to setup multiple subnetworks (eg. maybe isolate like (api, db) + (api, web)) (TODO)
+			// - ability to connect to networks created with other docker-compose (TODO)
+			default:
+				driver: bridge
+				ipam:
+					config:
+						- subnet: 10.100.0.0/16
+							gateway: 10.100.0.1
+
+		// TODO: volumes
