@@ -1,0 +1,41 @@
+# terminal/ubuntu
+' LeonardPauli/docs
+	Created by Leonard Pauli, 23 mar 2018
+
+// an operating system
+
+
+- issues.locale.fix
+- ssh.passwordLogin.remove
+- add secure user role
+- demo auth flow
+
+
+issues.locale.fix: // by: prevent ssh to forward your locale
+	alt: ssh.locale.remote.set
+	alt: ssh.locale.remote.prevent
+	alt: ssh.locale.local.disableSending
+	then: ssh.locale.view // check that LC_ALL is set
+
+add secure user role // by adding new limited user account with own ssh login (no password)
+	- adduser mydev
+		// remove password using (- passwd -d mydev) (alt use --disabled-password during creation)
+		view users: vi /etc/passwd
+
+	- add sudo ability: "usermod -aG sudo mydev" // by: add user to group sudo; gets ability to prepend cmd's w/ sudo
+	- add ssh key to user:
+		- mkdir /home/mydev/.ssh
+		- echo "sshKeyPubPastedHere" >> /home/mydev/.ssh/authorized_keys
+		correct mod; - chmod 600 /home/mydev/.ssh/authorized_keys
+		correct own; - chown mydev:mydev /home/mydev/.ssh/authorized_keys // if wrong, you'll get "Permission denied (publickey)."
+		if added during instance creation; remove it from root; - vi /root/.ssh/authorized_keys // :set rnu;dd:wq
+		// root can still be accessed by "sudo su" + password, after logged in to mydev with ssh private key
+
+demo auth flow
+	- sessions.login-log.view-live: "tail -f /var/log/auth.log" // in new remote window (ubuntu, not osx)
+	- ssh.user.login
+	- user.switch.toRoot: "sudo su root"
+	- back: "exit"
+	- user.name.show: "whoami"
+	- sessions.view: "w" // "display who is logged in and what they are doing"
+	- user.groups.view: "id -p"

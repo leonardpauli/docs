@@ -66,6 +66,7 @@ in command mode:
 	"w": write // save
 	"wq": write and quit
 	"q!": force quit without saving
+	"w !sudo tee %": force write read-only file // write to tmp buffer "tee" with sudo ability
 
 history:
 	u: undo

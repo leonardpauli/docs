@@ -63,12 +63,12 @@ self-signed.auto-renewing
 
 
 // next up
-nginx.ssl configuration // with self-signed
-nginx.ssl.config
+nginx.config.ssl // with self-signed
+nginx.config.ssl
 	see nginx.config.edit
 
 	// https://scotthelme.co.uk/a-plus-rating-qualys-ssl-test/
-	- enable it, in create https block:
+	- enable it, create https block:
 		listen 443 ssl;
 		server_name example.com;
 		ssl_certificate /path/to/ssl.crt;
@@ -108,7 +108,7 @@ nginx.ssl.config
 	prevent known attacks
 		// https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
 		// TODO: cross check
-		- ssl_protocols TLSv1 TLSv1.1 TLSv1.2; // don't enable insecure SSL v2-3
+		// - ssl_protocols TLSv1 TLSv1.1 TLSv1.2; // don't enable insecure SSL v2-3
 		- ssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';
 			' cipher suit
 				- unsupported are auto-discarded

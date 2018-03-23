@@ -1,0 +1,51 @@
+# terminal/network
+' LeonardPauli/docs
+	Created by Leonard Pauli, 23 mar 2018
+
+// ...
+
+// TODO
+
+
+dictionary:
+	ip: "internet protocol"
+		dynamic / static // static required for servers, dynamic often used for clients/phones etc
+	ip-address
+		v4 // 94.234.33.146, almost full
+		v6 // 2001:db8:0:1234:0:567:8:1, new standard // possibly not fully supported in all places
+		whatsmyip:
+			// https://google.se/search?q=whatsmyip
+			// https://unix.stackexchange.com/a/81699/137784
+			- dig +short myip.opendns.com @resolver1.opendns.com
+			- ifconfig
+				// though not certainly valid if behind NAT, which often is the case
+				// though ok for getting the ip-address within, eg. local wifi network
+		// note: some countries proxies all requests behind one ip, or one ip block, so be careful when blocking ip's
+	localhost
+		v4: "127.0.0.1"
+		v6: "::1"
+
+	domain name // used in dns
+	dns: "domain name system" // "hierarchical decentralized naming system for resources connected to a network (eg. local or internet)
+		// eg. domain name -> IP address
+	  test: "https://intodns.com/example.com"
+	  	alt: nslookup -q=any example.com
+
+	hosts-file: "/etc/hosts" // (on osx) "mini dns" domain name -> IP lookup, checked before external dns
+		// http://osxdaily.com/2012/08/07/edit-hosts-file-mac-os-x/
+		edit:
+			// eg. make http://my-site.dev resolve to localhost.
+			// 	(optionally setup an nginx.domain-router on port 80 for improved experience)
+			127.0.0.1 my-site.dev
+			// eg. block domain (if configured nginx.domain-router on port 80, make sure it responds appropriately)
+			127.0.0.1 site-to-block.com
+		flush cache: dscacheutil -flushcache; sudo killall -HUP mDNSResponder
+
+	NAT: "network address translation" // "method of remapping one IP address space into another" // "by modifying address info in packets IP header, while in transit across traffic routing device"
+		// causes issues with WebRTC
+
+
+registrars:
+	- namecheap: "https://ap.www.namecheap.com"
+	- iwmn: "https://iwantmyname.com/dashboard/domains"
+

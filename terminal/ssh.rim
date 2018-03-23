@@ -1,0 +1,51 @@
+# terminal/ssh
+' LeonardPauli/docs
+	Created by Leonard Pauli, 23 mar 2018
+
+// secure shell
+// 	- "cryptographic network protocol for operating network services securely over an unsecured network"
+
+- generate public/private ssh key pair
+	- ssh-keygen -t rsa // generate, alt ssh-keygen -t rsa -f my-key-name
+	- cat ~/.ssh/id_rsa.pub // print the public one (id_rsa is default name)
+
+user.config.host.setup // on your computer, assigns key to domain name
+	// useful if using multiple keys for different logins / servers
+	- edit user.config: // https://askubuntu.com/questions/311558/ssh-permission-denied-publickey
+		Host example.com // or IP
+		Hostname example.com // diff?
+		User USERNAME # ie. mydev
+		ForwardAgent yes # to allow ssh-agent -> use of your local ssh keys when accessing ie. git in remote
+		PubKeyAuthentication yes
+		IdentityFile ./path/to/key # ie. ~/.ssh/id_rsa or another key
+
+
+user.login: "ssh mydev@example.co" // enter pw for key + hit save, only necessary first time
+
+
+user.config: "~/.ssh/config"
+local.config: "/etc/ssh/ssh_config"
+	// see vim."force write read-only file" if save issues, alt do sudo vi ... instead
+daemon.reload: "systemctl reload sshd"
+daemon.config: "/etc/ssh/sshd_config"
+
+passwordLogin.remove: 
+	- edit daemon.config // change so that ...
+		PasswordAuthentication no
+		PubkeyAuthentication yes
+		ChallengeResponseAuthentication no
+	- ssh.daemon.reload
+
+locale
+	// if "Locale ..." issue occurs, some of these can fix it
+	remote.prevent: // prevent remote locale acceptance
+		- edit daemon.config // change so that ...
+			AcceptEnv LANG LC_* // shouldn't this be commented out..?
+		- daemon.reload
+	remote.set: // force update session locale
+		- sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 // is this really persistent?
+		- terminal.shell.reload // exit and ssh in again
+	local.disableSending:
+		- edit local.config // comment out line:
+			SendEnv LANG LC_*
+	view: - locale
