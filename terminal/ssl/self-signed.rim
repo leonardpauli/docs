@@ -1,0 +1,101 @@
+# terminal/ssl/self-signed
+' LeonardPauli/docs
+	Created by Leonard Pauli, 19-22 mar 2018
+
+// https://stackoverflow.com/questions/10175812/how-to-create-a-self-signed-certificate-with-openssl
+
+self signed certificate: // note -x509 flag
+	create: "./openssl_gen selfsigned [...]"
+	print: "openssl x509 -in example-com.cert.pem -text -noout"
+signing request:
+	create: "./openssl_gen signingrequest [...]"
+	print: "openssl req -in example-com.req.pem -text -noout"
+	
+
+quick but deprecated: "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -subj '/CN=localhost'"
+	// -subj "/C=US/ST=Oregon/L=Portland/O=Company Name/OU=Org/CN=www.example.com"
+improved:
+	// https://stackoverflow.com/a/27931596/1054573
+	// - pass config file (with alternate_names section) with -config option
+	// - placing DNS name in "Common Name (CN)" is deprecated (but not prohibited) by IETF and CA/Browser Forums
+	// - any DNS name in CN must also be in alternate_names section (SAN)
+
+
+	see "./openssl_gen" // creates a oneliner helper
+		self signed certificate.create: "\(base) -out example-com.cert.pem -x509" // see ./openssl_gen selfsigned ...
+		signing request.create: "\(base) -out example-com.req.pem" // see ./openssl_gen signingrequest ...
+		base: "openssl req \
+			-config example-com.conf -new -sha256 \
+			-newkey rsa:2048 -nodes -days 365 \
+			-keyout example-com.key.pem
+			// -subj "/C=US/ST=Oregon/L=Portland/O=Company Name/OU=Org/CN=www.example.com"
+		config file:
+			options:
+				req.keyfile.default: "server-key.pem"
+				subject:
+					country: "US" // (2 letter code)
+					stateOrProvince: "NY"
+					locality: "New York"
+					organization: "Example, LLC"
+					commonName: "Example Company" // visible to user
+					emailAddress: "test@example.com" // visible to user
+					alternate:
+						- "example.com"
+						- "www.example.com"
+						- "other-subdomain.example.com"
+						// one-level wildcards ok
+						- "*.apps.example.com" // matches a.apps.example.com, not b.a.apps.example.com
+
+						// (for development, not production)
+						- "localhost"
+						- "localhost.localdomain"
+						- "127.0.0.1"
+						- "::1" # IPv6 localhost
+
+				req.ext: // meta, no change necessary
+					allowRSAKeyTransport: true // false if "you use ephemeral cipher suites"
+					keyUsage:
+						- "digitalSignature"
+						- "keyEncipherment" if req.ext.allowRSAKeyTransport
+					snippet: "
+						subjectKeyIdentifier = hash
+						basicConstraints = CA:FALSE
+						keyUsage = \(req.ext.keyUsage | join ", ")
+						subjectAltName = @alternate_names
+						nsComment = "OpenSSL Generated Certificate" # CHANGE (optional)
+						# extendedKeyUsage = serverAuth, clientAuth
+			template: "
+				[ req ]
+				default_bits = 2048
+				default_keyfile = \(req.keyfile.default)
+				distinguished_name = subject
+				req_extensions = req_ext
+				x509_extensions = x509_ext
+				string_mask = utf8only
+
+				[ subject ]
+				countryName = Country Name (2 letter code)
+				stateOrProvinceName = State or Province Name (full name)
+				localityName = Locality Name (eg, city)
+				organizationName = Organization Name (eg, company)
+				commonName = Common Name (e.g. server FQDN or YOUR name)
+				emailAddress = Email Address
+
+				countryName = \(subject.country)
+				stateOrProvinceName = \(subject.stateOrProvince)
+				localityName = \(subject.locality)
+				organizationName = \(subject.organization)
+				commonName = \(subject.commonName)
+				emailAddress = \(subject.emailAddress)
+
+				# used for self-signed certificate // openssl req -x509 ...
+				[ x509_ext ]
+				authorityKeyIdentifier = keyid,issuer
+				\(req.ext.snippet)
+
+				# used for certificate signing request // openssl req ...
+				[ req_ext ]
+				\(req.ext.snippet)
+
+				[ alternate_names ]
+				\(subject.alternate |> "DNS.\(index+1) = \(it)" | join "\n")

@@ -1,0 +1,16 @@
+# terminal/nginx
+' LeonardPauli/docs
+	Created by Leonard Pauli, 23 mar 2018
+
+// [engine X]
+// 	- "an HTTP and reverse proxy server, a mail proxy server, and a generic TCP/UDP proxy server"
+
+// https://nginx.org/en/
+
+config.edit:
+	- vi nginx.conf
+		- /etc/nginx/sited-enabled/example.com // Ubuntu/Debian
+		- /etc/nginx/conf.d/nginx.conf // RHEL/CentOS
+	- nginx -t // validate changes
+	- service nginx restart // alt. /etc/init.d/nginx restart
+	- sudo service nginx reload // diff?

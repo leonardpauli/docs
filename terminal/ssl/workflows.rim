@@ -5,110 +5,190 @@
 // secure sockets layer
 // 	- a cryptographic protocol
 
-self-signed:
-	// https://stackoverflow.com/questions/10175812/how-to-create-a-self-signed-certificate-with-openssl
 
-	self signed certificate: // note -x509 flag
-		create: "./openssl_gen selfsigned [...]"
-		print: "openssl x509 -in example-com.cert.pem -text -noout"
-	signing request:
-		create: "./openssl_gen signingrequest [...]"
-		print: "openssl req -in example-com.req.pem -text -noout"
-		
-	
-	quick but deprecated: "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -subj '/CN=localhost'"
-		// -subj "/C=US/ST=Oregon/L=Portland/O=Company Name/OU=Org/CN=www.example.com"
-	improved:
-		// https://stackoverflow.com/a/27931596/1054573
-		// - pass config file (with alternate_names section) with -config option
-		// - placing DNS name in "Common Name (CN)" is deprecated (but not prohibited) by IETF and CA/Browser Forums
-		// - any DNS name in CN must also be in alternate_names section (SAN)
+// TODO
+// https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-in-ubuntu-16-04
+// http://nginx.org/en/docs/http/configuring_https_servers.html
+// https://miki725.github.io/docker/crypto/2017/01/29/docker+nginx+letsencrypt.html
+// http://www.automationlogic.com/using-lets-encrypt-and-docker-for-automatic-ssl/
+// https://certbot.eff.org/docs/using.html#webroot
+// https://www.digitalocean.com/community/tutorials/how-to-use-certbot-standalone-mode-to-retrieve-let-s-encrypt-ssl-certificates
+// https://certbot.eff.org/docs/install.html#running-with-docker
+// https://www.digitalocean.com/community/tutorials/openssl-essentials-working-with-ssl-certificates-private-keys-and-csrs
 
 
-		see "./openssl_gen" // creates a oneliner helper
-			self signed certificate.create: "\(base) -out example-com.cert.pem -x509" // see ./openssl_gen selfsigned ...
-			signing request.create: "\(base) -out example-com.req.pem" // see ./openssl_gen signingrequest ...
-			base: "openssl req \
-				-config example-com.conf -new -sha256 \
-				-newkey rsa:2048 -nodes -days 365 \
-				-keyout example-com.key.pem
-				// -subj "/C=US/ST=Oregon/L=Portland/O=Company Name/OU=Org/CN=www.example.com"
-			config file:
-				options:
-					req.keyfile.default: "server-key.pem"
-					subject:
-						country: "US" // (2 letter code)
-						stateOrProvince: "NY"
-						locality: "New York"
-						organization: "Example, LLC"
-						commonName: "Example Company" // visible to user
-						emailAddress: "test@example.com" // visible to user
-						alternate:
-							- "example.com"
-							- "www.example.com"
-							- "other-subdomain.example.com"
-							// one-level wildcards ok
-							- "*.apps.example.com" // matches a.apps.example.com, not b.a.apps.example.com
+general:
+	// https://www.digitalocean.com/community/tutorials/openssl-essentials-working-with-ssl-certificates-private-keys-and-csrs
+	relative:
+		harder encryption usually costs more processing power / time
+		with faster computers, both encrypt, decrypt, and cracking gets faster
+			-> harder encryption is needed
+		encryption algorithm / parameters thereby (presumably) needs to be changed with time
 
-							// (for development, not production)
-							- "localhost"
-							- "localhost.localdomain"
-							- "127.0.0.1"
-							- "::1" # IPv6 localhost
 
-					req.ext: // meta, no change necessary
-						allowRSAKeyTransport: true // false if "you use ephemeral cipher suites"
-						keyUsage:
-							- "digitalSignature"
-							- "keyEncipherment" if req.ext.allowRSAKeyTransport
-						snippet: "
-							subjectKeyIdentifier = hash
-							basicConstraints = CA:FALSE
-							keyUsage = \(req.ext.keyUsage | join ", ")
-							subjectAltName = @alternate_names
-							nsComment = "OpenSSL Generated Certificate" # CHANGE (optional)
-							# extendedKeyUsage = serverAuth, clientAuth
-				template: "
-					[ req ]
-					default_bits = 2048
-					default_keyfile = \(req.keyfile.default)
-					distinguished_name = subject
-					req_extensions = req_ext
-					x509_extensions = x509_ext
-					string_mask = utf8only
+dictionary:
+	TLS: "transport layer security"
+	SSL: "secure sockets layer"
+	forward secrecy: // long-term keys do not compromise past session keys
+		alias: "perfect forward secrecy"
+		' use new derivation of private key for each session,
+			keeping data (ssl traffic) captured before main-private-key
+			leak unaffected (non-decryptable with leaked key)
+		"Diffie-Hellman key exchange" // method for cryptographic keys exchange over public channel
+			DHE: "Ephemeral Diffie-Hellman" // ?
+	cipher suite // subset of algorithms used to secure a network connection (using TSL or SSL)
+	ephemeral // short lived
+	MITM: "man in the middle attack" // traffic goes through hacker (with the ability to read and change data in both directions, even though it might be encrypted from both ends)
+	asymetric algorithm // eg. easy to get public key from private key, hard to get priv from pub
+	public key // share openly, generated with private key
+	private key // keep secret, allows decryption of data encrypted with public key
+	public key certificate // file used to prove public key ownership
+		alias: "cert"
+	CA: "Certificate Authority" // entity that issues digital certificates, some pre-trusted by clients
+	OCSP: "Online Certificate Status Protocol" // service by CA for clients to verify a server cert is valid (/ hasn't been revoked?)
+	OCSP stapling // cache OCSP response on server and attach to client request if wanted (so they don't have to make an additional one to the CA)
+		// https://raymii.org/s/tutorials/OCSP_Stapling_on_nginx.html
+	HSTS: "HTTP Strict Transport Security" // browsers, for domain: limits to use https (even before first contact with server - pre-set in browser)
+	HPKP: "HTTP Public Key Pinning" // browsers, for domain: limits acceptable certs (even before first contact with server - pre-set in browser)
+		- HSTS with HPKP ensures secure end-to-end connection, even before first handshake, because relevant info is bundled with browser source code
 
-					[ subject ]
-					countryName = Country Name (2 letter code)
-					stateOrProvinceName = State or Province Name (full name)
-					localityName = Locality Name (eg, city)
-					organizationName = Organization Name (eg, company)
-					commonName = Common Name (e.g. server FQDN or YOUR name)
-					emailAddress = Email Address
 
-					countryName = \(subject.country)
-					stateOrProvinceName = \(subject.stateOrProvince)
-					localityName = \(subject.locality)
-					organizationName = \(subject.organization)
-					commonName = \(subject.commonName)
-					emailAddress = \(subject.emailAddress)
+self-signed: see "./self-signed"
+signing-request: see "./self-signed"."signing request"
+p12 bundle:
+	from key and certificate: openssl pkcs12 -inkey key.pem -in certificate.pem -export -out certificate.p12
+	validate: openssl pkcs12 -in certificate.p12 -noout -info
 
-					# used for self-signed certificate // openssl req -x509 ...
-					[ x509_ext ]
-					authorityKeyIdentifier = keyid,issuer
-					\(req.ext.snippet)
-
-					# used for certificate signing request // openssl req ...
-					[ req_ext ]
-					\(req.ext.snippet)
-
-					[ alternate_names ]
-					\(subject.alternate |> "DNS.\(index+1) = \(it)" | join "\n")
+self-signed.auto-renewing
 
 
 // next up
-nginx ssl configuration // with self-signed
-	test: "https://ssllabs.com"
-auto-renewing // with self-signed
+nginx.ssl configuration // with self-signed
+nginx.ssl.config
+	see nginx.config.edit
+
+	// https://scotthelme.co.uk/a-plus-rating-qualys-ssl-test/
+	- enable it, in create https block:
+		listen 443 ssl;
+		server_name example.com;
+		ssl_certificate /path/to/ssl.crt;
+		ssl_certificate_key /path/to/ssl.key;
+		
+	block:
+		// https://cipherli.st/
+		ssl_protocols TLSv1.3; # Requires nginx >= 1.13.0 else use TLSv1.2
+		ssl_prefer_server_ciphers on; 
+		ssl_dhparam /etc/nginx/dhparam.pem; # openssl dhparam -out /etc/nginx/dhparam.pem 4096
+		ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;
+		ssl_ecdh_curve secp384r1; # Requires nginx >= 1.1.0
+
+		// cache
+		ssl_session_timeout  10m;
+		ssl_session_cache shared:SSL:10m;
+		ssl_session_tickets off; # Requires nginx >= 1.5.9
+
+		// OCSP
+		ssl_stapling on; # Requires nginx >= 1.3.7
+		ssl_stapling_verify on; # Requires nginx => 1.3.7
+		resolver $DNS-IP-1 $DNS-IP-2 valid=300s;
+		resolver_timeout 5s;
+
+		// HPKP
+		add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
+
+		// other security headers
+		add_header X-Frame-Options DENY; // prevent getting iframed (and related attacks)
+		add_header X-Content-Type-Options nosniff; // prevents mime-type sniffing (and related attacs)
+		add_header X-XSS-Protection "1; mode=block"; // forces some XXS attack auto detection + full block
+			// https://stackoverflow.com/questions/9090577/what-is-the-http-header-x-xss-protection
+		// add_header X-Robots-Tag none; // really necessary?
+			// https://developers.google.com/search/reference/robots_meta_tag
+
+	// keepalive_timeout 70; // tradeof thing
+	prevent known attacks
+		// https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
+		// TODO: cross check
+		- ssl_protocols TLSv1 TLSv1.1 TLSv1.2; // don't enable insecure SSL v2-3
+		- ssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';
+			' cipher suit
+				- unsupported are auto-discarded
+				- ordering sets priority
+			for backwards compatibility (IE6/WinXP): ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:ECDHE-RSA-AES128-GCM-SHA256:AES256+EECDH:DHE-RSA-AES128-GCM-SHA256:AES256+EDH:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4";
+		- ssl_prefer_server_ciphers on;
+		- ssl_session_cache shared:SSL:10m; // "10Mb will hold around 40,000 connections"
+		- ssl_dhparam /etc/ssl/certs/dhparam.pem; // use stronger DHE parameter
+			> cd /etc/ssl/certs
+			> openssl dhparam -out dhparam.pem 4096
+			
+		- see nginx.use OCSP stapling
+		- see nginx.use HPKP extension
+
+	test:
+		- "https://ssllabs.com"
+		- "https://ssldecoder.org"
+		- "https://certificatemonitor.org"
+
+
+nginx.use OCSP stapling // after nginx ssl with CA is setup
+	// https://raymii.org/s/tutorials/OCSP_Stapling_on_nginx.html
+	- firewall.allow.outbound connections to urls;
+	- urls: getOCSPURLs "mysite.com"
+		getOCSPURLs () {
+			domain=${1:-google.com}
+			OLDIFS=$IFS; IFS=':'
+			certificates=$(openssl s_client -connect $domain:443 -servername $domain -showcerts -tlsextdebug -tls1 2>&1 </dev/null \
+				| sed -n '/-----BEGIN/,/-----END/ {/-----BEGIN/ s/^/:/; p;}');
+			for certificate in ${certificates#:}; do
+				echo $certificate | openssl x509 -noout -ocsp_uri; done;
+			IFS=$OLDIFS
+		}
+	- add to nginx conf "https (443) server block" // 8.8.8.8 is googles?
+		ssl_stapling on;
+		ssl_stapling_verify on;
+		resolver 8.8.8.8 8.8.4.4 valid=300s;
+		resolver_timeout 5s;
+	- server certificate issuer (usually CA) cert has to be known, it is if:
+		- ssl_certificate contains the intermidiate certs // probably
+		- ssl_trusted_certificate is set to the server certificate issuer cert // ssl_trusted_certificate /etc/ssl/certs/domain.chain.stapling.pem;
+	- see nginx.config.edit
+	- test it
+		- openssl s_client -connect example.org:443 -tls1 -tlsextdebug -status \
+			| grep "OCSP Response Status: successful"
+
+
+nginx.use HPKP extension:
+	// TODO: see https://raymii.org/s/articles/HTTP_Public_Key_Pinning_Extension_HPKP.html
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Public_Key_Pinning
+	- backup pins
+	- get "SPKI Fingerprint":
+		openssl x509 -noout -in certificate.pem -pubkey | \
+		openssl asn1parse -noout -inform pem -out public.key;
+		openssl dgst -sha256 -binary public.key | openssl enc -base64
+	- do get."SPKI Fingerprint" for:
+		- first cert in chain (eg. CA cert)
+		- a backup public key // in case CA changes root cert for new generations?
+	- nginx: add to https block: // possibly without new lines
+		add_header Public-Key-Pins
+			'pin-sha256="klO23nT2ehFDXCfx3eHTDRESMz3asj1muO+4aIdjiuY="; // SPKI Fingerprint 1
+			pin-sha256="633lt352PKRXbOwf4xSEa1M517scpD3l5f79xMD9r9Q="; // SPKI Fingerprint backup
+			report-uri="http://example.org/hpkp-report";
+			max-age=2592000; includeSubDomains';
+		// optionally use "Public-Key-Pins-Report-Only" header instead to disable enforcement
+		// (as to not make site unreachable if incorrect config)
+		// then switch it to "Public-Key-Pins" when tested
+	- handle reports
+		setup monitoring / logging + alerts for: // example request
+			POST \(report-uri): json:
+				{
+					"date-time": "2014-12-26T11:52:10Z",
+					"hostname": "www.example.org",
+					"port": 443,
+					"effective-expiration-date": "2014-12-31T12:59:59",
+					"include-subdomains": true,
+					"served-certificate-chain": ["-----BEGINCERTIFICATE-----\nMIIAuyg[...]tqU0CkVDNx\n-----ENDCERTIFICATE-----"],
+					"validated-certificate-chain": ["-----BEGINCERTIFICATE-----\nEBDCCygAwIBA[...]PX4WecNx\n-----ENDCERTIFICATE-----"],
+					"known-pins": ["pin-sha256=\"dUezRu9zOECb901Md727xWltNsj0e6qzGk\"", "pin-sha256=\"E9CqVKB9+xZ9INDbd+2eRQozqbQ2yXLYc\""]
+				}
 
 
 // TODO
@@ -117,5 +197,8 @@ auto-renewing // with self-signed
 	- using docker + existing nginx for validation
 	- automated renewal // cron job?
 	- production environment
+- hstspreload
+	// see https://hstspreload.org/
+	test: "https://hstspreload.org/"
 - setup on lpm
 - update deploy + server setup notes
