@@ -1,0 +1,8 @@
+# terminal/nginx/example/setup
+' LeonardPauli/docs
+	Created by Leonard Pauli, 24 mar 2018
+
+prerequisites:
+	see setup-simple."simplest server setup"
+	// optional: see setup-simple."creating dev-mode setup"
+

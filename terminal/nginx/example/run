@@ -1,0 +1,6 @@
+#!/bin/bash
+# run
+# run up --build
+# run up --build -d
+# run down
+docker-compose ${1:-up} ${2:-""}

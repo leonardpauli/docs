@@ -1,0 +1,114 @@
+# terminal/nginx/example/setup-simple
+' LeonardPauli/docs
+	Created by Leonard Pauli, 24 mar 2018
+
+prerequisites:
+	see terminal/container-orchestration/docker.install
+	see terminal/vim.general
+
+
+simplest server setup:
+	- mkdir example && cd example // create project
+	- echo hello > index.html // create file to serve
+	- mkdir nginx && vi nginx/default.conf // setup nginx config
+		server {
+			listen 80 default_server;
+			listen [::]:80 default_server; # for IPv6 support
+
+			root /usr/src/app/; # set document_root
+			try_files /index.html =404; # send document_root/index.html if exists, otherwise 404 not found error page
+		}
+	- vi Dockerfile // define image
+		FROM alpine:3.7
+
+		# install nginx
+		RUN apk add --update nginx \
+			&& rm -rf /var/cache/apk/* \
+			&& mkdir -p /run/nginx
+
+		# layer application source
+		WORKDIR /usr/src/app
+		COPY . /usr/src/app
+
+		# layer nginx config + set start
+		COPY ./nginx /etc/nginx/conf.d
+		ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]
+		EXPOSE 80
+	- build -t simple-nginx-example . // create / build the image
+	
+	start it:
+		- docker run -d --name my-app -p 3000:80 simple-nginx-example // start it // no -d, but --rm -it, for testing
+	
+	inspect it:
+		- docker logs my-app // probably show nothing
+		- docker exec -it my-app sh // go into container, ls should show your files
+		- cd /etc/nginx && vi nginx.conf // (:q<enter> to exit) view base config, expecially look in bottom where it includes your file
+		- vi conf.d/default.conf // (:q<enter> to exit) view your config
+		- exit // to exit
+
+	test it:
+		- docker ps -a // show all running and stopped containers, you should see my-app
+		- curl localhost:3000 // send a request to your server, should respond with what's in your index.html file
+		- open http://127.0.0.1:3000 // in your browser, should say the same
+		
+	clean up:
+		- docker stop my-app
+		- docker ps -a // should say it "exited"
+		- docker rm my-app
+		- docker ps -a // my-app should no longer show up, ie. removed
+		- docker images // simple-nginx-example should still show up
+		- docker rmi simple-nginx-example // remove image
+		- docker images // should not show it anymore
+
+
+- simplify start / stop with docker-compose:
+	// especially usefull when configuration gets larger, and multiple containers are linked together, etc
+
+	- vi docker-compose.yaml // yaml wants spaces, not tabs :(
+		version: '2'
+		services:
+			my-app:
+				image: simple-nginx-example
+				build:
+					context: ./
+					dockerfile: Dockerfile
+				ports: ["3000:80"]
+
+	start it: docker-compose up -d // d for detached / in the background
+	test it // as before, though the cointainer will be named "example_my-app_1" (where example is the name of the parent directory)
+
+	update:
+		- vi index.html // make some changes
+		- test it // the changes will not show, because they're not copied over to the image
+		- rebuild the image and re-start: docker-compose up --build -d // it will only rebuild and restart where necessary
+		- test it // see the new change? :)
+
+	clean up:
+		- docker-compose down // remove container and its network
+		- docker rmi simple-nginx-example // remove image
+
+
+creating dev-mode setup: // (not having to restart all the time):
+	// create dev versions of config files
+	// 	and attach the container source folder to your source folder (as volume)
+	- cp Dockerfile Dockerfile.dev
+	- vi Dockerfile.dev
+		replace: COPY . /usr/src/app
+		with: VOLUME /usr/src/app // declare that a volume can be connected to the path in the container
+	- cp docker-compose.yaml docker-compose.dev.yaml
+	- vi docker-compose.dev.yaml // change to match
+		image: simple-nginx-example:dev // tag image as development version
+			build:
+				context: ./
+				dockerfile: Dockerfile.dev // use dev config
+	- vi docker-compose.dev.yaml // add on line after "ports", at same level
+		volumes:
+			- .:/usr/src/app // tell docker to attach your current directory to the container
+
+	- docker-compose -f docker-compose.dev.yaml up -d // start it using dev config
+	- vi index.html
+	- test it // is update reflected? :)
+	// the nginx/* config files are still copied, so rebuild is still neccesary if these are changed
+	- docker-compose -f docker-compose.dev.yaml down // stop what was started with the dev config
+	// TODO: see terminal.create executable or terminal.alias if it gets annoying to write
+	// TODO: possibly change host port in prod to 80, and keep dev as 3000?
