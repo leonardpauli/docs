@@ -1,0 +1,23 @@
+# todo
+' LeonardPauli/docs
+	Created by Leonard Pauli, 23 mar 2018
+
+// todo relating to this repo
+
+
+cleanup structure:
+	- os / ubuntu
+	- ssl / nginx.ssl
+	- security/* names
+	- sort tosort/*
+
+thoughs:
+	- use submodules? or better way to get nested git repos? // eg. for services, other resources, etc
+		- no licence problems? ok to just state, submodules are just for referenceing, with their own licences etc?
+	- sync with nodenotes when ready
+	- open up personal todo list?
+	- improved guides // eg. practical example with all technologies, step by step using refs
+
+items:
+	- take out mainpoints for admin.privacy.gdpr
+

@@ -57,7 +57,12 @@ commands:
 
 
 base images:
-	alpine // very light-weight setup with only the most necessary included, prefer if possible
+	// always lock down with tags, or risk break in future
+	- alpine // very light-weight setup with only the most necessary included, prefer if possible
+	- alpine:3.7 // ~5MB, faster buildtime, use eg. apk add --update git
+		// If you have native dependencies, you'll need extra tools
+		// RUN apk add --no-cache make gcc g++ python
+	- ubuntu:16.04 // ~150MB, slower buildtime, use eg. apt-get update -q && apt-get install -yq git-core
 	- mhart/alpine-node:9.9 // https://github.com/mhart/alpine-node
 	- ...
 

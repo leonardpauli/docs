@@ -44,8 +44,37 @@ dictionary:
 	NAT: "network address translation" // "method of remapping one IP address space into another" // "by modifying address info in packets IP header, while in transit across traffic routing device"
 		// causes issues with WebRTC
 
+	firewall // "monitors and controls incoming and outgoing network traffic"
+		simple: white/black-list ip-addresses and ports
+			- make sure only relevant ports are enabled for outbound / inbound traffic
+			alt:
+				- provided by digitalocean on their droplets
+				- see nginx.simple-firewall
+				- see CSP
 
-registrars:
-	- namecheap: "https://ap.www.namecheap.com"
-	- iwmn: "https://iwantmyname.com/dashboard/domains"
+	loadbalancer // distribute traffic onto multiple servers to not make one crash under to heavy load
+		alt:
+			- provided by digitalocean on their droplets
+			- see nginx.loadbalancer
+
+	proxy:
+		alt:
+			- see nginx.proxy
+
+	CSP: "Content Security Policy" // clientside
+		// https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+		// https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers
+
+	cloud provider:
+		- digitalocean
+		- aws: "amazon web services"
+		- googlecloud
+		- ibm
+		- linode
+		- etc
+
+	registrars:
+		- namecheap: "https://ap.www.namecheap.com"
+		- iwmn: "https://iwantmyname.com/dashboard/domains"
+		- binero: "https://www.binero.se/"
 

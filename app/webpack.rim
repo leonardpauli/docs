@@ -1,0 +1,30 @@
+# app/webpack
+' LeonardPauli/docs
+	Created by Leonard Pauli, 23 mar 2018
+
+// asset bundler
+
+// TODO
+// https://webpack.js.org/
+
+
+dockerfile:
+	production: // only using node to build during image build: // eg. for webpack
+		FROM mhart/alpine-node:9.5
+
+		# cache node_modules with package.json, create app dir
+		COPY package.json package.lock /tmp/
+		RUN cd /tmp && npm i && mkdir -p /usr/src/app
+
+		# layer application source
+		WORKDIR /usr/src/app
+		COPY . /usr/src/app
+
+		# layer cached node_modules (native dependencies can't always be build in host os)
+		RUN rm -rf node_modules && cp -a /tmp/node_modules ./
+
+		# build and remove source
+		RUN npm run build && rm -rf ./build ./test ./src
+
+		# should generate output, eg. to ./dist
+		# combine with nginx.install.using-dockerfile to serve this output statically

@@ -1,0 +1,15 @@
+# tosort/regex
+' LeonardPauli/docs
+	Created by Leonard Pauli, 24 mar 2018
+
+// regular expression
+// 	- "sequence of characters defining a search pattern"
+// 	- usually used for string based find / find and replace actions
+
+
+see "https://regexr.com/"
+
+variants:
+	- "perl syntax" // usual in other programming languages
+	- "Basic Regular Expressions" // defined by (see os.POSIX)
+	- "Extended Regular Expressions" // defined by (see os.POSIX)

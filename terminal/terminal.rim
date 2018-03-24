@@ -168,6 +168,8 @@ create executable script:
 	- PATH=PATH:$(pwd) // temporarily add current folder to "PATH", allows you to write mycommand directly, see "edit bashrc" for persistant
 	- mycommand // run script as any other
 
+	- time ... // "time command execution"
+
 edit bashrc:
 	// TODO
 	vi ~/.bashrc
