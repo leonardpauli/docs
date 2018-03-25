@@ -281,7 +281,8 @@ config
 		$args // querystring? eg. "query=value&string=v"
 		$request_uri // path + querystring + fragment? "/some/path/?query=value&string=v#fragment"
 		$scheme // before colon? "https"
-		$server_name // "domain name", eg. www.domain.tld
+		$host // "domain name", eg. www.domain.tld, set by client through header ?
+		$server_name // what got matched with the server_name directive, usually similar to $host, but empty if used wildcard (server_name _;)
 
 		$document_root // see directive.root
 

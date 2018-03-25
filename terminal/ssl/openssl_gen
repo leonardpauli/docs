@@ -11,7 +11,7 @@ itera () { local fn=${1:-"echo"} del=${2:-","} xs=${3:-"a,b,c"} i=0;
 
 # usage: openssl_gen_config_file "a.com,b.com" > a.conf
 openssl_gen_config_file () {
-	domains=${1:-"localhost,127.0.0.1"}
+	domains=${1:-"localhost,my-app.dev"}
 
 	altnames="";fn () {
 		nl=$'\n';altnames+="DNS.$2 = $1${nl}";
@@ -82,8 +82,7 @@ openssl_gen () {
 	# arguments
 	kind=$1 # selfsigned or signingrequest
 	options=$2
-	options_default=";filename;localhost,127.0.0.1,example.com;Org Name;Name shown to user;email@example.com;SE;Uppland;Stockholm;Tech Team"
-	# options_default=";out/dev;localhost,127.0.0.1;Leonard Pauli F:A;Leonard Pauli Dev;admin@localhost;SE;Uppland;Stockholm;Tech Team"
+	options_default=";filename;localhost,example.com;Org Name;Name shown to user;email@example.com;SE;Uppland;Stockholm;Tech Team"
 
 	if [ ! "$kind" ] || [ ! "$options" ]
 	then

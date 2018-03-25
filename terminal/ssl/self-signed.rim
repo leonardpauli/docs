@@ -49,8 +49,6 @@ improved:
 						// (for development, not production)
 						- "localhost"
 						- "localhost.localdomain"
-						- "127.0.0.1"
-						- "::1" # IPv6 localhost
 
 				req.ext: // meta, no change necessary
 					allowRSAKeyTransport: true // false if "you use ephemeral cipher suites"

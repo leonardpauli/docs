@@ -2,7 +2,7 @@
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 22 mar 2018
 
-self signed certificate {FOLDER: "output", DOMAINS: "localhost,127.0.0.1,example.com"}:
+self signed certificate {FOLDER: "output", DOMAINS: "localhost,example.com"}:
 	- mkdir FOLDER
 	- generate selfsigned: "
 		../openssl_gen "selfsigned" ";\

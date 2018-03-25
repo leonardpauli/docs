@@ -16,7 +16,7 @@ prerequisites:
 	- mkdir ssl && echo ssl >> .gitignore // key should be secret, and not in source version control / git (it only is in this example as an example)
 	- ssl.example.setup."self signed certificate"
 		FOLDER: "ssl"
-		DOMAINS: "localhost,127.0.0.1,::1,my-app.dev"
+		DOMAINS: "localhost,my-app.dev"
 	- nginx.ssl.base.setup
 		default.conf should then have two server blocks (80 and 443), both ending with:
 			root /usr/src/app/;
@@ -43,17 +43,19 @@ prerequisites:
 
 - ssl using cert-signing-request and own CA:
 	- CA.local-dev.create-and-install {NAME: "nginx.example test CA"}
-	- cert.create-using-CA {USERFACINGNAME: "my-app.dev cert", DOMAINS: "localhost", "127.0.0.1", "::1", "my-app.dev"}
+	- cert.create-using-CA {USERFACINGNAME: "my-app.dev cert", DOMAINS: "localhost", "my-app.dev"}
 	- use new files
 		- move (crt, key) to ssl/ and rename to own-ca-signed.(crt, key)
 		- vi nginx/default.conf -c ":%s/selfsigned/own-ca-signed/g" -c ":wq" // replace selfsigned with own-ca-signed
 	- rebuild and test it
 		now you should get the green lock
 
-		
+
+- see nginx.ssl.force-https
+
+
 	thereafter:
 		- edit hosts file to get https://my-app.dev
-		- force-https
 		- auto-renew cert with your CA as an external service
 		- switch out your CA with a recognizable (eg. lets-encrypt)
 		- change auto-renew script to work with its service
@@ -97,7 +99,7 @@ notes: // TODO: move to terminal/ssl
 				- search (⌘⌥F): NAME
 				- double click it, expand trust section, change SSL to Always trust, close, enter password
 
-	- cert.create-using-CA {USERFACINGNAME: "my-app.dev cert", DOMAINS: "localhost", "127.0.0.1", "::1", "my-app.dev"}
+	- cert.create-using-CA {USERFACINGNAME: "my-app.dev cert", DOMAINS: "localhost", "my-app.dev"}
 		- a signing-request
 			- key.private.create: openssl genrsa -out domain.key 2048
 			- signing-request.create: openssl req -new -key domain.key -out domain.csr -subj "/CN=USERFACINGNAME"
