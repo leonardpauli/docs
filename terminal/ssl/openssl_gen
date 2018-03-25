@@ -129,9 +129,10 @@ openssl_gen () {
 
 	openssl_gen_config_file "$domains" > $name.conf
 
+	# possibly add .pem to all output files?
 	if [ $kind = "selfsigned" ]
-		then middle="-out $name.cert.pem -x509"
-		else middle="-out $name.req.pem"
+		then middle="-out $name.crt -x509"
+		else middle="-out $name.req"
 	fi
 
 	# -nodes: skip password protect key file
@@ -140,7 +141,7 @@ openssl_gen () {
 		-newkey rsa:2048 \
 		-nodes \
 		-days 365 \
-		-keyout $name.key.pem \
+		-keyout $name.key \
 		$middle \
 		-subj "/C=$country/ST=$stateOrProvince/L=$locality/O=$organization/OU=$organizationUnit/CN=$commonName/emailAddress=$emailAddress"
 }

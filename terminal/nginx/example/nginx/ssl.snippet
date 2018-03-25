@@ -1,0 +1,21 @@
+# based on https://cipherli.st/
+ssl_protocols TLSv1.2;
+ssl_prefer_server_ciphers on; 
+ssl_dhparam ssl/dhparam.pem; # openssl dhparam -out dhparam.pem 4096
+ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;
+ssl_ecdh_curve secp384r1;
+
+# cache
+ssl_session_timeout  10m;
+ssl_session_cache shared:SSL:10m;  # "10Mb will hold around 40,000 connections"
+ssl_session_tickets off;
+
+
+# TODO (though possibly not in snippet by default? don't want to accedentally enable some of them for new domains)
+# OCSP, HPKP, and HSTS
+
+
+# other security headers
+add_header X-Frame-Options DENY; # prevent getting iframed (and related attacks)
+add_header X-Content-Type-Options nosniff; # prevents mime-type sniffing (and related attacks)
+add_header X-XSS-Protection "1; mode=block"; 

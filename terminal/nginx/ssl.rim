@@ -1,0 +1,166 @@
+# terminal/nginx/ssl
+' LeonardPauli/docs
+	Created by Leonard Pauli, 19-25 mar 2018
+
+prerequisites:
+	see nginx.config.edit
+
+
+force-https:
+	server {
+		listen 80 default_server;
+		listen [::]:80 default_server;
+		return 301 https://$server_name$request_uri;
+	}
+	server {
+		listen 443 default_server ssl;
+		listen [::]:443 default_server ssl;
+		...
+	}
+
+
+base.setup:
+	prerequisites
+		- "terminal/ssl.certificate.create"
+
+	- see "use stronger dhparam"
+	- see "create ssl default settings snippet"
+	- create https block:
+		- nginx.config.edit:
+			server {
+				listen 443 ssl;
+				listen [::]:443 ssl; # IPv6
+				server_name example.com www.example.com;
+
+				include conf.d/ssl.snippet;
+
+				# use keys
+				ssl_certificate /path/to/ssl.crt;
+				ssl_certificate_key /path/to/ssl.key;
+
+				# rest as previously in http block
+				...
+			}
+
+use ssl:
+	// see http://nginx.org/en/docs/http/configuring_https_servers.html
+	// 	- especially for multi-domain - one-ip setups
+	// https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-in-ubuntu-16-04
+	// https://scotthelme.co.uk/a-plus-rating-qualys-ssl-test/
+	// https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
+
+	- see base.setup
+	- see force-https
+	- see "use OCSP stapling"
+	- see "use HPKP extension"
+	- see "use HSTS"
+
+	- test:
+		- "https://ssllabs.com"
+		- "https://ssldecoder.org"
+		- "https://certificatemonitor.org"
+
+
+use stronger dhparam: // details? used in key communication, but weaker by default
+	- generate: openssl dhparam -out ssl/dhparam.pem 4096 // takes ~3 minutes
+	- edit nginx config:
+		ssl_dhparam ssl/dhparam.pem; # openssl dhparam -out dhparam.pem 4096
+
+create ssl default settings snippet:
+	prerequisites
+		- optional: "use stronger dhparam"
+	- vi nginx/ssl.snippet // create ssl config snippet	
+		# based on https://cipherli.st/
+		ssl_protocols TLSv1.3; // try TLSv1.2 if 1.3 not available, avoid ssl v2-3 (unsecure)
+		# (optionally insert here from nginx.ssl."use stronger dhparam")
+		ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;
+			' cipher suit
+				simple: ssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';
+				for backwards compatibility (IE6/WinXP): ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:ECDHE-RSA-AES128-GCM-SHA256:AES256+EECDH:DHE-RSA-AES128-GCM-SHA256:AES256+EDH:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4";
+				- unsupported are auto-discarded
+				- ordering sets priority
+		ssl_prefer_server_ciphers on;
+		ssl_ecdh_curve secp384r1; # ?
+
+		# cache
+		ssl_session_timeout 10m;
+		ssl_session_cache shared:SSL:10m; # "10Mb will hold around 40,000 connections"
+		ssl_session_tickets off; # ?
+
+
+# extra
+
+
+use OCSP stapling: // after nginx ssl with CA is setup
+	// https://raymii.org/s/tutorials/OCSP_Stapling_on_nginx.html
+	- firewall.allow.outbound connections to urls;
+	- urls: getOCSPURLs "mysite.com"
+		getOCSPURLs () {
+			domain=${1:-google.com}
+			OLDIFS=$IFS; IFS=':'
+			certificates=$(openssl s_client -connect $domain:443 -servername $domain -showcerts -tlsextdebug -tls1 2>&1 </dev/null \
+				| sed -n '/-----BEGIN/,/-----END/ {/-----BEGIN/ s/^/:/; p;}');
+			for certificate in ${certificates#:}; do
+				echo $certificate | openssl x509 -noout -ocsp_uri; done;
+			IFS=$OLDIFS
+		}
+	- add to nginx conf "https (443) server block"
+		# OCSP
+		ssl_stapling on;
+		ssl_stapling_verify on;
+		resolver 8.8.8.8 8.8.4.4 valid=300s; # see network.dns.providers
+		resolver_timeout 5s;
+	- server certificate issuer (usually CA) cert has to be known, it is if:
+		- ssl_certificate contains the intermidiate certs // probably
+		- ssl_trusted_certificate is set to the server certificate issuer cert // ssl_trusted_certificate /etc/ssl/certs/domain.chain.stapling.pem;
+	- see nginx.config.edit
+	- test it
+		- openssl s_client -connect example.org:443 -tls1 -tlsextdebug -status \
+			| grep "OCSP Response Status: successful"
+
+
+use HSTS: "HTTP Strict Transport Security" // forces https
+	// https://hstspreload.org/
+	Warning: do in stages, cause there is no easy going back + affects ALL subdomians
+		- 5 minutes: max-age=300; includeSubDomains
+		- 1 week: max-age=604800; includeSubDomains
+		- 1 month: max-age=2592000; includeSubDomains
+	- nginx.config.edit: https block:
+		# HPKP
+		add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
+
+
+use HPKP extension:
+	// TODO: see https://raymii.org/s/articles/HTTP_Public_Key_Pinning_Extension_HPKP.html
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Public_Key_Pinning
+	- backup pins
+	- get "SPKI Fingerprint":
+		openssl x509 -noout -in certificate.pem -pubkey | \
+		openssl asn1parse -noout -inform pem -out public.key;
+		openssl dgst -sha256 -binary public.key | openssl enc -base64
+	- do get."SPKI Fingerprint" for:
+		- first cert in chain (eg. CA cert)
+		- a backup public key // in case CA changes root cert for new generations?
+	- nginx: add to https block: // possibly without new lines
+		# HPKP
+		add_header Public-Key-Pins
+			'pin-sha256="klO23nT2ehFDXCfx3eHTDRESMz3asj1muO+4aIdjiuY="; // SPKI Fingerprint 1
+			pin-sha256="633lt352PKRXbOwf4xSEa1M517scpD3l5f79xMD9r9Q="; // SPKI Fingerprint backup
+			report-uri="http://example.org/hpkp-report";
+			max-age=2592000; includeSubDomains';
+		// optionally use "Public-Key-Pins-Report-Only" header instead to disable enforcement
+		// (as to not make site unreachable if incorrect config)
+		// then switch it to "Public-Key-Pins" when tested
+	- handle reports
+		setup monitoring / logging + alerts for: // example request
+			POST \(report-uri): json:
+				{
+					"date-time": "2014-12-26T11:52:10Z",
+					"hostname": "www.example.org",
+					"port": 443,
+					"effective-expiration-date": "2014-12-31T12:59:59",
+					"include-subdomains": true,
+					"served-certificate-chain": ["-----BEGINCERTIFICATE-----\nMIIAuyg[...]tqU0CkVDNx\n-----ENDCERTIFICATE-----"],
+					"validated-certificate-chain": ["-----BEGINCERTIFICATE-----\nEBDCCygAwIBA[...]PX4WecNx\n-----ENDCERTIFICATE-----"],
+					"known-pins": ["pin-sha256=\"dUezRu9zOECb901Md727xWltNsj0e6qzGk\"", "pin-sha256=\"E9CqVKB9+xZ9INDbd+2eRQozqbQ2yXLYc\""]
+				}

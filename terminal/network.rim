@@ -30,6 +30,10 @@ dictionary:
 		// eg. domain name -> IP address
 	  test: "https://intodns.com/example.com"
 	  	alt: nslookup -q=any example.com
+	  providers:
+	  	- googles: 8.8.8.8, 8.8.4.4
+			- aws: 172.16.0.23
+			- opendns: 208.67.222.222, 208.67.220.220 // https://use.opendns.com/
 
 	hosts-file: "/etc/hosts" // (on osx) "mini dns" domain name -> IP lookup, checked before external dns
 		// http://osxdaily.com/2012/08/07/edit-hosts-file-mac-os-x/

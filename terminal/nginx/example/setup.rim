@@ -6,3 +6,76 @@ prerequisites:
 	see setup-simple."simplest server setup"
 	// optional: see setup-simple."creating dev-mode setup"
 
+- self-signed ssl example:
+	- make main nginx.conf editable
+		- docker-compose exec nginx sh -c "cat /etc/nginx/nginx.conf" > nginx.conf // copy it from inside the container
+		- edit Dockerfile: // insert close to "layer nginx config"
+			COPY nginx.conf /etc/nginx/nginx.conf
+		- vi nginx.conf // comment out ssl_session_cache, because it conflicts with later settings ("... conflicts with already declared size ...")
+
+	- mkdir ssl && echo ssl >> .gitignore // key should be secret, and not in source version control / git (it only is in this example as an example)
+	- ssl.example.setup."self signed certificate"
+		FOLDER: "ssl"
+		DOMAINS: "localhost,127.0.0.1,::1,my-app.dev"
+	- nginx.ssl.base.setup
+		default.conf should then have two server blocks (80 and 443), both ending with:
+			root /usr/src/app/;
+			try_files /index.html =404;
+	- nginx.security."use recommended security headers:"
+	- make ssl folder available in container
+		- edit Dockerfile: // insert close to "layer nginx config"
+			VOLUME /etc/nginx/ssl
+		- edit docker-compose.yaml: // insert after + at same level as "build" block
+			volumes:
+				- ./ssl:/etc/nginx/ssl
+	- expose https port (443, in addition to http port, 80)
+		- edit Dockerfile:
+			EXPOSE 80 443
+		- edit docker-compose.yaml:
+			port: ["80:80", "443:443"]
+
+	- docker-compose up --build -d
+	- test it at localhost
+		- docker-compose logs // if not showing up
+	- test it at https://localhost
+		should say "Not secure"
+
+
+
+	next step would be to:
+		- create your own CA
+		- a signing-request
+		- sign it with your CA
+		- generate crt and key, use those instead, and
+		- trust your CA on your computer (possibly requires browser restart)
+		then you should get the green lock directly
+		
+	thereafter:
+		- edit hosts file to get https://my-app.dev
+		- force-https
+		- auto-renew cert with your CA as an external service
+		- switch out your CA with a recognizable (eg. lets-encrypt)
+		- change auto-renew script to work with its service
+
+	then:
+		- secure production environment:
+			// see https://github.com/voxpupuli/hiera-eyaml
+			// see terminal/pgp-workflow
+			- generate server.key.(pub and priv) on server once during setup by trusted sysadmin
+			- only copy server.key.pub, and save it to git
+			- discard all access to server (including server.key.priv)
+				// it will then only be changed using git/CI system
+				// if now core setup is needed, only option is to discard and recreate the server
+				// Possible to save backup access in case inspection needed (in case of attack)? if so its use should be clearly noted.
+			- upload server.key.priv to 
+			- secret production files
+				- eg. .env.prod and ssl.key.prod
+				- encrypt using server.key.pub, during dev
+				- decrypt using server.key.priv, on server
+				' should only be readable by prod server, but writable by devs
+						- only reach prod after CI and peer-review
+						- extra flag if secure stuff changed
+						- only pass master CI if last commit signed by trusted devs
+					encrypted could be stored in git
+						(but keeping them org-public rather than world-public can't be that bad if quantum computers manage to crack all encryption? :))
+							(Nah, bigger problems then.)

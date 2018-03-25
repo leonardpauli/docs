@@ -184,7 +184,7 @@ features:
 			// see https://www.nginx.com/resources/wiki/start/topics/examples/logrotation/
 
 	ssl: // for https
-		see ssl.nginx.config.ssl
+		see "./ssl"
 
 
 
@@ -281,6 +281,7 @@ config
 		$args // querystring? eg. "query=value&string=v"
 		$request_uri // path + querystring + fragment? "/some/path/?query=value&string=v#fragment"
 		$scheme // before colon? "https"
+		$server_name // "domain name", eg. www.domain.tld
 
 		$document_root // see directive.root
 
@@ -332,7 +333,7 @@ performance-optimization:
 		client_header_timeout 30;
 		client_body_timeout 60;
 		send_timeout 60;
-		keepalive_timeout 65 20;
+		keepalive_timeout 65 20; // tradeof between what and what?
 		### buffers ###
 		client_header_buffer_size 1k;
 		client_body_buffer_size 128k;
@@ -341,6 +342,11 @@ performance-optimization:
 		client_body_temp_path /var/spool/nginx/client/;
 		output_buffers 1 32k;
 		postpone_output 1460;
+
+' robots:
+	// https://stackoverflow.com/questions/9090577/what-is-the-http-header-x-xss-protection
+	// add_header X-Robots-Tag none; # really wanted?
+	// https://developers.google.com/search/reference/robots_meta_tag
 
 // other references:
 // https://www.nginx.com/resources/wiki/start/topics/tutorials/config_pitfalls/

@@ -10,6 +10,8 @@ WORKDIR /usr/src/app
 COPY . /usr/src/app
 
 # layer nginx config + set start
+VOLUME /etc/nginx/ssl
+COPY nginx.conf /etc/nginx/nginx.conf
 COPY ./nginx /etc/nginx/conf.d
 ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]
-EXPOSE 80
+EXPOSE 80 443
