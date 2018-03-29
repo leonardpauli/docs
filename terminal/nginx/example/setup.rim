@@ -71,6 +71,13 @@ prerequisites:
 		server_name local.my-app.com my-app.localhost;
 
 
+- clenup nginx config
+	- mv nginx.conf nginx/nginx.conf
+	- mkdir sites && mkdir snippets && mv ssl.snippet snippets/ssl.conf
+	- extract snippets into snippets/*.conf, and site into sites/my-app.conf // using "include snippets/xxx.conf"
+	- rm default.conf
+	- vi Dockerfile: // replace previous two nginx copy lines with one
+		COPY ./nginx/ /etc/nginx/
 
 
 	thereafter:

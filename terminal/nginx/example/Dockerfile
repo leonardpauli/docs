@@ -11,7 +11,6 @@ COPY . /usr/src/app
 
 # layer nginx config + set start
 VOLUME /etc/nginx/ssl
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY ./nginx /etc/nginx/conf.d
+COPY ./nginx/ /etc/nginx/
 ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]
 EXPOSE 80 443
