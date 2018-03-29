@@ -16,7 +16,8 @@ prerequisites:
 	- mkdir ssl && echo ssl >> .gitignore // key should be secret, and not in source version control / git (it only is in this example as an example)
 	- ssl.example.setup."self signed certificate"
 		FOLDER: "ssl"
-		DOMAINS: "localhost,my-app.dev"
+		DOMAINS: "localhost,my-app.localhost,local.my-app.com"
+		// see "custom localhost domain name"
 	- nginx.ssl.base.setup
 		default.conf should then have two server blocks (80 and 443), both ending with:
 			root /usr/src/app/;
@@ -42,8 +43,8 @@ prerequisites:
 
 
 - ssl using cert-signing-request and own CA:
-	- CA.local-dev.create-and-install {NAME: "nginx.example test CA"}
-	- cert.create-using-CA {USERFACINGNAME: "my-app.dev cert", DOMAINS: "localhost", "my-app.dev"}
+	- terminal/ssl/using-ca.CA.local-dev.create-and-install {NAME: "nginx.example test CA"}
+	- terminal/ssl/using-ca.cert.create-using-CA {USERFACINGNAME: "my-app.dev cert", DOMAINS: "localhost", "my-app.localhost", "local.my-app.com"}
 	- use new files
 		- move (crt, key) to ssl/ and rename to own-ca-signed.(crt, key)
 		- vi nginx/default.conf -c ":%s/selfsigned/own-ca-signed/g" -c ":wq" // replace selfsigned with own-ca-signed
@@ -52,10 +53,27 @@ prerequisites:
 
 
 - see nginx.ssl.force-https
+- see nginx.ssl.catch-all
+
+
+- custom localhost domain name:
+	' note
+		my-app.dev was a common pattern before google bought it as a gTLD
+			(and enforced https (good but not when testing own https redirect...))
+		localhost -> 127.0.0.1 (by default)
+		*.local -> reserved by "Apple Bonjour" in osx
+		*.localhost -> 127.0.0.1 (by default in many os:es, but not always, though it's reserved to not be registered as an TLD, + clear (but many chars), so relatively good choice, could possibly be wrongly used by something else)
+		local.my-app.com -> 127.0.0.1 (configurable in /etc/hosts, probably best if you already own my-app.com)
+		(make sure the name you choose is in your ssl cert (self-signed for dev / local))
+	- see network.hosts-file.edit: // add line
+		127.0.0.1 local.my-app.com
+	- make server respond to it: vi nginx/default.conf // where just my-app.localhost was before
+		server_name local.my-app.com my-app.localhost;
+
+
 
 
 	thereafter:
-		- edit hosts file to get https://my-app.dev
 		- auto-renew cert with your CA as an external service
 		- switch out your CA with a recognizable (eg. lets-encrypt)
 		- change auto-renew script to work with its service
@@ -82,38 +100,3 @@ prerequisites:
 					encrypted could be stored in git
 						(but keeping them org-public rather than world-public can't be that bad if quantum computers manage to crack all encryption? :))
 							(Nah, bigger problems then.)
-
-
-notes: // TODO: move to terminal/ssl
-	- CA.local-dev.create-and-install {NAME: "nginx.example test CA"}
-		// https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/
-		- key.private.create: openssl genrsa -out myCA.key 2048
-			// use -des3 (instead of -nodes) to encrypt key with passphrase (store in 1password or similar)
-			// just to prevent anyone that happens to come over the file to create certs trusted by your computer
-			// though if they get the file, there will be bigger issues, and it will be limited to SSL (see below), and only used for local development...
-		- cert.root.create: openssl req -x509 -new -nodes -key myCA.key -sha256 -days 365 -out myCA.pem -subj "/CN=NAME"
-		- CA.cert.root.install
-			- on OSX: // (possibly requires browser restart)
-				- open /Applications/Utilities/Keychain\ Access.app/
-				- File -> Import Items... (⌘⇧I)
-				- search (⌘⌥F): NAME
-				- double click it, expand trust section, change SSL to Always trust, close, enter password
-
-	- cert.create-using-CA {USERFACINGNAME: "my-app.dev cert", DOMAINS: "localhost", "my-app.dev"}
-		- a signing-request
-			- key.private.create: openssl genrsa -out domain.key 2048
-			- signing-request.create: openssl req -new -key domain.key -out domain.csr -subj "/CN=USERFACINGNAME"
-		- send it + domain names to CA for signed cert creation // you keep the private key?
-			- config.create: vi domain.ext // TODO: if this is the same kind of file as in self-signed... DRY it up?
-				authorityKeyIdentifier=keyid,issuer
-				basicConstraints=CA:FALSE
-				keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment # sure of all of those?
-				subjectAltName = @alt_names
-
-				[alt_names]
-				DNS.1 = DOMAINS.0
-				DNS.2 = DOMAINS.1
-				# etc
-			- CA.cert.create with req: openssl x509 -req -sha256 -days 365 \
-				-CA myCA.pem -CAkey myCA.key -CAcreateserial \
-				-extfile domain.ext -in domain.csr -out domain.crt

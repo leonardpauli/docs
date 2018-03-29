@@ -1,0 +1,30 @@
+# tosort/javascript
+' LeonardPauli/docs
+	Created by Leonard Pauli, 29 mar 2018
+
+// programming language
+// 	- different from java
+// 	- widely used and popular (eg. default in websites / browsers as of 2018, will probably change with webasm though)
+
+tooling:
+	package manager:
+		- npm (alt. yarn)
+		- alt: bower, etc
+	linting
+		- eslint
+		- prettier?
+	transpiling
+		- babel
+	static type checking
+		- flow
+		- typescript
+	bundeling
+		- webpack
+		- alt: rollup, etc
+	testing:
+		- jest
+		- alt: mocka, etc
+
+
+' to read:
+	https://jgthms.com/javascript-in-14-minutes/

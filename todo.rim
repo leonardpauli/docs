@@ -17,7 +17,9 @@ thoughs:
 	- sync with nodenotes when ready
 	- open up personal todo list?
 	- improved guides // eg. practical example with all technologies, step by step using refs
+	- move terminal.server.troubleshooting to new devops file?
 
 items:
 	- take out mainpoints for admin.privacy.gdpr
 
+// see https://github.com/sindresorhus/awesome

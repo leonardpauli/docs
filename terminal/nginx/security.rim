@@ -6,7 +6,7 @@
 see "./ssl.use ssl"
 
 use recommended security headers:
-	- nginx.config.edit: // global by adding to http block (or all server blocks)
+	- nginx.config.edit: // global by adding to relevant server blocks (possibly through snippet/include), all headers set in http/main context will be overriden if any is set in the (request specific) server block
 
 		# security headers
 		add_header X-Frame-Options DENY; # prevent getting iframed (and related attacks)

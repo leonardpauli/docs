@@ -1,0 +1,14 @@
+# tosort/open-data
+' LeonardPauli/docs
+	Created by Leonard Pauli, 29 mar 2018
+
+// sources for data (somewhat) free to use
+
+code:
+	- "https://github.com"
+	problems:
+		- "http://rosettacode.org/wiki/Category:Programming_Tasks"
+		- "http://www.techiedelight.com/list-of-problems/"
+
+other:
+	- "https://aws.amazon.com/public-datasets/"

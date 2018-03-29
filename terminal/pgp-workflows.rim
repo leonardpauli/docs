@@ -76,3 +76,7 @@ add to github:
 	gpg2 --export-secret-key -a SenderName > SenderName.private.key
 	gpg2 --delete-secret-key SenderName
 	gpg2 --delete-key SenderName
+
+
+' to read:
+	- https://eklitzke.org/using-gpg-agent-effectively

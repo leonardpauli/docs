@@ -3,12 +3,15 @@
 	Created by Leonard Pauli, 19 mar 2018
 
 // TODO
+// https://wonderunit.com/thoughts-on-free-and-open-source/
+// https://cla-assistant.io/
+// https://github.com/tvvocold/FOSS-for-Dev
 
 contributions
 	// see http://unlicense.org/
 	- make sure contributions are provided under the same licence
 	- possibly have contributors sign a waiver with gpg (see "terminal/pgp-workflows"), with same key as they sign their commits?
-
+		possible to do fine without?
 
 SPDX // Software Package Data Exchange
 	// supported by Linux foundation

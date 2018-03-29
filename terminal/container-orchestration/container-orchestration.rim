@@ -2,7 +2,37 @@
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 23 mar 2018
 
-// ...
+// ability to manage software on virtually infinite hardware
+// 	- ("scaling cpu"?)
+
+options:
+	- just getting one really huge server
+		more than not, you could fit all the db data in ram, have enough processing power / threads / workers, and network throughput, in one package
+		alts: aws: x1.32xlarge: 1952GiB, 128vCPUs, (2 * 1920GiB SSD), 25Gigabit
+			- on-demand: $13/h, (if less load, smart scheduling possible)
+			- reserved, 3yr, upfront payment: ~70% off (marked changes fast, value will probably decrease with times)
+			- https://www.ec2instances.info
+	- CaaS // Container as a Service, upload the container images and let the service handle instance provisioning, spinup/down of containers, 0 downtime deploy, etc
+		alt: eg. google cloud
+		using (see container-orchestration)
+	- serverless, FaaS // Function as a Service, upload functions, not whole server setups/containers
+		// see https://read.acloud.guru/serverless-is-eating-the-stack-and-people-are-freaking-out-and-they-should-be-431a9e0db482
+		alts:
+			- aws lambda
+			- https://github.com/openfaas/faas
+		if:
+			- enough uneven traffic (eg. less during nights, or spikes): only pay when used (though each minute/secound/request/data could cost a bit more then a mostly utilised reserved instance)
+			- enough traffic or smart function "warming" // if not used, code for function might get "cold" and take a minute to re-initiate (though there are workarounds)
+			- no specific os setting needed
+			- service might need to scale (serverless provider handles all the cpu scaling relatively automatically, see function warming)
+			- ...?
+		- less devops, more automatic scaling + deploy, though..
+		- ..cold functions?
+		- more cost per possible request, but no overhead cost (great for uneven/low traffic, less good if instances already are max-utilized)
+		- harder to monitor yourself? (you don't own the infrastructure, only the functions)
+		- note:
+			- cold functions
+			- eg. db connections will be many thousand (if used per function) instead of a couple (if per instance)
 
 // TODO
 
@@ -17,7 +47,7 @@ image.create: see docker
 container.(create / manage): see docker
 declarative image / container setup / management: see docker-compose
 
-container orchestration: // handle containers over multiple machines etc
+container-orchestration: // handle containers over multiple machines etc
 	- docker-swarms // nicer UX, familar syntax + easy to setup, etc, though..
 	- kubernetes // larger community + performance, more "the way to go"
 

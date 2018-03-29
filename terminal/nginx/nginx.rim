@@ -10,8 +10,6 @@
 NOTE: see "example/setup.rim" first
 
 
-// see https://www.nginx.com/resources/wiki/start/topics/examples/SSL-Offloader/
-
 install:
 	using custom dockerfile: // assumes: mkdir nginx && vi nginx/default.conf # see config
 		FROM alpine:3.7
@@ -43,6 +41,14 @@ install:
 
 
 features:
+
+	static response:
+		server {
+			listen 80; listen [::]:80;
+			server_name _;
+			default_type text/plain;
+			return 200 "hello world";
+		}
 
 	// route to other server 
 	// route on domain name + multiple
@@ -352,3 +358,5 @@ performance-optimization:
 // other references:
 // https://www.nginx.com/resources/wiki/start/topics/tutorials/config_pitfalls/
 // https://www.nginx.com/resources/wiki/start/topics/examples/fullexample2/
+// https://github.com/fcambus/nginx-resources
+// https://www.nginx.com/resources/wiki/start/topics/examples/SSL-Offloader/

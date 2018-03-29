@@ -232,3 +232,15 @@ function
 		- "my_function () { echo hello; return 'hi' }"
 	arguments:
 		// see https://stackoverflow.com/a/30033822/1054573
+
+server.troubleshooting: // from https://news.ycombinator.com/item?id=16685452, lazyant
+	uptime # uptime and CPU stress
+	w # or better yet: last | head # who is/has been in
+	netstat -tlpn # find server role
+	df -hi # check inode availability + free memory (out of disk space?)
+	grep kill /var/log/messages # out of memory?
+	ps auxf # what's running
+	htop # (alt. top) stressed?, look out for D (waiting on I/O typically) processes
+	history # what has changed recently
+	tail /var/log/application.log # anything interesting logged?
+

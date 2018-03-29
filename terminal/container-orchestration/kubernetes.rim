@@ -5,6 +5,8 @@
 // ...
 
 // TODO
+// http://blog.kubernetes.io/2018/03/kubernetes-1.10-stabilizing-storage-security-networking.html
+// https://kubernetes.io/docs/tutorials/
 
 installation:
 	// TODO

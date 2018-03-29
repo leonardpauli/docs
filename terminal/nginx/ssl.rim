@@ -7,16 +7,48 @@ prerequisites:
 
 
 force-https:
-	server {
-		listen 80 default_server;
-		server_name _; # wildcard
-		return 301 https://$host$request_uri; # using host here (set by client?) instead of $server_name (because it's empty because of the wildcard..?)
-	}
-	server {
-		listen 443 default_server ssl;
-		listen [::]:443 default_server ssl;
-		...
-	}
+	- config.edit:
+		# force https on known domains
+		#  - using 301/308 (permanent redirect) could be hard to undo
+		# 	-> use 307 when testing (temporary redirect)
+		server {
+			listen 80;
+			listen [::]:80;
+			server_name
+				domainname.tld variant.domainname.tld
+				other-domainname.tld
+				etc.tld
+			;
+			return 301 https://$host$request_uri;
+		}
+
+
+		# my-app
+		server {
+			listen 443 default_server ssl;
+			listen [::]:443 default_server ssl;
+			server_name domainname.tld variant.domainname.tld;
+			...
+		}
+	' caching
+		// see https://stackoverflow.com/questions/9130422/how-long-do-browsers-cache-http-301s
+		undo a 301
+			- hard, avoid if possible
+			- make a new redirect from where the first landed
+				if back to first source
+					- look out for redirect loops (make sure first redirect is removed)
+					- allowed to change firsts target
+				else: people might still have the "permanent" 301 left (do not remove (change is ok) first+second redirect)
+
+catch-all:
+	- config.edit: // insert in bottom
+		# catch all
+		server {
+			listen 443; listen [::]:443; # both https and http
+			listen 80; listen [::]:80;
+			server_name ~.; # like wildcard _, but better in some cases (?)
+			return 444; # nginx for abort
+		}
 
 
 base.setup:
