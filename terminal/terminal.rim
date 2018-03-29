@@ -159,7 +159,8 @@ syntax
 		- a || b // run second if first err?
 		- a | b // "pipe" stdout from a to stdin of b
 
-create executable script:
+
+executable.create: // script
 	- vi mycommand
 		#!/bin/bash # aka "shebang", indicating path to program to send the rest of the file to for execution
 		echo "hello there"
@@ -168,9 +169,11 @@ create executable script:
 	- PATH=PATH:$(pwd) // temporarily add current folder to "PATH", allows you to write mycommand directly, see "edit bashrc" for persistant
 	- mycommand // run script as any other
 
-	- time ... // "time command execution"
+executable
+	time ... // "time command execution"
 
-edit bashrc:
+
+bashrc.edit:
 	// TODO
 	vi ~/.bashrc
 	vi ~/.zshrc
@@ -244,3 +247,24 @@ server.troubleshooting: // from https://news.ycombinator.com/item?id=16685452, l
 	history # what has changed recently
 	tail /var/log/application.log # anything interesting logged?
 
+
+
+cronjob: // helper for interacting with cron (from greek work for time), scheduled-command-execution
+	// deamon should launch on system start and will check config every minute
+	// see https://askubuntu.com/questions/2368/how-do-i-set-up-a-cron-job
+	format: "https://crontab.guru/#*/5_*_*_*_*"
+		- minute, hour, day in month, month (jan - dec, 1-12), day in week (sun - sat, 0-6)
+		- *: any
+		- */1: everyone
+		- 1: when it is 1
+	example:
+		- */1 * * * * echo "hello $(whoami) $(date) $(pwd)" >> Documents/hello.txt // every minute
+			// hello leonardpauli Thu Mar 29 14:37:00 CEST 2018 /Users/leonardpauli
+			// hello leonardpauli Thu Mar 29 14:38:00 CEST 2018 /Users/leonardpauli
+			// etc
+		- 0 0 */2 * * command // execute command every second day at 00:00
+	edit.interactively: crontab -e // add your lines, and ":wq", it will check every minute, + run as your user
+	edit.programmatically:
+		add: (crontab -l && echo "*/1 * * * * command") | crontab -
+		view: crontab -l
+		remove: (crontab -l | sed -e "s/.* command//g") | crontab - // lookout for regex chars in "command"

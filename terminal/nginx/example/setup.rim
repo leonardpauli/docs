@@ -80,6 +80,24 @@ prerequisites:
 		COPY ./nginx/ /etc/nginx/
 
 
+- auto-renew
+	see "ssl using cert-signing-request and own CA":
+	see terminal.executable.create
+	see terminal.cronjob
+
+	- vi ssl/own-ca-signed.renew.sh:
+		#!/bin/bash
+		openssl x509 -req -sha256 -days 30 \
+			-CA ../files/myCA.pem -CAkey ../files/myCA.key -CAcreateserial \
+			-extfile own-ca-signed.ext -in own-ca-signed.csr -out own-ca-signed.crt
+	- chmod u+x ssl/own-ca-signed.renew.sh
+		test it: cd ssl && ./own-ca-signed.renew.sh
+		inspect it: openssl x509 -in own-ca-signed.crt -text -noout // check that validity.not before is when the command was run
+		cd ..
+	- terminal.cronjob.add: "0 0 */2 * * cd $(pwd)/ssl && ./own-ca-signed.renew.sh" // $(pwd) should be project dir
+		// test it by eg. running it in one minute, wait, and check expected result, remove with terminal.cronjob.remove
+
+
 	thereafter:
 		- auto-renew cert with your CA as an external service
 		- switch out your CA with a recognizable (eg. lets-encrypt)
