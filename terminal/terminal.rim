@@ -268,3 +268,6 @@ cronjob: // helper for interacting with cron (from greek work for time), schedul
 		add: (crontab -l && echo "*/1 * * * * command") | crontab -
 		view: crontab -l
 		remove: (crontab -l | sed -e "s/.* command//g") | crontab - // lookout for regex chars in "command"
+
+	email output/error: // ???
+		MAILTO=email@domain.com

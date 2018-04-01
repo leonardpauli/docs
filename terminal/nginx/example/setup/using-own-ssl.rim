@@ -1,0 +1,53 @@
+# terminal/nginx/example/using-ssl-own
+' LeonardPauli/docs
+	Created by Leonard Pauli, 24-31 mar 2018
+
+prerequisites:
+	see "./setup-server-simple"
+
+- ssl using self-signed cert:
+	- make main nginx.conf editable
+		- docker-compose exec nginx sh -c "cat /etc/nginx/nginx.conf" > nginx.conf // copy it from inside the container
+		- edit Dockerfile: // insert close to "layer nginx config"
+			COPY nginx.conf /etc/nginx/nginx.conf
+		- vi nginx.conf // comment out ssl_session_cache, because it conflicts with later settings ("... conflicts with already declared size ...")
+
+	- mkdir ssl && echo ssl >> .gitignore // key should be secret, and not in source version control / git (it only is in this example as an example)
+	- ssl.example.setup."self signed certificate"
+		FOLDER: "ssl"
+		DOMAINS: "localhost,my-app.localhost,local.my-app.com"
+		// see "custom localhost domain name"
+	- nginx.ssl.base.setup
+		default.conf should then have two server blocks (80 and 443), both ending with:
+			root /usr/src/app/;
+			try_files /index.html =404;
+	- nginx.security."use recommended security headers:"
+	- make ssl folder available in container
+		- edit Dockerfile: // insert close to "layer nginx config"
+			VOLUME /etc/nginx/ssl
+		- edit docker-compose.yaml: // insert after + at same level as "build" block
+			volumes:
+				- ./ssl:/etc/nginx/ssl
+	- expose https port (443, in addition to http port, 80)
+		- edit Dockerfile:
+			EXPOSE 80 443
+		- edit docker-compose.yaml:
+			port: ["80:80", "443:443"]
+
+	- docker-compose up --build -d
+	- test it at localhost
+		- docker-compose logs // if not showing up
+	- test it at https://localhost
+		should say "Not secure"
+
+
+- ssl using cert-signing-request and own CA:
+	' if using files/ directory to store CA keys etc, exclude it from git and docker:
+		- echo files >> .dockerignore && echo files >> .gitignore
+	- terminal/ssl/using-ca.CA.local-dev.create-and-install {NAME: "nginx.example test CA"}
+	- terminal/ssl/using-ca.cert.create-using-CA {USERFACINGNAME: "my-app.dev cert", DOMAINS: "localhost", "my-app.localhost", "local.my-app.com"}
+	- use new files
+		- move (crt, key) to ssl/ and rename to own-ca-signed.(crt, key)
+		- vi nginx/default.conf -c ":%s/selfsigned/own-ca-signed/g" -c ":wq" // replace selfsigned with own-ca-signed
+	- rebuild and test it
+		now you should get the green lock

@@ -1,4 +1,4 @@
-# terminal/nginx/example/setup-simple
+# terminal/nginx/example/setup-server-simple
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 24 mar 2018
 
@@ -7,7 +7,7 @@ prerequisites:
 	see terminal/vim.general
 
 
-simplest server setup:
+setup server.simple:
 	- mkdir example && cd example // create project
 	- echo hello > index.html // create file to serve
 	- mkdir nginx && vi nginx/default.conf // setup nginx config
@@ -61,6 +61,7 @@ simplest server setup:
 		- docker images // should not show it anymore
 
 
+
 - simplify start / stop with docker-compose:
 	// especially usefull when configuration gets larger, and multiple containers are linked together, etc
 
@@ -86,6 +87,7 @@ simplest server setup:
 	clean up:
 		- docker-compose down // remove container and its network
 		- docker rmi simple-nginx-example // remove image
+
 
 
 creating dev-mode setup: // (not having to restart all the time):

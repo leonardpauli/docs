@@ -1,0 +1,53 @@
+# terminal/nginx/example/nginx-misc-fixes
+' LeonardPauli/docs
+	Created by Leonard Pauli, 24,31 mar 2018
+
+prerequisites:
+	see "./using-ssl-own"
+
+
+- see nginx.ssl.force-https
+- see nginx.ssl.catch-all
+
+- custom localhost domain name:
+	' note
+		my-app.dev was a common pattern before google bought it as a gTLD
+			(and enforced https (good but not when testing own https redirect...))
+		localhost -> 127.0.0.1 (by default)
+		*.local -> reserved by "Apple Bonjour" in osx
+		*.localhost -> 127.0.0.1 (by default in many os:es, but not always, though it's reserved to not be registered as an TLD, + clear (but many chars), so relatively good choice, could possibly be wrongly used by something else)
+		local.my-app.com -> 127.0.0.1 (configurable in /etc/hosts, probably best if you already own my-app.com)
+		(make sure the name you choose is in your ssl cert (self-signed for dev / local))
+	- see network.hosts-file.edit: // add line
+		127.0.0.1 local.my-app.com
+	- make server respond to it: vi nginx/default.conf // where just my-app.localhost was before
+		server_name local.my-app.com my-app.localhost;
+
+
+- clenup nginx config
+	- mv nginx.conf nginx/nginx.conf
+	- mkdir sites && mkdir snippets && mv ssl.snippet snippets/ssl.conf
+	- extract snippets into snippets/*.conf, and site into sites/my-app.conf // using "include snippets/xxx.conf"
+	- rm default.conf
+	- vi Dockerfile: // replace previous two nginx copy lines with one
+		COPY ./nginx/ /etc/nginx/
+
+
+- auto-renew
+	see "ssl using cert-signing-request and own CA":
+	see terminal.executable.create
+	see terminal.cronjob
+
+	- vi ssl/own-ca-signed.sh:
+		#!/bin/bash
+		openssl x509 -req -sha256 -days 30 \
+			-CA ../files/myCA.pem -CAkey ../files/myCA.key -CAcreateserial \
+			-extfile own-ca-signed.ext -in own-ca-signed.csr -out own-ca-signed.crt
+	- chmod u+x ssl/own-ca-signed.sh
+		test it: cd ssl && ./own-ca-signed.sh
+		inspect it: openssl x509 -in own-ca-signed.crt -text -noout // check that validity.not before is when the command was run
+		cd ..
+	- terminal.cronjob.add: "0 0 */2 * * cd $(pwd)/ssl && ./own-ca-signed.sh" // $(pwd) should be project dir
+		// test it by eg. running it in one minute, wait, and check expected result, remove with terminal.cronjob.remove
+		// if this is run in host, container needs rebuilding + restart afterwards
+		// better to run it from inside and restart nginx natively?

@@ -10,8 +10,8 @@ force-https:
 	see "use HSTS"
 	- config.edit:
 		# force https on known domains
-		#  - using 301/308 (permanent redirect) could be hard to undo
-		# 	-> use 307 when testing (temporary redirect)
+		#  - if sure, use HSTS, and use 301/308 (permanent redirect), without Cache-Control header // (could be hard to undo)
+		#  - else: use 307 (temporary redirect) with Cache-Control header (eg. 172800 for 2 days, try shorter or no if testing)
 		server {
 			listen 80;
 			listen [::]:80;
@@ -20,7 +20,10 @@ force-https:
 				other-domainname.tld
 				etc.tld
 			;
-			return 301 https://$host$request_uri;
+			location / {
+				add_header Cache-Control "public, max-age=172800";
+				return 307 https://$host$request_uri;
+			}
 		}
 
 
@@ -40,6 +43,15 @@ force-https:
 					- look out for redirect loops (make sure first redirect is removed)
 					- allowed to change firsts target
 				else: people might still have the "permanent" 301 left (do not remove (change is ok) first+second redirect)
+
+force-https.insert-acme-verification:
+	- insert before last location block (see force-http):
+		# acme ssl verification
+		location /.well-known/ {
+			root /usr/src/app/letsencrypt/public; # customize path to what's provided to certbot --webroot-path
+			allow all;
+			try_files $uri =404;
+		}
 
 catch-all:
 	- config.edit: // insert in bottom
