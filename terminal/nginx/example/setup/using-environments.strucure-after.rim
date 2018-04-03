@@ -1,0 +1,78 @@
+# terminal/nginx/example/setup/using-environment.strucure-after
+' LeonardPauli/docs
+	Created by Leonard Pauli, 1-2 apr 2018
+
+
+see "./using-environments"
+// this might not be fully updated
+
+
+structure:
+	
+	files // gitignore, dockerignore; personal notes
+	
+	// setup instructions and scripts
+	setup // dockerignore
+		setup.rim // TODO
+		deploy.sh // TODO
+
+		ssl.ca.create.sh // TODO
+		ssl.prod.sh
+		ssl.local.sh
+	
+		makeshift-data
+			ca
+				ca.srl
+				ca.key
+				ca.pem
+				sign-request.sh // original script
+			ssl
+				prod.key
+				prod.crt
+				local.key
+				local.crt
+
+	// environment data
+	.env.example // TODO
+	.env
+	data // gitignore, dockerignore
+		ca
+			ca.srl
+			ca.key
+			ca.pem
+			sign-request.sh
+		letsencrypt
+			data1
+			data2
+			public
+		ssl
+			prod.key
+			prod.crt
+			prod.csr
+			local.key
+			local.crt
+			local.csr
+
+	// container
+	Dockerfile
+	docker-compose.yml
+	init-and-start.sh // TODO
+
+	// check env + setup outside container + start container(s)
+	run // .sh
+		- abort if not .env exists
+		- abort if not data/ exists
+		- ssl.create if (not .crt exists) and .env.enable // using static server 
+		- ssl.autorenew.setup if .env.enable
+		- docker-compose up
+
+	// server
+	nginx
+		snippets
+		sites
+			init.sh // creates my-app.conf of {local,prod} depending on .env
+			my-app.local.conf
+			my-app.prod.conf
+
+	// application
+	src

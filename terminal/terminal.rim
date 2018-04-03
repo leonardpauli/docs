@@ -79,14 +79,14 @@ navigation
 	- lsoutline: // see "edit bashrc" for how to "install"
 		// TODO: add exclude + depth flagged arguments
 		lsoutline () {
-			local p=${1:-.}
-			local indent=${2-""}
-			([[ $p = "files" ]] || [[ $p = "node_modules" ]]) && return;
+			local p="${1:-.}"
+			local indent="${2-""}"
+			([[ $p = "files" ]] || [[ $p = "node_modules" ]] || [[ $p = ".DS_Store" ]]) && return;
 			[[ -f $p ]] && echo "$indent$p";
-			if [[ -d $p ]] then
-				local savedpwd=$(pwd); cd $p
+			if [[ -d $p ]]; then
+				local savedpwd="$(pwd)"; cd $p
 				echo "$indent$p"
-				for f in *; do lsoutline $f "$indent\t"; done
+				[ "$(ls -A)" ] && (for f in $(echo $(ls -A)); do lsoutline $f "$indent\t"; done)
 				cd $savedpwd
 			fi
 		}
@@ -99,6 +99,9 @@ files
 		rm -rf folder // remove recurcive (all contents) force (no question, otherwise shown if not empty) folder
 	- cat file // copy file contents into terminal
 	- echo "text" // write text into terminal
+	- mv a b // move / rename
+	- cp a b // copy
+	- cp -R a b // copy directory
 
 	temporary:
 		MYTMPDIR=$(mktemp -d) // remove -d for file (path)
@@ -161,7 +164,7 @@ syntax
 
 
 executable.create: // script
-	- vi mycommand
+	- vi mycommand // seems better to use (more platform independent, though permission issue?): #!/usr/bin/env
 		#!/bin/bash # aka "shebang", indicating path to program to send the rest of the file to for execution
 		echo "hello there"
 	- chmod u+x file // change mode; add User eXecutable permission to file
@@ -201,6 +204,8 @@ bashrc.edit:
 			git commit -am "$issuenrhash$*"
 			git push -u origin "$branchname"
 		}
+
+		tabs -2 # set tab-width
 	source ~/.zshrc
 
 	with ohmyzsh:
@@ -263,11 +268,12 @@ cronjob: // helper for interacting with cron (from greek work for time), schedul
 			// hello leonardpauli Thu Mar 29 14:38:00 CEST 2018 /Users/leonardpauli
 			// etc
 		- 0 0 */2 * * command // execute command every second day at 00:00
+	edit.after: /etc/init.d/cron reload // should normally not be necessary, but gotchas with symlinks etc
 	edit.interactively: crontab -e // add your lines, and ":wq", it will check every minute, + run as your user
 	edit.programmatically:
-		add: (crontab -l && echo "*/1 * * * * command") | crontab -
+		add: (crontab -l && echo "*/1 * * * * command # some-id-or-tag") | crontab -
 		view: crontab -l
-		remove: (crontab -l | sed -e "s/.* command//g") | crontab - // lookout for regex chars in "command"
+		remove: (crontab -l | sed -e "s/.* # some-id-or-tag//g") | crontab - // lookout for regex chars in tag, or be safe and stic to alpha-num
 
 	email output/error: // ???
 		MAILTO=email@domain.com

@@ -1,0 +1,142 @@
+# terminal/nginx/example/setup/using-environments
+' LeonardPauli/docs
+	Created by Leonard Pauli, 1-3 apr 2018
+
+prerequisites:
+	see "./nginx-misc-fixes"
+
+see "./using-environment.strucure-after"
+
+
+- setup .env
+	- vi .env.example
+		ENABLE_LOCAL=true
+		ENABLE_PROD=false
+		DOMAINS_LOCAL=my-app.localhost,local.my-app.com
+		DOMAINS_PROD=my-app.com
+		SSL_DISPLAY_NAME=My App
+		SSL_PROD_EMAIL=admin@my-app.com
+		SSL_PROD_STAGEING=true
+	- vi setup.rim
+		// run all commands from project dir
+		- configure environment variables: cp .env.example .env && vi .env // enter own values
+	- echo .env >> .gitignore
+- setup env data
+	- vi setup/setup.rim
+		- provide environment files:
+			- mkdir -p data/ca data/ssl
+			- ./setup/ssl.ca.create.sh // or put your existing in data/ca 
+	- echo data >> .gitignore && echo data >> .dockerignore
+	- vi docker-compose.yaml: // adjust
+		env_file: .env
+
+- create cert create/renew scripts
+	- vi setup/ssl.ca.create.sh // see the file
+	- vi setup/ssl.local.sh // see the file
+	- vi setup/ssl.prod.sh // placeholder for now
+	- chmod u+x setup/ssl.local.sh
+	- chmod u+x setup/ssl.prod.sh
+
+- provide makeshift certificates
+	- generate fake certs to setup/makeshift-data/ssl/
+		- create fake-ca.{srl,key,pem} to "_files" // files/* are ignored, we want the makeshift fake ca to be included (do not trust locally)
+			./ssl.ca.create.sh ./makeshift-data/ca "Fake CA"
+		- generate fake prod.{key,crt} example.com
+			mkdir ./makeshift-data/ssl
+			./ssl.local.sh create $(pwd)/makeshift-data/ssl/local "Fake Local" "example.localhost,local.example.com" ./makeshift-data/ca/sign-request.sh
+		- generate fake local.{key,crt} local.example.com
+			./ssl.local.sh create $(pwd)/makeshift-data/ssl/prod "Fake Prod" "example.com" ./makeshift-data/ca/sign-request.sh
+	- vi Dockerfile: // adjust
+		# layer env data
+		COPY ./setup/makeshift-data /usr/src/app/setup
+		VOLUME /usr/src/app/data
+	- vi docker-compose.yaml // adjust
+		volumes:
+      - ./data:/usr/src/app/data
+
+
+- split prod and local ssl config:
+	- create merge script:
+		- vi nginx/sites/init.sh
+			#!/bin/bash
+			sites="my-app" # "my-app other-app etc"
+
+			for site in $sites; do
+				# [ "$ENABLE_PROD" = "true" ] && cat nginx/$site.prod.conf 2> /dev/null >> $site.conf
+				# [ "$ENABLE_LOCAL" = "true" ] && cat nginx/$site.local.conf 2> /dev/null >> $site.conf
+				if [ "$ENABLE_PROD" = "true" ]; then { echo "$(cat)" >> $site.conf ; } <<- EOF
+					server {
+						listen 443 ssl;
+						listen [::]:443 ssl;
+						server_name $(echo $(echo "$DOMAINS_PROD" | sed -e "s/,/ /g"));
+
+						ssl_certificate ssl/prod.crt;
+						ssl_certificate_key ssl/prod.key;
+
+						include sites/$site.inner.conf;
+					}
+					EOF
+				fi
+				if [ "$ENABLE_LOCAL" = "true" ]; then { echo "$(cat)" >> $site.conf ; } <<- EOF
+					server {
+						listen 443 ssl;
+						listen [::]:443 ssl;
+						server_name $(echo $(echo "$DOMAINS_LOCAL" | sed -e "s/,/ /g"));
+
+						ssl_certificate ssl/local.crt;
+						ssl_certificate_key ssl/local.key;
+
+						include sites/$site.inner.conf;
+					}
+					EOF
+				fi
+			done
+		- chmod u+x nginx/sites/init.sh
+	// - vi nginx/sites/my-app.inner.conf
+	// - vi nginx/sites/my-app.local.conf
+
+- move application data into src
+	- mkdir src && mv index.html src/
+	- vi nginx/sites/my-app.inner.conf // add src/ to root
+	- vi Dockerfile // change
+		# layer application source
+		WORKDIR /usr/src/app
+		COPY ./ /usr/src/app/
+
+		# layer env data
+		# COPY ./setup/makeshift-data /usr/src/app/setup
+
+
+- invoke container inside setup:
+	- vi init-and-start.sh
+		#!/bin/bash
+		echo "INIT and START" \
+		&& cp -R setup/makeshift-data/ssl /etc/nginx && cp -R data/ssl /etc/nginx \
+		&& (cd /etc/nginx/sites && ./init.sh) \
+		&& /usr/sbin/nginx -g "daemon off;"
+	- chmod u+x init-and-start.sh
+	- vi Dockerfile
+		ENTRYPOINT ["./init-and-start.sh"]
+
+- change run.sh
+	- vi setup/setup.rim
+		- ./run
+	- vi run // insert
+		# require environment
+		if [ ! -f .env ]; then echo "missing .env, see setup"; exit; fi
+		if [ ! -d data ]; then echo "missing data/, see setup"; exit; fi
+
+		# load env
+		envtoload="ENABLE_PROD ENABLE_LOCAL SSL_DISPLAY_NAME DOMAINS_PROD DOMAINS_LOCAL"
+		for a in $envtoload; do export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done
+
+		# ssl.create
+		if [ $ENABLE_PROD = "true" ] && [ ! -f data/ssl/prod.key ]; do ./setup/ssl.prod.sh create ... fi
+		if [ $ENABLE_LOCAL = "true" ] && [ ! -f data/ssl/local.key ]; do ./setup/ssl.local.sh create ... fi
+
+		# ssl.autorenew.setup
+		(crontab -l | sed -e "s/.* # my-app run.*//g") | crontab - # remove previous
+		if [ $ENABLE_PROD = "true" ]; do (crontab -l && echo "0 0 */2 * * $(pwd)/setup/ssl.prod.sh renew # my-app run ssl-prod") | crontab - fi
+		if [ $ENABLE_LOCAL = "true" ]; do (crontab -l && echo "0 0 */2 * * $(pwd)/setup/ssl.local.sh renew # my-app run ssl-local") | crontab - fi
+
+		# launch

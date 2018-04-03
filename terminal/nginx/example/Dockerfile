@@ -7,10 +7,14 @@ RUN apk add --update nginx \
 
 # layer application source
 WORKDIR /usr/src/app
-COPY . /usr/src/app
+COPY ./ /usr/src/app/
+
+# layer env data
+# COPY ./setup/makeshift-data /usr/src/app/setup/
+VOLUME /usr/src/app/data
 
 # layer nginx config + set start
-VOLUME /etc/nginx/ssl
 COPY ./nginx/ /etc/nginx/
-ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]
 EXPOSE 80 443
+
+ENTRYPOINT ["./init-and-start.sh"]
