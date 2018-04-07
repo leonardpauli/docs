@@ -8,7 +8,7 @@ kind=${1:-"rebuild"}
 if [ ! -d data ]; then echo "missing data/, see setup"; exit; fi
 
 # load env
-envtoload="ENABLE_LOCAL ENABLE_PROD DOMAINS_LOCAL DOMAINS_PROD SSL_DISPLAY_NAME" # SSL_PROD_EMAIL SSL_PROD_STAGEING
+envtoload="ENABLE_LOCAL ENABLE_PROD DOMAINS_LOCAL DOMAINS_PROD SSL_DISPLAY_NAME SSL_PROD_EMAIL SSL_PROD_STAGEING"
 [ -f .env ] && for a in $envtoload; do export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done
 [ -f .env ] && for a in $envtoload; do echo "$a = $(cat .env | grep $a= | sed -e "s/.*=//g")"; done
 
@@ -16,14 +16,14 @@ envtoload="ENABLE_LOCAL ENABLE_PROD DOMAINS_LOCAL DOMAINS_PROD SSL_DISPLAY_NAME"
 if [ "$ENABLE_LOCAL" = "true" ] && [ ! -f data/ssl/local.key ]; then echo "creating local"
 	(cd ./setup && ./ssl.local.sh create $(pwd)/../data/ssl/local "$SSL_DISPLAY_NAME Local" "$DOMAINS_LOCAL") fi
 if [ "$ENABLE_PROD" = "true" ] && [ ! -f data/ssl/prod.key ]; then echo "creating prod"
-	(cd ./setup && ./ssl.prod.sh create $(pwd)/../data/ssl/prod "$SSL_DISPLAY_NAME" "$DOMAINS_PROD") fi
+	(cd ./setup && ./ssl.prod.sh create $(pwd)/../data/ssl/prod "$SSL_DISPLAY_NAME" "$DOMAINS_PROD" "$SSL_PROD_EMAIL" "$SSL_PROD_STAGEING") fi
 
 # ssl.autorenew.setup
 (crontab -l | sed -e "s/.* # my-app run.*//g") | crontab - # remove previous
 if [ $ENABLE_LOCAL = "true" ]; then (crontab -l && echo \
 	"0 0 */2 * * cd $(pwd)/setup && ./ssl.local.sh renew $(pwd)/data/ssl/local \"$SSL_DISPLAY_NAME Local\" \"$DOMAINS_LOCAL\" # my-app run ssl-local") | crontab -; fi
 if [ $ENABLE_PROD = "true" ]; then (crontab -l && echo \
-	"0 0 */2 * * cd $(pwd)/setup && ./ssl.prod.sh renew $(pwd)/data/ssl/prod \"$SSL_DISPLAY_NAME\" \"$DOMAINS_PROD\" # my-app run ssl-prod") | crontab -; fi
+	"0 0 */2 * * cd $(pwd)/setup && ./ssl.prod.sh renew # my-app run ssl-prod") | crontab -; fi
 
 # launch
 if [ "$kind" = "rebuild" ];

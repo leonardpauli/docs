@@ -91,7 +91,7 @@ navigation
 			fi
 		}
 
-files
+files:
 	- mkdir folder // make directory
 	- mkdir -p a/path/folder // create intermediate directories as well
 	- touch file // create empty file
@@ -107,6 +107,14 @@ files
 		MYTMPDIR=$(mktemp -d) // remove -d for file (path)
 		cleanup: trap "rm -rf $MYTMPDIR" EXIT
 			// makes sure it's cleaned up upon (unexpected + normal) exit
+
+	links:
+		// see https://linuxgazette.net/105/pitcher.html
+		ln source.file target // hard (ie. data/inode exists once with two files pointing at it, data will be rm:ed when all pointers are rm:ed)
+			// files only, could manually mkdir + ln the contents though
+		ln -s source.file target // symbolic (ie. data/inode exists once with one file pointing at it, and one link pointing at the file. rm/mv:ing the file makes the link broken)
+			// should work for directory as well (but abs paths required?)
+			// can be done even if source doesn't exist at the moment
 
 text processing:
 	- grep
@@ -183,7 +191,7 @@ executable
 	time ... // "time command execution"
 
 
-bashrc.edit:
+bashrc.edit: // rc: "run commands"
 	// TODO
 	vi ~/.bashrc
 	vi ~/.zshrc

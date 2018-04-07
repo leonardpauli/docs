@@ -1,29 +1,36 @@
 #!/bin/bash
 # using letsencrypt
-#
-# envtoload="SSL_PROD_STAGEING DOMAINS_PROD SSL_PROD_EMAIL"
-# [ -f .env ] && for a in $envtoload; do export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done
-# or: export SSL_PROD_STAGEING=true; export DOMAINS_PROD='example.com'; export SSL_PROD_EMAIL='admin@example.com'
-#
-# ./<program> renew -q
-# ./<program> create
-lepath="$(pwd)/../data/letsencrypt"
-
+# OBS: not pure
+# ./<program> renew
+# ./<program> create output/cert-and-key-prefix-path "Some Name" "example.com,www.example.com" "true" "admin@example.com"
+lepathrel="../data/letsencrypt"
+lepath="$(pwd)/$lepathrel"
 
 letsencrypt () {
 	docker run --rm -it \
 		-v $lepath/data:/etc/letsencrypt \
-		-v $lepath/data2:/var/lib/letsencrypt \
 		-v $lepath/public:/var/www/public \
 		certbot/certbot "$@"
 }
 
 if [ "$1" = "create" ]; then
-	stagingFlag="--staging"; [ "$SSL_PROD_STAGEING" = "false" ] && stagingFlag=""
+	filename=$2; # path/to/file-prefix // $filename.{crt,key}
+	# name=${3:-"Some Name"} # show to user
+	domains=${4:-"localhost,my-app.localhost,local.my-app.com"}
+	use_staging=${5:-"true"}
+	email=$6
+	
+	# TODO: would $lepath work just as well?
+	ln -sf $lepathrel/live/mycert/fullchain.pem $filename.crt
+	ln -sf $lepathrel/live/mycert/privkey.pem $filename.key
+
+	stagingFlag="--staging"; [ "$use_staging" = "false" ] && stagingFlag=""
 	letsencrypt certonly --webroot \
-		--agree-tos --no-eff-email \
+		--non-interactive --agree-tos --no-eff-email \
 		--webroot-path /var/www/public \
 		--cert-name mycert \
-		--domains $DOMAINS_PROD \
-		$stagingFlag --email $SSL_PROD_EMAIL
+		--domains $domains \
+		$stagingFlag --email $email
 else letsencrypt $@; fi
+
+# TODO: use quiet flag on renew?

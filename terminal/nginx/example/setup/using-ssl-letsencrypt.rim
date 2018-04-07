@@ -14,7 +14,7 @@ prerequisites:
 	- see force-https.insert-acme-verification:
 	- vi setup/setup.rim // insert
 		- provide environment files:
-			- mkdir -p data/letsencrypt/{data1,data2,public}
+			- mkdir -p data/letsencrypt/{data,public}
 
 	- create cert create/renew script
 		- vi setup/ssl.prod.sh
