@@ -6,7 +6,7 @@ domains_local_spaced="$(echo "$DOMAINS_LOCAL" | sed -e "s/,/ /g")"
 
 # snippets
 cat ../snippets/ssl.force-https+acme.template.conf \
-	| sed -e "s/SERVER_NAME/$domains_prod_spaced/g" \
+	| sed -e "s/SERVER_NAME/$domains_local_spaced $domains_prod_spaced/g" \
 	> ../snippets/ssl.force-https+acme.conf
 
 # sites

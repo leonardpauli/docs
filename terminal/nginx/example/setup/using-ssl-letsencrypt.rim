@@ -55,6 +55,7 @@ prerequisites:
 				- 0 0 */2 * * $(pwd)/certbot.sh renew && [restart nginx?]
 		- enable prod
 	restart nginx?
+		/usr/sbin/nginx -s reload
 		docker kill -s HUP nginx >/dev/null 2>&1
 		check that new cert is picked up
 	interesting flags/paths
