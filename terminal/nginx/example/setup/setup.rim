@@ -8,17 +8,21 @@ prerequisites:
 	see "./using-ssl-own"
 	see "./nginx-misc-fixes"
 	see "./using-environments"
+	see "./using-deploy"
 	see "./using-ssl-letsencrypt"
 
 
 	// run all commands from project dir
 	
-	- configure environment variables:
-		cp .env.example .env && vi .env // enter own values
-	- provide environment files:
-		- mkdir -p data/ca data/ssl
-		- ./setup/ssl.ca.create.sh // or put your existing in data/ca 
+	- environment:
+		variables:
+			- cp .env.example .env && vi .env // enter own values
+		files:
+			- mkdir -p data/ca data/ssl
+			- cd ./setup && ./ssl.ca.create.sh // (is using local) or put your existing in data/ca
 	- ./run
+
+	- see using-deploy.environment.setup
 
 
 	then:

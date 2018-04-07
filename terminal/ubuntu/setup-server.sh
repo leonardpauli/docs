@@ -16,20 +16,20 @@ p 'Guide: How to setup (a digitalocean.com) instance (with docker-compose) to ru
 
 p '- instance creation'; indentations=$(($indentations+1))
 if [ ! "$arg1" = "instance" ]; then
-  p 'Is this running on the instance already? (y/n) [n]'; read onInstance
+  p 'Is this running on the instance already? (y/N)'; read onInstance
 else
   onInstance="y"
 fi
 if [ ! "$onInstance" = "y" ]; then
 
-  p '- digitalocean.login // open? (y/n) [y]'; read tmp
+  p '- digitalocean.login // open? (Y/n)'; read tmp
   [ ! "$tmp" = "n" ] && open https://cloud.digitalocean.com
   # TODO: use digitalocean api to create droplet?
 
   p '- droplet.create'; indentations=$(($indentations+1))
   p '- ubuntu 17'
   p '- enable ipv6'
-  p '- add your ssh key: Create new? (y/n) [y]'; read sshKeyNeeded
+  p '- add your ssh key: Create new? (Y/n)'; read sshKeyNeeded
   if [ ! "$sshKeyNeeded" = "n" ]; then
     indentations=$(($indentations+1))
     if [ ! -f ~/.ssh/id_rsa.pub ]; then
@@ -54,8 +54,8 @@ if [ ! "$onInstance" = "y" ]; then
   
   p 'Enter connected domain name (example.com) or IP: '; read instanceIP
 
-  p '- ssh."config key/host use locally"'; indentations=$(($indentations+1))
-  p 'Add entry in ~/.ssh/config? (y/n) [y]'; read tmp
+  p '- ssh.user.config.add-remote'; indentations=$(($indentations+1))
+  p 'Add entry in ~/.ssh/config? (Y/n)'; read tmp
   if [ ! "$tmp" = "n" ]; then
     { echo "$(cat)" >> ~/.ssh/config ; } <<- EOF
 Host $instanceIP
@@ -64,6 +64,7 @@ Host $instanceIP
   ForwardAgent yes
   PubKeyAuthentication yes
   IdentityFile ~/.ssh/id_rsa
+  IdentitiesOnly yes
 EOF
     cat ~/.ssh/config
     p ''
@@ -77,7 +78,7 @@ EOF
   scp ./$scriptname root@$instanceIP:./
   p 'Will now run this script from instance. ↩︎'; read tmp
   p '...'
-  ssh root@$instanceIP ./$scriptname instance
+  ssh root@$instanceIP ./$scriptname instance "$pubKey" ""
 
   exit 1
 fi
@@ -142,7 +143,7 @@ p '- uninstall possibly old versions' \
 && p '- prioritize newly added repo' && apt-cache policy docker-ce \
 && p '- install docker' && sudo apt-get install -y docker-ce \
 && p '- check status, systemctl used also for auto start on boot' && sudo systemctl status docker \
-&& p '- add user to docker group' && sudo usermod -aG docker ${USER} \
+&& p '- add user to docker group' && sudo usermod -aG docker $USER \
 && p '// done; test by writing "docker" on next login'
 # && p '- relogin to apply' && su - ${USER} // not from script
 indentations=$(($indentations-1))

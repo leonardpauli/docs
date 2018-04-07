@@ -1,0 +1,28 @@
+# terminal/nginx/example/setup/using-deploy
+' LeonardPauli/docs
+	Created by Leonard Pauli, 3 apr 2018
+
+prerequisites:
+	see "./using-environment"
+
+
+- vi .env.example
+	SSH_PROD=user@my-app.com
+	SSH_PROD_PREFIX=cd folder &&
+		// cd my-app/terminal/nginx/example &&  
+- vi setup/deploy.sh
+	#!/bin/bash
+	echo deploying...
+	deploy_command='git pull && ./run'
+	ssh $SSH_PROD "$SSH_PROD_PREFIX $deploy_command"
+	echo done
+
+
+environment.setup // - vi setup.rim
+	- production:
+		- see terminal/ubuntu.setup-server.sh
+		- in remote:
+			- app='my-app'
+			- ssh.config.add-remote.to git.repo.create {name: $app; repo: "git@github.com:<user>/<name>.git"}
+			- see ./setup.environment
+			- ./$app/run production

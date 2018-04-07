@@ -10,6 +10,7 @@
 - add secure user role
 - demo auth flow
 
+restart: sudo shutdown -r now
 
 issues.locale.fix: // by: prevent ssh to forward your locale
 	alt: ssh.locale.remote.set

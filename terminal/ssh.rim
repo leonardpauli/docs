@@ -6,21 +6,66 @@
 // 	- "cryptographic network protocol for operating network services securely over an unsecured network"
 
 - generate public/private ssh key pair
-	- ssh-keygen -t rsa // generate, alt ssh-keygen -t rsa -f my-key-name
+	- ssh-keygen -t rsa // generate
 	- cat ~/.ssh/id_rsa.pub // print the public one (id_rsa is default name)
+	- ssh-keygen -t rsa -N "" -f my-key-name -q // -N (password) -q quiet
 
-user.config.host.setup // on your computer, assigns key to domain name
-	// useful if using multiple keys for different logins / servers
-	- edit user.config: // https://askubuntu.com/questions/311558/ssh-permission-denied-publickey
-		Host example.com // or IP
-		Hostname example.com // diff?
-		User USERNAME # ie. mydev
-		ForwardAgent yes # to allow ssh-agent -> use of your local ssh keys when accessing ie. git in remote
-		PubKeyAuthentication yes
-		IdentityFile ./path/to/key # ie. ~/.ssh/id_rsa or another key
+config.add-remote:
+	to user: // on your computer, assigns key to domain name
+		// useful if using multiple keys for different logins / servers
+		- edit user.config: // https://askubuntu.com/questions/311558/ssh-permission-denied-publickey
+			Host my-app // lookup identifier "ssh user@<host>" // usually same as Hostname
+				Hostname example.com // or IP
+				User USERNAME # ie. mydev // optional, filter on "ssh <user>@host"
+				ForwardAgent yes // to allow ssh-agent -> use of your local ssh keys when accessing ie. git in remote
+				PubKeyAuthentication yes // use ssh key istead of password
+				IdentityFile ~/path/to/key // default: ~/.ssh/id_rsa
+				IdentitiesOnly yes // don't try default key first, see https://stackoverflow.com/a/11251797/1054573
+	to git.repo.create {name: "my-app"; repo: "git@github.com:<user>/<name>.git"}:
+		- init:
+			- known-hosts.add-host repo.domain
+			- app='<name>' && repo='<repo>' // git remote get-url origin | pbcopy
+			- mkdir $app && cd $app && git init && git remote add origin $repo // instead of git clone
+		- fix key:
+			- mkdir files && ssh-keygen -t rsa -N "" -f files/deploy-key -q
+			- git.remote.deploy-key.add // get ssh-key with read only access for your server
+				cat files/deploy-key.pub 
+			- git config core.sshCommand "ssh -i $(pwd)/files/deploy-key -F /dev/null"
+				// requires git 2.10.0+, -F disable default config file
+		- git fetch && git checkout -b master --track origin/master
 
 
-user.login: "ssh mydev@example.co" // enter pw for key + hit save, only necessary first time
+known-hosts.add-host:
+	- on tmp computer in separate network:
+		// https://serverfault.com/a/845159/185727
+		// TODO: which -t keys to fetch?
+		// 	see https://security.stackexchange.com/questions/50878/ecdsa-vs-ecdh-vs-ed25519-vs-curve25519
+		- host=github.com; hashes="$((
+				ssh-keyscan -t rsa,ed25519 -H $host;
+				for ip in $(dig @1.1.1.1 $host +short); do
+					ssh-keyscan -t rsa,ed25519 -H $host,$ip;
+					ssh-keyscan -t rsa,ed25519 -H $ip;
+				done
+			) 2> /dev/null)"; echo "$hashes" | pbcopy
+		common:
+			github.com:
+				' |1|e7BwP6itJhEnSWHmyHcRnR2cBfk=|anvWd+IBJvrvbjAFqf/DmSXfzeY= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+					|1|ZrRIA7kBv0ETX8NNo6clBYNnGWo=|7zVOPFVPp0iNTlcs0ajqpj95VWA= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+					|1|knA7hHpZesFJwsVvLGSlUEGO3Zk=|uJnWRNAZ6g6tU0w1rLw6Uysbt4M= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+					|1|nRn1Fmv5Lv2C5uliLzXaVHvpmEs=|IJOLexUJUqwjzeEMicKtz8FUJPQ= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+					|1|mPGdaOVXAqeCGJM1w5E90VCaduU=|UevTQrHLjKAEQbI+JWLTgCrCJLc= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+			bitbucket.org:
+				' |1|ehPMEzwuAplZRxOc25DVOt2vagE=|lztWTfYSV+DOw6MynStOd0W3s0M= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==
+					|1|jCuxIHoOd0NcDZ3Ifc95lSsTI8Q=|fTyV2wFXFSGwSXJCJxZZuZwJdaE= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==
+					|1|YWOnQTKEF2AjfUAfQadXn1Veu7w=|0+dYzHrkdppFtI5W93Q49el59tA= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==
+					|1|alNzoX3d0KBC2/jnP5J93eLTi3M=|p31e4o6+NiCaeu3H45cruE8IP+c= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==
+					|1|8OtfK4XLq7Nw88NJkdwLt03uo8Y=|w2bqOKm2POj443GNY+MJlZU4aQg= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==
+					|1|yYRwNM5HFbyNPYjDKCvDLhj6uQo=|P4ylMLpuCb0cOaGukW7N1XpP5ZU= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==
+					|1|g//+BfJgQJbgP2L1CoprniHPTDY=|biuLgY1L++n8OcmKII1UFAHvV/c= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==
+	- on server:
+		- echo '<paste>' | sudo tee -a ~/.ssh/known_hosts // write "echo '" before pasting
+
+user.login: "ssh mydev@example.com" // enter pw for key + hit save, only necessary first time
 
 
 user.config: "~/.ssh/config"

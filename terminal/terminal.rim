@@ -146,7 +146,11 @@ syntax
 		/dev/null // discards any data it receives
 	redirect:
 		a > file // (redirect) write stdout to file
+		a | tee file // what really happens? also, when requiring sudo for write access to file:
+		a | sudo tee file // "sudo a > file" won't work because file is opened for read before sudo ticks in?
+			// see https://askubuntu.com/questions/103643/cannot-echo-hello-x-txt-even-with-sudo
 		a >> file // (redirect) append stdout to file (why files should always end with empty new line)
+		a | tee -a file
 		> // stdout
 		>> // append stdout
 		1> // stdout

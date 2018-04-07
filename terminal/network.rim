@@ -31,9 +31,13 @@ dictionary:
 	  test: "https://intodns.com/example.com"
 	  	alt: nslookup -q=any example.com
 	  providers:
+	  	- cloudflare: 1.1.1.1, 1.0.0.1 // https://1.1.1.1/
+	  		the IP could have issues in some wrongly configured networks
+	  		fastest in some tests + better privacy
+			- opendns: 208.67.222.222, 208.67.220.220 // https://use.opendns.com/
 	  	- googles: 8.8.8.8, 8.8.4.4
 			- aws: 172.16.0.23
-			- opendns: 208.67.222.222, 208.67.220.220 // https://use.opendns.com/
+			- ISP's own: usually default in consumer computers
 
 	hosts-file: "/etc/hosts" // (on osx) "mini dns" domain name -> IP lookup, checked before external dns
 		// http://osxdaily.com/2012/08/07/edit-hosts-file-mac-os-x/
@@ -48,6 +52,23 @@ dictionary:
 	NAT: "network address translation" // "method of remapping one IP address space into another" // "by modifying address info in packets IP header, while in transit across traffic routing device"
 		// causes issues with WebRTC
 
+	port // comunication endpoint to an OS, associated with a process
+		default:
+			- 80: http
+			- 443: https
+			- 22: ssh
+			- 9418: git // ?
+		to scan:
+			nmap: "network map" // see https://nmap.org
+				// see https://blog.appcanary.com/2017/improve-security-port-scan-yourself.html
+				- brew info nmap
+				- brew install nmap
+				- nmap localhost
+				- nmap -p22 example.com
+				- nmap --script-help=ssh-hostkey
+				- nmap -p22 github.com --script ssh-hostkey
+
+
 	firewall // "monitors and controls incoming and outgoing network traffic"
 		simple: white/black-list ip-addresses and ports
 			- make sure only relevant ports are enabled for outbound / inbound traffic
@@ -55,6 +76,8 @@ dictionary:
 				- provided by digitalocean on their droplets
 				- see nginx.simple-firewall
 				- see CSP
+				- see ufw ("uncomplicated firewall")
+					// see https://www.digitalocean.com/community/tutorials/how-to-setup-a-firewall-with-ufw-on-an-ubuntu-and-debian-cloud-server
 
 	loadbalancer // distribute traffic onto multiple servers to not make one crash under to heavy load
 		alt:
@@ -68,6 +91,11 @@ dictionary:
 	CSP: "Content Security Policy" // clientside
 		// https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
 		// https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers
+
+	http: "Hyper Text Transmit Protocol"
+	https: "HTTP Secure" // ~http with ssl
+		see ssl
+		// https://iwrconsultancy.co.uk/blog/https.htm
 
 	cloud provider:
 		- digitalocean

@@ -6,12 +6,24 @@
 see "./ssl.use ssl"
 
 use recommended security headers:
+	// https://blog.appcanary.com/2017/http-security-headers.html
 	- nginx.config.edit: // global by adding to relevant server blocks (possibly through snippet/include), all headers set in http/main context will be overriden if any is set in the (request specific) server block
 
 		# security headers
 		add_header X-Frame-Options DENY; # prevent getting iframed (and related attacks)
 		add_header X-Content-Type-Options nosniff; # prevents mime-type sniffing (and related attacs)
 		add_header X-XSS-Protection "1; mode=block"; # forces some XXS attack auto detection + full block
+
+		# privacy
+		add_header Referrer-Policy "no-referrer";
+
+	- specific ones:
+		add_header Content-Security-Policy 
+		# use first until confident: Content-Security-Policy-Report-Only
+		# see https://csp.withgoogle.com/docs/adopting-csp.html
+		# 	(inc. CSP Mitigator helper browser extension)
+		# firewall? whitelist outgoing traffic
+		# see https://blog.appcanary.com/2017/http-security-headers
 
 ' notes:
 	- install using docker
