@@ -19,6 +19,7 @@ prerequisites:
 			- cp .env.example .env && vi .env // enter own values
 		files:
 			- mkdir -p data/ca data/ssl
+			- mkdir -p data/letsencrypt/{data1,data2,public}
 			- cd ./setup && ./ssl.ca.create.sh // (is using local) or put your existing in data/ca
 	- ./run
 

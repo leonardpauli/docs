@@ -5,13 +5,12 @@
 kind=${1:-"rebuild"}
 
 # require environment
-if [ ! -f .env ]; then echo "missing .env, see setup"; exit; fi
 if [ ! -d data ]; then echo "missing data/, see setup"; exit; fi
 
 # load env
 envtoload="ENABLE_LOCAL ENABLE_PROD DOMAINS_LOCAL DOMAINS_PROD SSL_DISPLAY_NAME" # SSL_PROD_EMAIL SSL_PROD_STAGEING
-for a in $envtoload; do export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done
-for a in $envtoload; do echo "$a = $(cat .env | grep $a= | sed -e "s/.*=//g")"; done
+[ -f .env ] && for a in $envtoload; do export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done
+[ -f .env ] && for a in $envtoload; do echo "$a = $(cat .env | grep $a= | sed -e "s/.*=//g")"; done
 
 # ssl.create
 if [ "$ENABLE_LOCAL" = "true" ] && [ ! -f data/ssl/local.key ]; then echo "creating local"

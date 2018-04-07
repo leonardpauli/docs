@@ -123,12 +123,11 @@ see "./using-environment.strucure-after"
 		- ./run
 	- vi run // insert
 		# require environment
-		if [ ! -f .env ]; then echo "missing .env, see setup"; exit; fi
 		if [ ! -d data ]; then echo "missing data/, see setup"; exit; fi
 
 		# load env
 		envtoload="ENABLE_PROD ENABLE_LOCAL SSL_DISPLAY_NAME DOMAINS_PROD DOMAINS_LOCAL"
-		for a in $envtoload; do export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done
+		[ -f .env ] && for a in $envtoload; do export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done
 
 		# ssl.create
 		if [ $ENABLE_PROD = "true" ] && [ ! -f data/ssl/prod.key ]; do ./setup/ssl.prod.sh create ... fi

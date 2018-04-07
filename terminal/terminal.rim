@@ -166,6 +166,9 @@ syntax
 		- a || b // run second if first err?
 		- a | b // "pipe" stdout from a to stdin of b
 
+	loops:
+		- xs="a b c"; for x in $(echo "$xs"); do echo $x; done // possibly need "unset IFS" or "IFS=' '" first
+		- xs=("a" b 'c'); for x in $xs; do echo $x; done
 
 executable.create: // script
 	- vi mycommand // seems better to use (more platform independent, though permission issue?): #!/usr/bin/env

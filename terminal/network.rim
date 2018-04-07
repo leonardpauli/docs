@@ -97,6 +97,10 @@ dictionary:
 		see ssl
 		// https://iwrconsultancy.co.uk/blog/https.htm
 
+	VPN: "Virtual Private Network"
+		- algo
+			// see https://georgianpartners.com/the-problem-with-the-tor-network-and-commercial-vpns/
+
 	cloud provider:
 		- digitalocean
 		- aws: "amazon web services"

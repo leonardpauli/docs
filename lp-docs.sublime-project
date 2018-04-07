@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "/",
+			"path": ".",
 			"folder_exclude_patterns": ["node_modules"],
 			"file_exclude_patterns": ["package.lock"],
 			"follow_symlinks": true

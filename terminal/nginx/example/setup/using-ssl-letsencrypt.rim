@@ -1,0 +1,67 @@
+# terminal/nginx/example/setup/using-ssl-letsencrypt
+' LeonardPauli/docs
+	Created by Leonard Pauli, 29,31 mar + 3 apr 2018
+
+prerequisites:
+	see "./using-environments"
+	see "./using-deploy"
+
+- using ssl.letsencrypt
+	prerequisites:
+		get server with docker + register domain name and point it to the server
+		// proof has to be provided from domain-name (eg. though connected server)
+
+	- see force-https.insert-acme-verification:
+	- vi setup/setup.rim // insert
+		- provide environment files:
+			- mkdir -p data/letsencrypt/{data1,data2,public}
+
+	- create cert create/renew script
+		- vi setup/ssl.prod.sh
+			// see the file in git
+
+	- prepare
+		- nginx checks for certificates at start time, and aborts if they're missing
+		- for continious deployment -> other sites should be able to run before cert is validated+generated
+		- renewal process (acme server) should work while site is up
+		- possible solutions:
+			- have acme server enabled + site disabled, generated cert, change nginx config to acme+site enabled combo, renew
+				- requires messing with nginx config + not dry
+			- have acme run as separate service/container + as dependency before allowing site container to start
+				- cleaner
+				- requires setup script
+				- delays nginx start
+				- requires renewal cronjob to run ou... can be packaged nicely (except for nginx restart)
+
+
+	// see https://stackoverflow.com/questions/42756958/how-can-i-use-lets-encrypt-without-stopping-nginx
+	// https://github.com/gilyes/docker-nginx-letsencrypt-sample
+	' try:
+		- docker pull certbot/certbot
+		- docker run --rm -it certbot/certbot help
+
+	rate-limit: // https://letsencrypt.org/docs/rate-limits/
+		"certificates per registered domain":
+			staging: 30000/week
+			prod: 20/week
+
+
+
+' notes
+	then		
+		- test cert
+			- auto-renew
+				- ./certbot.sh renew
+				- 0 0 */2 * * $(pwd)/certbot.sh renew && [restart nginx?]
+		- enable prod
+	restart nginx?
+		docker kill -s HUP nginx >/dev/null 2>&1
+		check that new cert is picked up
+	interesting flags/paths
+		--csr CSR
+		--cert-path
+		--cert-name
+		--non-interactive
+		ssl_certificate /etc/letsencrypt/live/yourdomain.example/fullchain.pem;
+		ssl_certificate_key /etc/letsencrypt/live/yourdomain.example/privkey.pem;
+
