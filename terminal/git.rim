@@ -1,0 +1,87 @@
+# terminal/git
+' LeonardPauli/docs
+	Created by Leonard Pauli, 12 feb, 5 apr 2018
+
+// version control system
+// 	- manage source code / text files between people / computers / stages / time
+// 	- "snapshot" (commit) a folder by storing the delta (changed lines in text files) since last one
+// 	- two different commits based on the same one creates "branches" in the history
+// 		- eg. one on each collaborators computer, or per feature, or "stage" (dev, QA, prod)
+// 	- move between commits, "merge" changes from different histories/branches
+
+
+get help / learn more:
+	- `man git`, `man git-add`, `man git-commit`, `man git-submodule`, etc to learn more.
+		// (then press `h` to learn how to navigate, and `q` to quit) (terminal.less)
+
+
+dictionary:
+	repository: "a normal folder, that uses git"
+	machine: "ie. your computer"
+	local repository: "a repository on your machine"
+	remote repository: "a repository on another machine"
+
+workflow.simple.overview.start
+	- create folder
+	- _make folder use git_ - a hidden directory .git is added which store all git related information
+	- add a file - the file will be untracked (git won't care about any changes you make to it)
+	- _start tracking the file and "stage" it_
+	- change the file - the changes will show up as unstaged, meaning they won't be saved to this version
+	- _stage the changes_ - the file will now be fully staged again, all its changes will be saved to this version
+	- _save the staged changes as a commit_ - the version is now saved, now the current version is clean, meaning there are no unsaved changes
+	- change the file
+	- _stage the changes_
+	- _make a commit_ - now, a second version will be saved
+	- _view the log_ - it should show two commits (versions), each with a reference code
+	- you can then jump and compare between versions
+	- you can also "branch off" by creating alternate versions - this is what happens when...
+
+workflow.multiple-collaborators.overview.start
+	- you _create the project_, and _make some commits_ (`git init`, `git add`, `git commit`)
+	- you _make it accessible_ on some server (optional) (`git remote`, `git push`)
+	- you invite another to _clone your project_ (`git clone`)
+	- the other _make some changes and commits_ (`git add`, `git commit`)
+	- the other _sends those changes_ to the server (or straigt to you) (`git push`)
+	- you _check if there are any new things_ on the server (`git fetch`)
+	- if so, you _integrate them_ into your local repository (`git pull`)
+	- now, if you before that had made some commits yourself, the pull might fail partly, because of conflicting changes
+		- in this case, there will be two _different histories_ of commits, two branches of changes
+		- you can then _merge the two branches_ (`git merge`, or `git rebase`)
+		- this will create a new, uncommitted version, with the unconflicting changes staged, and the conflicting ones unstaged for you to solve (_merge conflict_)
+		- _edit these unstaged files_ so they look good, then _stage them_ (`git add`), and _commit the merge_ (`git commit`)
+		- now, you can _push your new commits_ to the server (`git push`), and the other can `git pull` them
+		- in this case, the branches would probably have been named `origin/master` (the remote one) and `master` (your local one), with `HEAD` being the current, uncommitted version
+		- by _manually creating your own branches_ (`git checkout -b`), many different kinds of workflows are possible
+		- one common one being *feature branches* (google it)
+
+commands.reference
+	- `git init` - make folder use git
+	- `git remote add origin user@domain.tld:user/repository.git` - connect another repository location; ie. a collaborator, "origin", or server
+	- `git remote -v` - view connected repositories
+	- `git fetch` - download list of changes (from remote repositorie(s))
+	- `git pull` - integrate changes from remote (into your local repository)
+	- `git status` - view list of changed + untracked files
+	- `git add myfile.txt` - start tracking a file + stage
+	- `git rm myfile.txt` - stop tracking a file
+	- `git add .` - start tracking all the files
+	- `echo "myfile.txt" >> .gitignore` - prevent myfile.txt from getting tracked
+	- `git diff` - view unstaged changes
+	- `git diff --cached` - view staged changes
+	- `git log` - view list of commits + their reference number aka *hash* aka *sha*
+	- `git diff b2164c7` - compare current version with one earlier commit
+	- `git diff --name-status e794b23 ada8abb` - like git status but for two commits from history, see `man git-diff` for more options
+	- `git commit -m "what I did"` - save a version (commit) of the staged changes with the specified message
+	- `git push` - upload the commits etc to remote
+	- `git branch` - list branches
+	- `git branch -D my-branch` - delete a branch
+	- `git checkout -b my-branch` - create a new branch (staged and unstaged changes kept)
+	- `git checkout first-branch` - switch to existing branch (staged and unstaged changes kept, or branch switch is aborted)
+	- `git checkout -- myfile.txt` - reset unstaged file changes 
+	- `git reset HEAD` - unstage all staged changes (changes kept)
+	- `git reset --hard HEAD` - resets/removes all staged changes (changes removed!)
+	- `man git-revert` - info about reverting a commit other than the latest
+	- `git merge other-branch` - joins two branches in one "merge commit" in current branch
+	- `git rebase other-branch` - "replay changes of current branch ontop of target branch"
+	- `git filter-branch --prune-empty --tree-filter "rm -f myfile.txt"` - rewrite history; make changes in multiple commits; ie. remove a file from all commits
+	- `man git-submodules` - have one repository inside another, useful if two repositories shares some code
+	- `git clone` - create a local clone of a remote repository, and setup remote etc
