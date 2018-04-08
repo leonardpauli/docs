@@ -109,12 +109,23 @@ files:
 			// makes sure it's cleaned up upon (unexpected + normal) exit
 
 	links:
+		// permissions are stored in inode, not file, so chmod link might affect the target inode, but not the link itself
 		// see https://linuxgazette.net/105/pitcher.html
-		ln source.file target // hard (ie. data/inode exists once with two files pointing at it, data will be rm:ed when all pointers are rm:ed)
-			// files only, could manually mkdir + ln the contents though
-		ln -s source.file target // symbolic (ie. data/inode exists once with one file pointing at it, and one link pointing at the file. rm/mv:ing the file makes the link broken)
-			// should work for directory as well (but abs paths required?)
+		ln source target // -f to force
+		hard:
+			// hard (ie. data/inode exists once with two files pointing at it, data will be rm:ed when all pointers are rm:ed)
+			ln /abs/path/to/file/whose/inode/will/be/used path/to/new-file
+			ln -f ../originals/* synced-copies/ // multiple, do agan to update synced if one original has been added or replaced
+		soft/symbolic: // using -s flag
+			// symbolic (ie. data/inode exists once with one file pointing at it, and one link pointing at the file. rm/mv:ing the file makes the link broken)
 			// can be done even if source doesn't exist at the moment
+			' source is relative to target position, if relative
+				' to get path: cd target.parent-directory && cd source.parent-directory
+					ln ../a /g/y/t && cat /g/y/t -> cat /g/a
+					ln /a /g/y/t && cat /g/y/t -> cat /a
+			ln -s originals alias-directory
+			ln ../path/to/source-file/relative/to/target target 
+				// files only, could manually mkdir + ln the contents though			
 
 text processing:
 	- grep
