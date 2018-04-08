@@ -16,8 +16,13 @@ prerequisites:
 		- vi setup/ssl.prod.sh
 			// see the file in git
 	- edit ./run: // the prod renew script
-		./ssl.prod.sh renew --force-renewal -q --post-hook "cd $(pwd)"' && docker-compose exec nginx /usr/sbin/nginx -s reload'
-		// TODO: post-hook is string eval:ed from inside container... just do && instead?
+		"0 0 */2 * * cd $(pwd)/setup && ./ssl.prod.sh renew -q && cd .. && docker-compose exec nginx /usr/sbin/nginx -s reload # my-app run ssl-prod"
+		// post-hook is string eval:ed from inside container... just do && instead for now
+		// TODO: this leads to unecessary reloads
+		// ./ssl.prod.sh renew --force-renewal -q --post-hook "cd $(pwd)"' && docker-compose exec nginx /usr/sbin/nginx -s reload'
+	- edit setup.rim
+		for ssl in production, first ./run with local enabled and prod disabled (to have the server started), then ./run with prod enabled
+			// (will use the running server for ssl cert creation acme request verification)
 
 	- prepare
 		- nginx checks for certificates at start time, and aborts if they're missing
