@@ -9,14 +9,15 @@ sslpath="ssl"
 ssl_to_data_path=".."
 
 letsencrypt () {
+	mkdir -p $data_path/$lepath/{data,logs,public}
 	docker run --rm -it \
 		-v $data_path/$lepath/data:/etc/letsencrypt \
 		-v $data_path/$lepath/public:/var/www/public \
+		-v $data_path/$lepath/logs:/var/log/ \
 		certbot/certbot "$@"
 }
 
 if [ "$1" = "create" ]; then
-	lepath_after_base=
 	filename=$2; # file-prefix // $filename.{crt,key}
 	# name=${3:-"Some Name"} # show to user
 	domains=${4:-"localhost,my-app.localhost,local.my-app.com"}
@@ -33,6 +34,6 @@ if [ "$1" = "create" ]; then
 		--cert-name mycert \
 		--domains $domains \
 		$stagingFlag --email $email
-else letsencrypt $@; fi
+else letsencrypt "$@"; fi
 
 # TODO: use quiet flag on renew?

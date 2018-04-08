@@ -12,13 +12,12 @@ prerequisites:
 		// proof has to be provided from domain-name (eg. though connected server)
 
 	- see force-https.insert-acme-verification:
-	- vi setup/setup.rim // insert
-		- provide environment files:
-			- mkdir -p data/letsencrypt/{data,public}
-
 	- create cert create/renew script
 		- vi setup/ssl.prod.sh
 			// see the file in git
+	- edit ./run: // the prod renew script
+		./ssl.prod.sh renew --force-renewal -q --post-hook "cd $(pwd)"' && docker-compose exec nginx /usr/sbin/nginx -s reload'
+		// TODO: post-hook is string eval:ed from inside container... just do && instead?
 
 	- prepare
 		- nginx checks for certificates at start time, and aborts if they're missing
@@ -55,6 +54,7 @@ prerequisites:
 				- 0 0 */2 * * $(pwd)/certbot.sh renew && [restart nginx?]
 		- enable prod
 	restart nginx?
+		docker-compose exec nginx /usr/sbin/nginx -s reload
 		/usr/sbin/nginx -s reload
 		docker kill -s HUP nginx >/dev/null 2>&1
 		check that new cert is picked up

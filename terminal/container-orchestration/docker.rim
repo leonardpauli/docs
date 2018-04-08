@@ -82,3 +82,11 @@ notes:
 	npm
 		- npm install exclusively on Host or Container OS // if shared volume; installation (native modules) isn't same
   - lsof -n -i:PORT // list listening processes
+  permissions:
+  	// see https://medium.com/@mccode/understanding-how-uid-and-gid-work-in-docker-containers-c37a01d01cf
+  	run -u=$UID:$UID
+  	root has $UID 0
+  	first user seems to have $UID 1000 // see /etc/passwd ?
+  	kernel (shared by all containers) handles permissions with UID, container maps UID to names
+  	for volumes:
+  		mkdir them with correct chmod/own before docker run and permissions will be kept, else they'll be created with root (it seems)

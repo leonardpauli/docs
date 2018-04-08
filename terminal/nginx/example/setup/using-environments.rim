@@ -24,7 +24,7 @@ see "./using-environment.strucure-after"
 - setup env data
 	- vi setup/setup.rim
 		- provide environment files:
-			- mkdir -p data/ca data/ssl
+			- mkdir -p data/{ca,ssl}
 			- ./setup/ssl.ca.create.sh // or put your existing in data/ca 
 	- echo data >> .gitignore && echo data >> .dockerignore
 	- vi docker-compose.yaml: // adjust

@@ -13,6 +13,7 @@
 config.add-remote:
 	to user: // on your computer, assigns key to domain name
 		// useful if using multiple keys for different logins / servers
+		// see https://www.digitalocean.com/community/tutorials/how-to-configure-custom-connection-options-for-your-ssh-client
 		- edit user.config: // https://askubuntu.com/questions/311558/ssh-permission-denied-publickey
 			Host my-app // lookup identifier "ssh user@<host>" // usually same as Hostname
 				Hostname example.com // or IP
@@ -21,6 +22,7 @@ config.add-remote:
 				PubKeyAuthentication yes // use ssh key istead of password
 				IdentityFile ~/path/to/key // default: ~/.ssh/id_rsa
 				IdentitiesOnly yes // don't try default key first, see https://stackoverflow.com/a/11251797/1054573
+				ServerAliveInterval 10 // send keep-alive packet every 10s
 	to git.repo.create {name: "my-app"; repo: "git@github.com:<user>/<name>.git"}:
 		- init:
 			- known-hosts.add-host repo.domain
