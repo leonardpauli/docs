@@ -1,0 +1,33 @@
+# terminal/nginx/example/setup
+' LeonardPauli/docs
+	Created by Leonard Pauli, 24 mar 2018
+
+prerequisites:
+	see "./setup-server-simple"
+	// optional: see "./simplest-server-setup"."creating dev-mode setup"
+	see "./using-ssl-own"
+	see "./nginx-misc-fixes"
+	see "./using-environments"
+	see "./using-deploy"
+	see "./using-ssl-letsencrypt"
+
+
+	// run all commands from project dir
+	
+	- environment:
+		variables:
+			- cp .env.example .env && vi .env // enter own values
+		files:
+			- mkdir -p data/{ca,ssl}
+			- cd ./setup && ./ssl.ca.create.sh // (is using local) or put your existing in data/ca
+	- ./run
+
+	- see using-deploy.environment.setup
+
+	- for production
+		for ssl in production, first ./run with local enabled and prod disabled (to have the server started), then ./run with prod enabled
+			// (will use the running server for ssl cert creation acme request verification)
+		if switching away from SSL_PROD_STAGEING, some cert (data/letsencrypt) might have to be removed (or a nifty flag sent to letsencrypt?)
+		auto-renew isn't thoroughly tested
+			+ it will restart nginx every second day, even though cert wasn't updated
+			+ local auto-renew won't restart nginx
