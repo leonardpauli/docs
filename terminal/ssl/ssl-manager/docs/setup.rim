@@ -1,0 +1,40 @@
+# terminal/ssl/ssl-manager/setup
+' LeonardPauli/docs
+	Created by Leonard Pauli, 10 apr 2018
+	originally from terminal/nginx/example -> terminal/nginx/base
+
+
+- terminal.nginx.base.bootstrap ./my-app && cd my-app // create http server (necessary for acme verification)
+	Dockerfile: FROM LeonardPauli/docs-nginx-base
+- vi nginx/sites/my-app // enable ssl.force-https+acme
+- vi docker-compose.yaml
+	services:
+		nginx:
+			image: ...
+			build: .
+			env_file: .env
+			volumes: // or just data directly
+				- "./data/ssl:/usr/src/data/ssl"
+				- "./data/letsencrypt/data/live:/usr/src/data/letsencrypt/data/live"
+				- "./data/ssl/acme/.well-known/acme-challenge:/usr/src/public/.well-known/acme-challenge"
+		ssl-manager:
+			image: LeonardPauli/docs-ssl-manager
+			env_file: .env // possibly only pass in the necessary vars
+			volumes: // or just data directly
+				- "./data/ssl:/usr/src/data/ssl"
+				- "./data/ca:/usr/src/data/ca"
+				- "./data/letsencrypt:/usr/src/data/letsencrypt"
+- vi .env.example && vi .env // add/mod relevant parameters, including nginx_reload_through_file=true
+- docker run -v $(pwd)/data/ca:/usr/src/data/ca LeonardPauli/docs-ssl-manager cd /usr/src/setup && ./ssl.ca.create.sh // (is using local) or put your existing in data/ca
+- openssl dhparam -out ./data/ssl/dhparam.pem 4096 // optional for tiny better security, takes ~3m
+- ./run
+
+
+- for production
+	for ssl in production, first ./run with local enabled and prod disabled (to have the server started), then ./run with prod enabled
+		// (will use the running server for ssl cert creation acme request verification)
+	if switching away from SSL_PROD_STAGEING, some cert (data/letsencrypt) might have to be removed (or a nifty flag sent to letsencrypt?)
+	auto-renew isn't thoroughly tested
+		+ it will restart nginx every second day, even though cert wasn't updated
+		+ local auto-renew won't restart nginx
+	see "./using-ssl-letsencrypt"

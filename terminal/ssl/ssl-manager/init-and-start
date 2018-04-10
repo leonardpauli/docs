@@ -1,0 +1,43 @@
+#!/bin/sh
+scripts_path="$(pwd)"
+data_path="$(pwd)/data"
+reload_script="$scripts_path/set-renew-needed.sh"
+
+# require environment
+if [ ! -d data ]; then echo "missing data/, see setup"; exit; fi
+
+entries_prefix='my-app run'; echo 'clearning ssl.autorenew entries'
+(crontab -l | sed -e "s/.* # $entries_prefix.*//g") | crontab - # remove previous
+
+
+# ssl.create and ssl.autorenew.setup
+
+setup_ssl () {
+	local name=${1:-anon}
+	local enabled=${2:-false}
+	local create_s=$3
+	local renew_schedule=$4
+	local renew_s=$5
+	printf "ssl.$name: "; if [ "$enabled" = "true" ]; then
+		if [ -f data/ssl/$name.key ];
+			then printf 'exists\n'
+			else printf 'creating\n' && (cd $scripts_path && $create_s)
+		fi;
+		local entry="$entries_prefix ssl-$name"; echo "ssl.autorenew.register: $entry"
+		(crontab -l && echo "$renew_schedule cd $scripts_path && $renew_s # $entry") | crontab -;
+	else printf 'disabled\n'; fi
+}
+
+create_s=(./ssl.local.sh create $data_path/ssl/local "$SSL_DISPLAY_NAME Local" "$DOMAINS_LOCAL")
+renew_s="./ssl.local.sh renew $(pwd)/data/ssl/local '$SSL_DISPLAY_NAME Local' '$DOMAINS_LOCAL' && $reload_script local"
+setup_ssl local "$ENABLE_LOCAL" $create_s '10 0 */2 * *' $renew_s
+
+create_s=(./ssl.prod.sh create "prod" "$SSL_DISPLAY_NAME" "$DOMAINS_PROD" "$SSL_PROD_EMAIL" "$SSL_PROD_STAGEING")
+renew_s="./ssl.prod.sh renew -q --deploy-hook '$reload_script prod'"
+setup_ssl prod "$ENABLE_PROD" $create_s '20 0 */2 * *' $renew_s
+# cd .. && docker-compose exec nginx /usr/sbin/nginx -s reload
+# see https://certbot.eff.org/docs/using.html#renewing-certificates
+ 
+
+echo "process.keep-alive // for renewal cronjobs)"
+tail -f /dev/null
