@@ -10,10 +10,12 @@ RUN apk update -f && apk --no-cache add -f \
 COPY ./ /app/
 
 # install acme.sh
+ARG ssl_acme_data="/data/ssl/acme"
+ARG ssl_acme_home="/app/acme"
 RUN cd /app/acme.sh && ./acme.sh --install --nocron \
-		--accountkey /data/ssl/acme/accountkey \
-		--cert-home /data/ssl/acme/certs \
-		--home /app/acme \
+		--accountkey "$ssl_acme_data/accountkey" \
+		--cert-home "$ssl_acme_data/certs" \
+		--home "$ssl_acme_home" \
 	&& rm -rf /app/acme.sh
 
 WORKDIR /app
@@ -52,11 +54,16 @@ ENV \
 	ssl_prod_stageing="true" \
 	ssl_prod_notify_email="" \
 	\
-	ssl_acme_data="/data/ssl/acme" \
-	ssl_acme_home="/app/acme" \
-	ssl_acme_webroot="/data/ssl/acme/webroot"
+	ssl_acme_data="$ssl_acme_data" \
+	ssl_acme_home="$ssl_acme_home" \
+	ssl_acme_webroot="$ssl_acme_home/webroot" \
+	\
+	ssl_crt_created_log="/data/ssl/creation.log"
 
 # ssl_acme_data and ssl_acme_home are non-changable after build
+# ssl_crt_created_log: tail -f it for changes and restart/reload certs if necessary 
+# tail -f -s 5 -n 0 "$ssl_crt_created_log" | while read line; do echo "restart $line"; done
+
 
 # example:
 # .env

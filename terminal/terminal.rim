@@ -104,6 +104,8 @@ files:
 	- cp a b // copy
 	- cp -R a b // copy directory
 
+	- tail -f file // live follow last part of file, good for logs
+
 	temporary:
 		MYTMPDIR=$(mktemp -d) // remove -d for file (path)
 		cleanup: trap "rm -rf $MYTMPDIR" EXIT
@@ -205,6 +207,7 @@ executable.test:
 	- see "https://github.com/koalaman/shellcheck"
 
 executable
+	see "https://developer.apple.com/library/content/documentation/OpenSource/Conceptual/ShellScripting"
 	time ... // "time command execution"
 
 

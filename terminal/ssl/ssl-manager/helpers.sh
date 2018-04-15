@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
-
+ssl_crt_create_post_script="echo \"\$(date) new-cert \$name\" >> '$ssl_crt_created_log'"
+ssl_crt_create_post_script_invoke () { echo "name='$1'; $ssl_crt_create_post_script" | sh; }
 
 # subs
 
@@ -10,6 +11,8 @@ cleanup () {
 
 ssl_data_makeshift_use_fn () {
 	cd "data-makeshift"
+
+	touch "$ssl_crt_created_log"
 
 	if [ ! -f "$ssl_dhparam_path" ]; then
 		echo "$ssl_dhparam_path.makeshift"
@@ -102,7 +105,7 @@ ssl_crt_csr_sign () {
 ssl_crt_renewal_setup () {
 	name=${1:-anon}
 	cron_add "$crt_renew_schedule" "ssl-$name" \
-		"$crt_signscript '$crt_csr' '$crt_crt'"
+		"$crt_signscript '$crt_csr' '$crt_crt' && (name='local'; $ssl_crt_create_post_script)"
 	# echo "$(date): set-renew-needed triggered by '$sender'" >> $data/ssl/renew-needed
 }
 
@@ -128,7 +131,7 @@ ssl_acme_crt_renewal_setup () {
 	name=${1:-anon}
 	crt_signscript="echo whaaat"
 	cron_add "$crt_renew_schedule" "ssl-$name" \
-		"( crt_csr='$crt_csr' crt_crt='$crt_crt'; $crt_signscript; )"
+		"$crt_signscript && (name='prod'; $ssl_crt_create_post_script)"
 }
 ssl_acme_await_online () {
 	first_domain="$(echo "$crt_domains" | sed 's/,.*//')"

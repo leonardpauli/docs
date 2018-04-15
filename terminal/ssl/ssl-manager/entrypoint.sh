@@ -41,7 +41,7 @@ if [ "$ssl_local_ca_create" = "true" ] && isnt_created "$ssl_local_ca_crt"; then
 	rm -f "$ssl_local_ca_crt.makeshift"
 fi
 
-
+crt_created_agg=""
 # ssl_local_create
 if [ "$ssl_local_create" = "true" ]; then
 	echo 'do ssl.local.create'
@@ -61,10 +61,11 @@ if [ "$ssl_local_create" = "true" ]; then
 		ssl_crt_key_create
 		ssl_crt_csr_create
 		ssl_crt_csr_sign
+		crt_created_agg="$crt_created_agg local"
 	fi
 
 	# renewal
-	[ ! "$ssl_local_renew_schedule" = "false" ] && ssl_crt_renewal_setup local
+	[ ! "$ssl_local_renew_schedule" = "false" ] && ssl_crt_renewal_setup 'local'
 
 	# done
 	rm -f "$ssl_local_crt.makeshift"
@@ -99,15 +100,18 @@ if [ "$ssl_prod_create" = "true" ]; then
 		# ssl_crt_csr_sign
 		ssl_acme_init
 		ssl_acme_csr_sign
+		crt_created_agg="$crt_created_agg prod"
 	fi
 
 	# renewal
-	[ ! "$ssl_prod_renew_schedule" = "false" ] && ssl_acme_crt_renewal_setup prod
+	[ ! "$ssl_prod_renew_schedule" = "false" ] && ssl_acme_crt_renewal_setup 'prod'
 
 	# done
 	rm -f "$ssl_prod_crt.makeshift"
 fi
 
+# notify (eg. server) that cert reload might be good
+[ ! -z "$crt_created_agg" ] && ssl_crt_create_post_script_invoke "$crt_created_agg"
 
 # done
 echo "process.keep-alive // for renewal cronjobs"
