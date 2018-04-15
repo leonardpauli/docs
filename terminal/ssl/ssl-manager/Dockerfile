@@ -64,9 +64,9 @@ ENV \
 # 	domain_prod=my-app.com
 # 	production=false
 # server:
-# 	volumes: ["data/ssl/acme/.well-known/acme-challenge":"/public/.well-known/acme-challenge"]
+# 	volumes: ["./data/ssl/acme/.well-known/acme-challenge":"/public/.well-known/acme-challenge"]
 # ssl-manager:
-# 	volumes: ["data/ca:/data/ca", "data/ssl:/data/ssl"]
+# 	volumes: ["./data/ca:/data/ca", "./data/ssl:/data/ssl"]
 # 	environment:
 #			ssl_local_domains: "${domain_base}.localhost,local.$domain_prod"
 #			ssl_local_displayname: "$domain_base (local)"

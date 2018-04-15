@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 cron_prefix='my-app run'
-source ./helpers
+source ./helpers.sh
 
 
 
@@ -35,9 +35,10 @@ if [ "$ssl_local_ca_create" = "true" ] && isnt_created "$ssl_local_ca_crt"; then
 	ca_key="$ssl_local_ca_key"
 	ca_crt="$ssl_local_ca_crt"
 	ca_signscript="$ssl_local_ca_signscript"
-	ssl_ca_create	
+	ssl_ca_create
+	ssl_crt_signscript_create
 
-	rm -f "$ssl_local_ca_key.makeshift"
+	rm -f "$ssl_local_ca_crt.makeshift"
 fi
 
 
@@ -58,14 +59,13 @@ if [ "$ssl_local_create" = "true" ] && isnt_created "$ssl_local_crt"; then
 	# do
 	ssl_crt_key_create
 	ssl_crt_csr_create
-	ssl_crt_signscript_create
 	ssl_crt_csr_sign
 
 	# renewal
 	[ ! "$ssl_local_renew_schedule" = "false" ] && ssl_crt_renewal_setup local
 
 	# done
-	rm -f "$ssl_local_key.makeshift"
+	rm -f "$ssl_local_crt.makeshift"
 fi
 
 
@@ -92,7 +92,6 @@ if [ "$ssl_prod_create" = "true" ] && isnt_created "$ssl_prod_crt"; then
 	# do
 	ssl_crt_key_create
 	ssl_crt_csr_create
-	# ssl_crt_signscript_create
 	# ssl_crt_csr_sign
 	ssl_acme_init
 	ssl_acme_csr_sign
@@ -101,7 +100,7 @@ if [ "$ssl_prod_create" = "true" ] && isnt_created "$ssl_prod_crt"; then
 	[ ! "$ssl_prod_renew_schedule" = "false" ] && ssl_acme_crt_renewal_setup prod
 
 	# done
-	rm -f "$ssl_prod_key.makeshift"
+	rm -f "$ssl_prod_crt.makeshift"
 fi
 
 

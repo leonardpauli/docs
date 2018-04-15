@@ -1,17 +1,18 @@
 version: '3'
 services:
   server:
-    image: httpd:2.4-alpine
+    image: nginx:1.13-alpine
     volumes:
-      - ./data/ssl/acme/.well-known/acme-challenge:/usr/local/apache2/htdocs/.well-known/acme-challenge
+      - ./data/ssl/acme/.well-known/acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge
     ports: ["80:80"]
     
   ssl-manager:
     image: leonardpauli/docs-ssl-manager
     build: ..
-    # entrypoint: ["tail", "-f", "/dev/null"]
-    volumes: ["data/ca:/data/ca", "data/ssl:/data/ssl"]
+    entrypoint: ["tail", "-f", "/dev/null"]
+    volumes: ["./data/ca:/data/ca", "./data/ssl:/data/ssl"]
     environment:
+      ssl_dhparam_create: 'false'
       ssl_local_domains: "${domain_base}.localhost,local.$domain_prod"
       ssl_local_displayname: "$domain_base (local)"
       ssl_prod_create: "$production"

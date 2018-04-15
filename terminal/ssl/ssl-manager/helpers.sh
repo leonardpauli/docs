@@ -5,30 +5,33 @@
 
 cleanup () {
 	echo 'ssl.autorenew.clear'
-	nw=$'\n'; (crontab -l | sed -E "s/.* # $cron_prefix.*$nw//g") | crontab -
+	(crontab -l | sed -E "s/.* # $cron_prefix.*/ /g" | sed '/^ $/d') | crontab -
 }
 
 ssl_data_makeshift_use_fn () {
 	cd "data-makeshift"
 
 	if [ ! -f "$ssl_dhparam_path" ]; then
+		echo "$ssl_dhparam_path.makeshift"
 		touch "$ssl_dhparam_path.makeshift"
 		cp ssl/dhparam.pem "$ssl_dhparam_path"
 	fi
 	if [ ! -f "$ssl_local_ca_key" ]; then
-		touch "$ssl_local_ca_key.makeshift"
+		echo "$ssl_local_ca_crt.makeshift"
+		touch "$ssl_local_ca_crt.makeshift"
 		cp ca/ca.key "$ssl_local_ca_key"
 		cp ca/ca.pem "$ssl_local_ca_crt"
-		cp ca/ca.srl "$ssl_local_ca_srl"
 	fi
 	if [ ! -f "$ssl_local_key" ]; then
-		touch "$ssl_local_key.makeshift"
+		echo "$ssl_local_crt.makeshift"
+		touch "$ssl_local_crt.makeshift"
 		cp ssl/local.key "$ssl_local_key"
 		cp ssl/local.csr "$ssl_local_csr"
 		cp ssl/local.crt "$ssl_local_crt"
 	fi
 	if [ ! -f "$ssl_prod_key" ]; then
-		touch "$ssl_prod_key.makeshift"
+		echo "$ssl_prod_crt.makeshift"
+		touch "$ssl_prod_crt.makeshift"
 		cp ssl/prod.key "$ssl_prod_key"
 		cp ssl/prod.csr "$ssl_prod_csr"
 		cp ssl/prod.crt "$ssl_prod_crt"
@@ -41,7 +44,7 @@ ssl_dhparam_create_fn () {
 	openssl dhparam -out "$dhparam_path" 4096;
 }
 
-ssl_ca_create_fn () {
+ssl_ca_create () {
 	openssl genrsa -out "$ca_key" 2048
 	openssl req -x509 -new -nodes -sha256 -days 365 \
 		-subj "/CN=$ca_displayname" \
@@ -54,27 +57,27 @@ ssl_ca_create_fn () {
 
 # ssl_crt_create
 ssl_crt_key_create () {
-	# crt_key
+	echo "ssl_crt_key_create $crt_key"
 	openssl genrsa -out "$crt_key" 2048
 }
 ssl_crt_signscript_create () {
-	echo "$(cat)" > "$crt_signscript" <<-'EOF'
+	echo "ssl_crt_signscript_create $ca_signscript"
+	{ echo "$(cat)" > "$ca_signscript"; } <<-EOF
 	#!/usr/bin/env sh
-	crt_csr="$1"
-	crt_crt="$2"
-	EOF
-	echo "; cd '$crt'"
-	cd PWD
-	openssl x509 -req -sha256 -days 30 \
-		-CAserial "$ca_crt.srl" -CAcreateserial \
-		-CA "$ca_crt" -CAkey "$ca_key" \
-		-in "$crt_csr" -out "$crt_crt"
+	crt_csr="\$1"
+	crt_crt="\$2"
+
+	openssl x509 -req -sha256 -days 30 \\
+		-CAserial "$ca_crt.srl" -CAcreateserial \\
+		-CA "$ca_crt" -CAkey "$ca_key" \\
+		-in "\$crt_csr" -out "\$crt_crt"
 	EOF
 	# -extfile $DIR/tmp.ext 
 	# todo: logic to check domains / csr content
-	chmod u+x "$crt_signscript"
+	chmod u+x "$ca_signscript"
 }
 ssl_crt_csr_create () {
+	echo "ssl_crt_csr_create $crt_csr"
   # partly based on acme.sh
   # TODO: fix idn support or just use acme.sh's createcsr fn
   # oh, see acme.sh --createCSR
@@ -92,8 +95,9 @@ ssl_crt_csr_create () {
   openssl req -new -sha256 -key "$crt_key" -subj "/CN=$crt_displayname" -config "$crt_csr_conf" -out "$crt_csr"
 }
 ssl_crt_csr_sign () {
+	echo "ssl_crt_csr_sign $crt_signscript '$crt_csr' '$crt_crt'"
 	# crt_csr crt_crt crt_signscript
-	crt_signscript "$crt_csr" "$crt_crt"
+	$crt_signscript "$crt_csr" "$crt_crt"
 }
 ssl_crt_renewal_setup () {
 	name=${1:-anon}
