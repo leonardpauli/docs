@@ -1,4 +1,4 @@
-# terminal/container-orchestration
+# terminal/containers
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 23 mar 2018
 
@@ -14,7 +14,7 @@ options:
 			- https://www.ec2instances.info
 	- CaaS // Container as a Service, upload the container images and let the service handle instance provisioning, spinup/down of containers, 0 downtime deploy, etc
 		alt: eg. google cloud
-		using (see container-orchestration)
+		using (see orchestration)
 	- serverless, FaaS // Function as a Service, upload functions, not whole server setups/containers
 		// see https://read.acloud.guru/serverless-is-eating-the-stack-and-people-are-freaking-out-and-they-should-be-431a9e0db482
 		alts:
@@ -47,7 +47,7 @@ image.create: see docker
 container.(create / manage): see docker
 declarative image / container setup / management: see docker-compose
 
-container-orchestration: // handle containers over multiple machines etc
+orchestration: // handle containers over multiple machines etc
 	- docker-swarms // nicer UX, familar syntax + easy to setup, etc, though..
 	- kubernetes // larger community + performance, more "the way to go"
 

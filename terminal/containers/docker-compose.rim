@@ -31,10 +31,11 @@ commands: // expects a docker-compose.yml file to exist
 
 
 docker-compose.yml // definition file
-	version: '2'
+	version: '3'
 	services:
 		my-service:
 			image: my-org/my-image-name:my-tag
+			# entrypoint: ["tail", " -f", "/dev/null"] // trick to make it stall (prevent default startup script, but keep it up for inspection with "docker-compose exec my-service sh")
 			build:
 				context: ./
 				dockerfile: Dockerfile
@@ -46,7 +47,8 @@ docker-compose.yml // definition file
 			//   - ./:/usr/src/app // local-dir(abs or rel) : container-dir(abs)
 			expose: [3000:80] // network : container, only attaches it to internal docker network, ie. for linking with other containers
 			ports: [80:80] // like expose, but attaches it directly to host
-			links: [other-service] // allows http://other-service:3003 to work (if 3003 is in "expose")
+			// links: [other-service] (deprecated)
+			// http://other-service:3003 works (if 3003 is in its "expose", and on same network)
 			depends_on: [other-service] // have other-service become ready before starting this one
 			networks:
 				default:
@@ -61,7 +63,7 @@ docker-compose.yml // definition file
 				default:
 					ipv4_address: 10.100.0.3
 
-		networks: // neat to be explicit
+		networks: // neat to be explicit, see https://docs.docker.com/compose/networking/#specify-custom-networks
 			// - simpler to setup multiple subnetworks (eg. maybe isolate like (api, db) + (api, web)) (TODO)
 			// - ability to connect to networks created with other docker-compose (TODO)
 			default:

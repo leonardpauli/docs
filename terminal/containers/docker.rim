@@ -39,8 +39,9 @@ commands:
 	docker build -t [org-name/]image-name[:some-optional-tag] path/to/dir/containing/dockerfile
 	docker build -t my-image . // build an image using ./Dockerfile, ./* as context, and name it my-name
 	
-	docker images // list images
-	docker rmi my-image // remove image
+	docker images // docker image ls, list images
+	docker rmi my-image // docker image rm my-image, remove image
+	docker image prune // docker rmi $(docker images -f "dangling=true" -q)
 
 	docker run -t my-container -d -p 3000:80 my-image // start a new container, in detached mode (so it keeps running when closing terminal), using my-image, attaching container port 80 (EXPOSE 80) to host port 3000, naming it my-container
 	docker logs -f --tail 10 // show last 10 log lines and counting, ctrl-c to stop
@@ -64,9 +65,15 @@ base images:
 		// RUN apk add --no-cache make gcc g++ python
 	- ubuntu:16.04 // ~150MB, slower buildtime, use eg. apt-get update -q && apt-get install -yq git-core
 	- mhart/alpine-node:9.9 // https://github.com/mhart/alpine-node
+	- python:3.6-alpine3.7 // 87.5MB
+	- httpd:2.4-alpine // simple apache server (annoying, logs a lot), 86.8MB, https://hub.docker.com/_/httpd/
+		server:
+	    image: httpd:2.4-alpine
+	    volumes: ["./public:/usr/local/apache2/htdocs"]
+	    ports: ["80:80"]
 	- ...
 
-Dockerfile
+Dockerfile // see https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#build-cache
 	# comment
 	FROM org/image:tag
 	RUN echo "hello" && echo "world" // each comman (RUN, FROM, etc) creates a new layer, so be mindful
@@ -144,3 +151,18 @@ notes:
 		kernel (shared by all containers) handles permissions with UID, container maps UID to names
 		for volumes:
 			mkdir them with correct chmod/own before docker run and permissions will be kept, else they'll be created with root (it seems)
+	performance:
+		apart from docker NAT (and possibly "context switching" (?)), performance should be moslty same as native
+			if run on linux
+		- "https://stackoverflow.com/questions/21889053/what-is-the-runtime-performance-cost-of-a-docker-container"
+			use --net=host instead of -p 80:80 to skip ~80% / 30ms roundtrip latency overhead of docker NAT (or shared bridge network between containers)
+				though this looses the port whitelisting security + remapping ability
+		- "https://blog.docker.com/2013/10/gathering-lxc-docker-containers-metrics/"
+	network:
+		disable: --net null
+	memory:
+		limit: --memory 1gb
+	cpu:
+		limit: --cpuset-cpus 0,2-3
+	isolating GUI apps: // see http://somatorio.org/en/post/running-gui-apps-with-docker/
+		// though on OSX, docker is run as VM, so performance affected?
