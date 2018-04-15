@@ -1,0 +1,14 @@
+# terminal/iterm
+' LeonardPauli/docs
+	Created by Leonard Pauli, 15 apr 2018
+
+// nicer than osx default terminal
+
+tabs:
+	cmd-t
+panels:
+	cmd-d
+	shift-cmd-d
+	broadcast input:
+		alt-cmd-i
+		write clear instead of cmd-k

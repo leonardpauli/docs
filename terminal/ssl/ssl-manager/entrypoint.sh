@@ -7,7 +7,7 @@ source ./helpers.sh
 # main
 
 cleanup
-
+crond -b # start crond for autorenewal
 
 # ssl_data_makeshift_use
 if [ "$ssl_data_makeshift_use" = "true" ]; then
@@ -43,7 +43,7 @@ fi
 
 
 # ssl_local_create
-if [ "$ssl_local_create" = "true" ] && isnt_created "$ssl_local_crt"; then
+if [ "$ssl_local_create" = "true" ]; then
 	echo 'do ssl.local.create'
 
 	# set params
@@ -57,9 +57,11 @@ if [ "$ssl_local_create" = "true" ] && isnt_created "$ssl_local_crt"; then
 	crt_renew_schedule="$ssl_local_renew_schedule"
 
 	# do
-	ssl_crt_key_create
-	ssl_crt_csr_create
-	ssl_crt_csr_sign
+	if isnt_created "$ssl_local_crt"; then
+		ssl_crt_key_create
+		ssl_crt_csr_create
+		ssl_crt_csr_sign
+	fi
 
 	# renewal
 	[ ! "$ssl_local_renew_schedule" = "false" ] && ssl_crt_renewal_setup local
@@ -70,7 +72,7 @@ fi
 
 
 # ssl_prod_create
-if [ "$ssl_prod_create" = "true" ] && isnt_created "$ssl_prod_crt"; then
+if [ "$ssl_prod_create" = "true" ]; then
 	echo 'do ssl.prod.create'
 
 	# set acme params
@@ -90,12 +92,14 @@ if [ "$ssl_prod_create" = "true" ] && isnt_created "$ssl_prod_crt"; then
 	crt_renew_schedule="$ssl_prod_renew_schedule"
 
 	# do
-	ssl_acme_await_online
-	ssl_crt_key_create
-	ssl_crt_csr_create
-	# ssl_crt_csr_sign
-	ssl_acme_init
-	ssl_acme_csr_sign
+	if isnt_created "$ssl_prod_crt"; then
+		ssl_acme_await_online
+		ssl_crt_key_create
+		ssl_crt_csr_create
+		# ssl_crt_csr_sign
+		ssl_acme_init
+		ssl_acme_csr_sign
+	fi
 
 	# renewal
 	[ ! "$ssl_prod_renew_schedule" = "false" ] && ssl_acme_crt_renewal_setup prod

@@ -1,4 +1,4 @@
-# terminal/container-orchestration/docker
+# terminal/containers/docker
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 23 mar 2018
 
@@ -66,11 +66,11 @@ base images:
 	- ubuntu:16.04 // ~150MB, slower buildtime, use eg. apt-get update -q && apt-get install -yq git-core
 	- mhart/alpine-node:9.9 // https://github.com/mhart/alpine-node
 	- python:3.6-alpine3.7 // 87.5MB
-	- httpd:2.4-alpine // simple apache server (annoying, logs a lot), 86.8MB, https://hub.docker.com/_/httpd/
+	- nginx:1.13-alpine // 18MB, simple static web server (as default)
 		server:
-	    image: httpd:2.4-alpine
-	    volumes: ["./public:/usr/local/apache2/htdocs"]
-	    ports: ["80:80"]
+			image: nginx:1.13-alpine
+			volumes: ["./public:/usr/share/nginx/html"]
+			ports: ["80:80"]
 	- ...
 
 Dockerfile // see https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#build-cache

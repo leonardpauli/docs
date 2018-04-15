@@ -14,6 +14,7 @@ services:
     entrypoint: ["tail", "-f", "/dev/null"]
     volumes: ["./data/ca:/data/ca", "./data/ssl:/data/ssl"]
     environment:
+      # ssl_local_renew_schedule: '*/1 * * * *'
       ssl_dhparam_create: 'false'
       ssl_local_domains: "${domain_base}.localhost,local.$domain_prod"
       ssl_local_displayname: "$domain_base (local)"

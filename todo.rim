@@ -21,5 +21,6 @@ thoughs:
 
 items:
 	- take out mainpoints for admin.privacy.gdpr
+	- s/sed -e/sed -E/ where necessary
 
 // see https://github.com/sindresorhus/awesome

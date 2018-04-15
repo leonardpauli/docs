@@ -307,5 +307,7 @@ cronjob: // helper for interacting with cron (from greek work for time), schedul
 		view: crontab -l
 		remove: (crontab -l | sed -e "s/.* # some-id-or-tag//g") | crontab - // lookout for regex chars in tag, or be safe and stic to alpha-num
 
-	email output/error: // ???
-		MAILTO=email@domain.com
+	notes:
+		docker: in alpine, needs to be started with `crond -b`
+		email output/error: // ???
+			MAILTO=email@domain.com
