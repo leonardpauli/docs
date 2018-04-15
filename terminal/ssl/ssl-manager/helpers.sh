@@ -102,7 +102,7 @@ ssl_crt_csr_sign () {
 ssl_crt_renewal_setup () {
 	name=${1:-anon}
 	cron_add "$crt_renew_schedule" "ssl-$name" \
-		"( crt_csr='$crt_csr' crt_crt='$crt_crt'; $crt_signscript; )"
+		"$crt_signscript '$crt_csr' '$crt_crt'"
 	# echo "$(date): set-renew-needed triggered by '$sender'" >> $data/ssl/renew-needed
 }
 
@@ -130,9 +130,31 @@ ssl_acme_crt_renewal_setup () {
 	cron_add "$crt_renew_schedule" "ssl-$name" \
 		"( crt_csr='$crt_csr' crt_crt='$crt_crt'; $crt_signscript; )"
 }
+ssl_acme_await_online () {
+	first_domain="$(echo "$crt_domains" | sed 's/,.*//')"
+	online_check_path=".well-known/acme-challenge/online"
+	online_check_file="$ssl_acme_webroot/$online_check_path"
+	endpoint="http://$first_domain/$online_check_path"
+
+	rm -rf "$online_check_file"; mkdir -p "$online_check_file"; rm -rf "$online_check_file"
+	echo 'online' > "$online_check_file"
+
+	echo "waiting for $endpoint to respond with 'online'..."
+	while ! (res="$(curl -m 5 -sS "$endpoint")" && echo "$res" \
+		&& echo "$res" | grep 'online' > /dev/null); do printf "."; sleep 5; done
+	echo "$host responded"
+	
+	rm "$online_check_file"
+}
 
 
 # helpers
+await_ping () {
+	host="$1"
+	while ! ping -w 1 -c 1 "$host" > /dev/null; do
+		echo "waiting for $host to respond..."; sleep 1; done
+	echo "$host responded"
+}
 cron_add () {
 	echo "cron.add: $cron_prefix $2"
 	(crontab -l && echo "$1 cd '$(pwd)' && $3 # $cron_prefix $2") | crontab -

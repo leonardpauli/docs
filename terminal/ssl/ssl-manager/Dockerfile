@@ -64,7 +64,7 @@ ENV \
 # 	domain_prod=my-app.com
 # 	production=false
 # server:
-# 	volumes: ["./data/ssl/acme/.well-known/acme-challenge":"/public/.well-known/acme-challenge"]
+# 	volumes: ["./data/ssl/acme/webroot/.well-known/acme-challenge":"/public/.well-known/acme-challenge"]
 # ssl-manager:
 # 	volumes: ["./data/ca:/data/ca", "./data/ssl:/data/ssl"]
 # 	environment:

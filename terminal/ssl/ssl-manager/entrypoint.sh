@@ -90,6 +90,7 @@ if [ "$ssl_prod_create" = "true" ] && isnt_created "$ssl_prod_crt"; then
 	crt_renew_schedule="$ssl_prod_renew_schedule"
 
 	# do
+	ssl_acme_await_online
 	ssl_crt_key_create
 	ssl_crt_csr_create
 	# ssl_crt_csr_sign
