@@ -34,6 +34,7 @@ echo "$extFile" > $DIR/tmp.ext
 
 # sign
 
-openssl x509 -req -sha256 -days 30 -CAcreateserial \
+openssl x509 -req -sha256 -days 30 \
+	-CAserial $... -CAcreateserial \
 	-CA $ca.pem -CAkey $ca.key \
 	-extfile $DIR/tmp.ext -in $filename.csr -out $filename.crt

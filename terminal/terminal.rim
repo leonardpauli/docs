@@ -94,6 +94,7 @@ navigation
 files:
 	- mkdir folder // make directory
 	- mkdir -p a/path/folder // create intermediate directories as well
+	- mkdir -p a/path && cd $_ // cd into created folder
 	- touch file // create empty file
 	- rm file // remove file
 		rm -rf folder // remove recurcive (all contents) force (no question, otherwise shown if not empty) folder
@@ -189,6 +190,9 @@ syntax
 		- xs="a b c"; for x in $(echo "$xs"); do echo $x; done // possibly need "unset IFS" or "IFS=' '" first
 		- xs=("a" b 'c'); for x in $xs; do echo $x; done
 
+	other:
+		- cmd a1 a2 && cmd2 $_ // cmd a1 a2 && cmd2 a2, $_ = last arg in prev command
+
 executable.create: // script
 	- vi mycommand // seems better to use (more platform independent, though permission issue?): #!/usr/bin/env
 		#!/bin/bash # aka "shebang", indicating path to program to send the rest of the file to for execution
@@ -197,6 +201,8 @@ executable.create: // script
 	- ./mycommand // run script
 	- PATH=PATH:$(pwd) // temporarily add current folder to "PATH", allows you to write mycommand directly, see "edit bashrc" for persistant
 	- mycommand // run script as any other
+executable.test:
+	- see "https://github.com/koalaman/shellcheck"
 
 executable
 	time ... // "time command execution"

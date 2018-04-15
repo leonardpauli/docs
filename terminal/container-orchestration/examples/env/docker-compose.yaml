@@ -1,0 +1,13 @@
+version: '3'
+services:
+  my-app:
+    image: leonardpauli/docs-containers-example-env
+    build:
+      context: .
+    env_file: .env
+    environment:
+      dc_changed: b
+      dc_changed_template: ${from_dot_env:-lal}
+      dc_changed_template_default: ${from_dot_env2:-lal}
+      dc_only: b
+      dc_only2: b

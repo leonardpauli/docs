@@ -38,3 +38,13 @@
 		+ it will restart nginx every second day, even though cert wasn't updated
 		+ local auto-renew won't restart nginx
 	see "./using-ssl-letsencrypt"
+
+' Notes
+	see https://github.com/gitphill/openssl-alpine
+	instead of certbot:
+		- https://github.com/diafygi/acme-nosudo
+		- or https://github.com/zenhack/simp_le
+		--
+		- https://github.com/Neilpang/acme.sh/wiki/Run-acme.sh-in-docker
+		- https://github.com/lukas2511/dehydrated
+		both are more KISS, but less official
