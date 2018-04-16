@@ -49,7 +49,6 @@ if [ "$ssl_local_create" = "true" ]; then
 	# set params
 	crt_key="$ssl_local_key"
 	crt_domains="$ssl_local_domains"
-	crt_displayname="$ssl_local_displayname"
 	crt_csr="$ssl_local_csr"
 	crt_csr_conf="$crt_csr.conf"
 	crt_signscript="$ssl_local_ca_signscript"
@@ -85,7 +84,6 @@ if [ "$ssl_prod_create" = "true" ]; then
 	# set params
 	crt_key="$ssl_prod_key"
 	crt_domains="$ssl_prod_domains"
-	crt_displayname="$ssl_prod_displayname"
 	crt_csr="$ssl_prod_csr"
 	crt_csr_conf="$crt_csr.conf"
 	# crt_signscript="$ssl_prod_ca_signscript"

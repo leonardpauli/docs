@@ -38,7 +38,6 @@ ENV \
 	\
 	ssl_local_create="true" \
 	ssl_local_domains="my-app.localhost,local.my-app.com" \
-	ssl_local_displayname="Some Name Local" \
 	ssl_local_renew_schedule="10 0 */2 * *" \
 	ssl_local_key="/data/ssl/local.key" \
 	ssl_local_csr="/data/ssl/local.csr" \
@@ -46,7 +45,6 @@ ENV \
 	\
 	ssl_prod_create="false" \
 	ssl_prod_domains="my-app.com" \
-	ssl_prod_displayname="My App" \
 	ssl_prod_renew_schedule="40 0 */2 * *" \
 	ssl_prod_key="/data/ssl/prod.key" \
 	ssl_prod_csr="/data/ssl/prod.csr" \
@@ -56,7 +54,7 @@ ENV \
 	\
 	ssl_acme_data="$ssl_acme_data" \
 	ssl_acme_home="$ssl_acme_home" \
-	ssl_acme_webroot="$ssl_acme_home/webroot" \
+	ssl_acme_webroot="$ssl_acme_data/webroot" \
 	\
 	ssl_crt_created_log="/data/ssl/creation.log"
 

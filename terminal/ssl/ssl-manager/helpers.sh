@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+helpers_file='/app/helpers.sh'
 ssl_crt_create_post_script="echo \"\$(date) new-cert \$name\" >> '$ssl_crt_created_log'"
 ssl_crt_create_post_script_invoke () { echo "name='$1'; $ssl_crt_create_post_script" | sh; }
 
@@ -95,6 +96,7 @@ ssl_crt_csr_create () {
 
   # _csr_cn="$(_idn "$domain")"
   # csr_key, not crt_key?
+  crt_displayname="$(first_domain_get "$crt_domains")" # has to be first domain name for letsencrypt
   openssl req -new -sha256 -key "$crt_key" -subj "/CN=$crt_displayname" -config "$crt_csr_conf" -out "$crt_csr"
 }
 ssl_crt_csr_sign () {
@@ -117,8 +119,7 @@ ssl_acme () {
 }
 ssl_acme_init () { ssl_acme --updateaccount --accountemail "$ssl_acme_notify_email"; }
 ssl_acme_csr_sign () {
-	# crt_crt?
-	ssl_acme --signcsr --csr "$crt_csr" -w "$ssl_acme_webroot";
+	ssl_acme --signcsr --csr "$crt_csr" -w "$ssl_acme_webroot" --fullchain-file "$crt_crt";
 	
 	# --cert-file /path/to/real/cert/file After issue/renew, the cert will be copied to this path.
 	# --key-file /path/to/real/key/file After issue/renew, the key will be copied to this path.
@@ -129,15 +130,14 @@ ssl_acme_csr_sign () {
 }
 ssl_acme_crt_renewal_setup () {
 	name=${1:-anon}
-	crt_signscript="echo whaaat"
+	crt_signscript="(source '$helpers_file'; crt_csr='$crt_csr' crt_crt='$crt_crt'; ssl_acme_csr_sign)"
 	cron_add "$crt_renew_schedule" "ssl-$name" \
 		"$crt_signscript && (name='prod'; $ssl_crt_create_post_script)"
 }
 ssl_acme_await_online () {
-	first_domain="$(echo "$crt_domains" | sed 's/,.*//')"
 	online_check_path=".well-known/acme-challenge/online"
 	online_check_file="$ssl_acme_webroot/$online_check_path"
-	endpoint="http://$first_domain/$online_check_path"
+	endpoint="http://$(first_domain_get "$crt_domains")/$online_check_path"
 
 	rm -rf "$online_check_file"; mkdir -p "$online_check_file"; rm -rf "$online_check_file"
 	echo 'online' > "$online_check_file"
@@ -152,6 +152,7 @@ ssl_acme_await_online () {
 
 
 # helpers
+first_domain_get () { echo "$1" | sed 's/,.*//'; }
 await_ping () {
 	host="$1"
 	while ! ping -w 1 -c 1 "$host" > /dev/null; do
