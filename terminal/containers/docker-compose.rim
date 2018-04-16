@@ -31,7 +31,7 @@ commands: // expects a docker-compose.yml file to exist
 
 
 docker-compose.yml // definition file
-	version: '3'
+	version: '3.4'
 	services:
 		my-service:
 			image: my-org/my-image-name:my-tag

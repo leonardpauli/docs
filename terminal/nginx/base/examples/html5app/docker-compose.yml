@@ -1,0 +1,22 @@
+# docker build -t leonardpauli/docs-nginx-base-example-html5app:prod .
+version: '3.4'
+services:
+  server:
+    image: leonardpauli/docs-nginx-base-example-html5app:prod
+    env_file: .env
+    ports: ["80:80", "443:443"]
+
+    # volumes:
+    #   - ./data/ssl/acme/webroot/.well-known/acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge
+    # depends_on:
+    #   - ssl-manager
+  
+  # ssl-manager:
+  #   image: leonardpauli/docs-ssl-manager
+  #   volumes: ["./data/ca:/data/ca", "./data/ssl:/data/ssl"]
+  #   environment:
+  #     ssl_prod_create: "$production"
+  #     ssl_local_domains: "$server_default_local_domains"
+  #     ssl_prod_domains: "$server_default_prod_domains"
+  #     ssl_prod_notify_email: "$ssl_prod_notify_email"
+  #     ssl_prod_stageing: "$ssl_prod_stageing"

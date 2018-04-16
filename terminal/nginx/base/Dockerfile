@@ -5,9 +5,7 @@ RUN apk add --update nginx \
 	&& rm -rf /var/cache/apk/* \
 	&& mkdir -p /run/nginx
 
-COPY nginx/snippets /etc/nginx/snippets
-COPY nginx/sites /etc/nginx/sites
-COPY nginx/nginx.template.conf nginx/init.sh /etc/nginx/
+COPY nginx /app/nginx-base
 
 # set start
 EXPOSE 80 443
@@ -28,11 +26,11 @@ ENV \
 
 # target: example-simple
 FROM internal-base as example-simple
-# COPY examples/simple/nginx/sites /etc/nginx/sites
+# COPY examples/simple/nginx /app/nginx
 COPY examples/simple/public /app/public
 
 
 # target: base
 FROM internal-base as base
-# VOLUME /etc/nginx/sites
+# VOLUME /app/nginx // though requires re-running ./endpoint on change
 # VOLUME /app/public

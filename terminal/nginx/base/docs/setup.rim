@@ -3,27 +3,32 @@
 	Created by Leonard Pauli, 24 mar 2018
 
 prerequisites:
-	see "./setup-server-simple"
+	// see "./setup-server-simple"
 	// optional: see "./simplest-server-setup"."creating dev-mode setup"
-	see "./using-ssl-own"
-	see "./nginx-misc-fixes"
-	see "./using-environments"
-	see "./using-deploy"
-	see "./using-ssl-letsencrypt"
+	// see "./using-ssl-own"
+	// see "./nginx-misc-fixes"
+	// see "./using-environments"
+	// see "./using-deploy"
+	// see "./using-ssl-letsencrypt"
 
+	setup
+		- using multistage dockerfile (same for testing / use)
+		- nginx config through template fix // available env vars declared in dockerfile
+			// (http/https, local/prod, default site public)
+			- nginx.template.conf -> nginx.conf
+			- sites/default.inner.conf -> sites/default.conf // special treatment for default side using env vars
+			- sites/*.{local,prod}.conf -> *.conf // merging local / prod config depending on env vars
+			- snipptes/? // some gets treated based on env vars
 
-	// run all commands from project dir
-	
-	- environment:
-		variables:
-			- cp .env.example .env && vi .env // enter own values
-		files:
-			- mkdir -p data/{ca,ssl}
-			- cd ./setup && ./ssl.ca.create.sh // (is using local) or put your existing in data/ca
-	- ./run
+	test using example/simple:
+		- cd examples/simple
+		- environment:
+			variables:
+				- cp .env.example .env && vi .env // enter own values
+		- docker-compose up --build
+
 
 	- see using-deploy.environment.setup
-
 	- for production
 		for ssl in production, first ./run with local enabled and prod disabled (to have the server started), then ./run with prod enabled
 			// (will use the running server for ssl cert creation acme request verification)

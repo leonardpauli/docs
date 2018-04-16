@@ -1,11 +1,10 @@
-#!/bin/bash
-# ./setup/deploy.sh
+#!/usr/bin/env sh
 echo deploying...
 
 envtoload="SSH_PROD SSH_PROD_PREFIX"
 [ -f .env ] && for a in $envtoload; do export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done
 
-deploy_command='git pull && ./run'
+deploy_command='git pull && ./start'
 ssh $SSH_PROD "$SSH_PROD_PREFIX $deploy_command"
 
 echo done

@@ -1,0 +1,10 @@
+# docker-compose -f docker-compose.yml -f docker-compose.dev-overrride.yml up --build
+version: '3.4'
+services:
+  server:
+    image: leonardpauli/docs-nginx-base-example-html5app:dev
+    build:
+      context: .
+      target: dev
+    volumes:
+      - ./public:/app/public

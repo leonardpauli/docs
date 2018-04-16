@@ -5,6 +5,7 @@ domains_local_spaced="$(echo "$server_default_local_domains" | sed 's/,/ /g')"
 nginx_conf_middle=""
 
 main () {
+	echo 'fix /nginx'
 	fix_snippets
 	fix_sites
 	fix_nginx_conf
