@@ -1,20 +1,38 @@
-FROM alpine:3.7
+FROM alpine:3.7 as internal-base
 
 # install nginx
 RUN apk add --update nginx \
 	&& rm -rf /var/cache/apk/* \
 	&& mkdir -p /run/nginx
 
-# layer application source
-WORKDIR /usr/src/app
-COPY ./ /usr/src/app/
+COPY nginx/snippets /etc/nginx/snippets
+COPY nginx/sites /etc/nginx/sites
+COPY nginx/nginx.template.conf nginx/init.sh /etc/nginx/
 
-# layer env data
-# COPY ./setup/makeshift-data /usr/src/app/setup/
-VOLUME /usr/src/app/data
-
-# layer nginx config + set start
-COPY ./nginx/ /etc/nginx/
+# set start
 EXPOSE 80 443
+WORKDIR /app
+COPY entrypoint.sh ./
+ENTRYPOINT ["./entrypoint.sh"]
 
-ENTRYPOINT ["./init-and-start.sh"]
+
+VOLUME /data/ssl
+ENV \
+	server_prod_enable="true" \
+	server_local_enable="true" \
+	server_default_prod_domains="my-app.com" \
+	server_default_local_domains="my-app.localhost,local.my-app.com" \
+	server_https_force="false"
+
+
+
+# target: example-simple
+FROM internal-base as example-simple
+# COPY examples/simple/nginx/sites /etc/nginx/sites
+COPY examples/simple/public /app/public
+
+
+# target: base
+FROM internal-base as base
+# VOLUME /etc/nginx/sites
+# VOLUME /app/public

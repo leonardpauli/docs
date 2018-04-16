@@ -1,0 +1,9 @@
+version: '3.4'
+services:
+  server:
+    image: leonardpauli/docs-nginx-base-example-simple
+    build:
+      context: ../..
+      target: example-simple
+    env_file: .env
+    ports: ["80:80"]
