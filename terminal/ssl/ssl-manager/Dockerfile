@@ -71,13 +71,12 @@ ENV \
 # server:
 # 	volumes: ["./data/ssl/acme/webroot/.well-known/acme-challenge":"/public/.well-known/acme-challenge"]
 # ssl-manager:
+# 	image: leonardpauli/docs-ssl-manager
 # 	volumes: ["./data/ca:/data/ca", "./data/ssl:/data/ssl"]
 # 	environment:
 #			ssl_local_domains: "${domain_base}.localhost,local.$domain_prod"
-#			ssl_local_displayname: "$domain_base (local)"
 #			ssl_prod_create: "$production"
 #			ssl_prod_domains: "$domain_prod"
-#			ssl_prod_displayname: "$domain_base"
 #			ssl_prod_notify_email: "webmaster@$domain_prod"
 #			ssl_prod_stageing: "false"
 

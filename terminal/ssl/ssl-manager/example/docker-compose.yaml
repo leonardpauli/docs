@@ -11,7 +11,7 @@ services:
   ssl-manager:
     image: leonardpauli/docs-ssl-manager
     build: ..
-    entrypoint: ["tail", "-f", "/dev/null"]
+    # entrypoint: ["tail", "-f", "/dev/null"]
     volumes: ["./data/ca:/data/ca", "./data/ssl:/data/ssl"]
     environment:
       # ssl_local_renew_schedule: '*/1 * * * *'

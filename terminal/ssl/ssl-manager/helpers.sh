@@ -119,7 +119,8 @@ ssl_acme () {
 }
 ssl_acme_init () { ssl_acme --updateaccount --accountemail "$ssl_acme_notify_email"; }
 ssl_acme_csr_sign () {
-	ssl_acme --signcsr --csr "$crt_csr" -w "$ssl_acme_webroot" --fullchain-file "$crt_crt";
+	ssl_acme --signcsr --csr "$crt_csr" -w "$ssl_acme_webroot" --fullchain-file "$crt_crt" "$@";
+	# --force
 	
 	# --cert-file /path/to/real/cert/file After issue/renew, the cert will be copied to this path.
 	# --key-file /path/to/real/key/file After issue/renew, the key will be copied to this path.
@@ -133,6 +134,8 @@ ssl_acme_crt_renewal_setup () {
 	crt_signscript="(source '$helpers_file'; crt_csr='$crt_csr' crt_crt='$crt_crt'; ssl_acme_csr_sign)"
 	cron_add "$crt_renew_schedule" "ssl-$name" \
 		"$crt_signscript && (name='prod'; $ssl_crt_create_post_script)"
+	# todo: use --reloadcmd for ssl_crt_create_post_script
+	# ie. ssl_acme_csr_sign --reloadcmd \"(name='prod'; $ssl_crt_create_post_script)\"
 }
 ssl_acme_await_online () {
 	online_check_path=".well-known/acme-challenge/online"
