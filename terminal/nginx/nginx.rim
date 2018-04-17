@@ -206,7 +206,7 @@ config
 		- service nginx restart
 			alt: sudo service nginx reload // diff?
 			alt: /etc/init.d/nginx restart
-
+			alt: /usr/sbin/nginx -s reload
 
 	syntax:
 		# comment, in main block/context

@@ -17,6 +17,16 @@ overlay_nginx () {
 	&& overlay_folder /app/nginx /etc/nginx
 }
 
+reload_nginx_on_new_ssl_cert () {
+	tail -f -s 5 -n 0 "$server_ssl_crt_created_log" \
+	| while read line; do echo "reload on cert" && /usr/sbin/nginx -s reload; done
+}
+
+# background process
+if [ ! -z "$server_ssl_crt_created_log" ]; then
+	reload_nginx_on_new_ssl_cert & reload_pid=$!; trap "kill $reload_pid" EXIT
+fi
+
 echo "entrypoint" \
 && overlay_nginx \
 && cd /etc/nginx/ && ./init.sh \

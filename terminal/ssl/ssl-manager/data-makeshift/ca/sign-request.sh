@@ -1,40 +1,17 @@
-#!/bin/bash
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ca=$DIR/ca
-filename="$1"
-domains="$2" # "localhost,example.com"
+#!/usr/bin/env sh
+crt_csr="$1"; crt_crt="$2"
 
+extracted_san="$( \
+openssl req -text -noout -in "$crt_csr" | tr $'\n' ';' \
+| sed -e "s/.*X509v3 Subject Alternative Name: ; *\([^;]*\).*/\1/" \
+)"
 
-# helpers
-itera () { local fn=${1:-"echo"} del=${2:-","} xs=${3:-"a,b,c"} i=0;
-	while [ "$xs" ]; do x=${xs%%$del*}
-		$fn "$x" $((i++))
-	[ "$xs" = "$x" ] && xs='' || xs="${xs#*$del}"; done
-}
-
-
-# create ext file
-
-altnames="";fn () {
-	nl=$'\n';altnames+="DNS.$2 = $1${nl}";
-};
-itera fn "," "$domains"
-
-extFile=$(cat <<- EOF
-	authorityKeyIdentifier=keyid,issuer
-	basicConstraints=CA:FALSE
-	keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment # sure of all of those?
-	subjectAltName = @alt_names
-
-	[alt_names]
-	$altnames
-	EOF)
-echo "$extFile" > $DIR/tmp.ext
-
-
-# sign
+extfile=$(mktemp); trap "rm -f $extfile" EXIT
+echo "keyUsage = nonRepudiation, digitalSignature, keyEncipherment" > "$extfile"
+echo "subjectAltName = $extracted_san" >> "$extfile"
 
 openssl x509 -req -sha256 -days 30 \
-	-CAserial $... -CAcreateserial \
-	-CA $ca.pem -CAkey $ca.key \
-	-extfile $DIR/tmp.ext -in $filename.csr -out $filename.crt
+-CAcreateserial \
+-CA "/data/ca/ca.pem" -CAkey "/data/ca/ca.key" \
+-extfile "$extfile" \
+-in "$crt_csr" -out "$crt_crt"

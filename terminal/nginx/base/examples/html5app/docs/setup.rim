@@ -1,0 +1,7 @@
+# terminal/nginx/base/example/html5app
+' LeonardPauli/docs
+	Created by Leonard Pauli, 17 apr 2018
+
+- vi .env.example && vi .env // add/mod relevant parameters, including nginx_reload_through_file=true (todo)
+- ./start
+- CA.cert.root.install data/ca.pem // + restart chrome

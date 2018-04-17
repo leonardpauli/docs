@@ -11,6 +11,7 @@ if [ "$env" = "dev" ]; then
 	# if ! (docker images | grep "$req_image "); then
 	# 	echo "$req_image missing, building it"
 		(cd ../.. && docker build -t leonardpauli/docs-nginx-base .)
+		(cd ../../../../ssl/ssl-manager && docker build -t leonardpauli/docs-ssl-manager .)
 	# fi
 	docker-compose -f docker-compose.yml -f docker-compose.dev-override.yml up --build
 elif [ "$env" = "prod" ]; then

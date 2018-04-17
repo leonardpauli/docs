@@ -4,6 +4,7 @@ services:
     image: nginx:1.13-alpine
     volumes:
       - ./data/ssl/acme/webroot/.well-known/acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge
+      # - ./data/ssl:/etc/nginx/ssl
     ports: ["80:80"]
     depends_on:
       - ssl-manager

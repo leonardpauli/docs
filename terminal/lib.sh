@@ -50,3 +50,23 @@ replace_with_multiline () {
 	echo "$to_repl" > $tmp_file
 	cat - | sed "/$to_find/ r $tmp_file" | sed "/$to_find/d"
 }
+
+
+# based on https://stackoverflow.com/questions/10909685/run-parallel-multiple-commands-at-once-in-the-same-terminal
+# background_cmds_use; background_cmds_add 'sleep 3'; background_cmds_await;
+background_cmds_use () {
+	background_cmds_pids=""
+	background_cmds_await () { wait $background_cmds_pids; }
+	background_cmds_add () {
+		echo "process '$1' started";
+		$1 & pid=$!;
+		background_cmds_pids="$background_cmds_pids $pid"
+	}
+	trap "kill $background_cmds_pids" EXIT # correct exit? SIGHUB, INT, etc?
+	# also, won't multiple traps override each other? also, remove pid if process ends earlier
+}
+# background process, simpler use:
+# heartbeat () { while [ "a" = "a" ]; do echo "loop $1"; sleep 1; done; }
+# heartbeat a & pid_a=$!; trap "kill $pid_a" EXIT
+# heartbeat b
+

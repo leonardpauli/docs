@@ -12,12 +12,14 @@ CA.local-dev.create-and-install {NAME: "nginx.example test CA"}
 		// just to prevent anyone that happens to come over the file to create certs trusted by your computer
 		// though if they get the file, there will be bigger issues, and it will be limited to SSL (see below), and only used for local development...
 	- cert.root.create: openssl req -x509 -new -nodes -key myCA.key -sha256 -days 365 -out myCA.pem -subj "/CN=NAME"
-	- CA.cert.root.install
-		- on OSX: // (possibly requires browser restart)
-			- open /Applications/Utilities/Keychain\ Access.app/
-			- File -> Import Items... (⌘⇧I)
-			- search (⌘⌥F): NAME
-			- double click it, expand trust section, change SSL to Always trust, close, enter password
+	- CA.cert.root.install myCA.pem
+
+CA.cert.root.install cert
+	- on OSX: // (possibly requires browser restart)
+		- open /Applications/Utilities/Keychain\ Access.app/
+		- File -> Import Items... (⌘⇧I) -> select cert
+		- search (⌘⌥F): NAME
+		- double click it, expand trust section, change SSL to Always trust, close, enter password
 
 
 cert.create-using-CA {USERFACINGNAME: "my-app.dev cert", DOMAINS: "localhost", "my-app.localhost", "local.my-app.com"}

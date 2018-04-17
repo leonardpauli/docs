@@ -13,8 +13,6 @@ cleanup () {
 ssl_data_makeshift_use_fn () {
 	cd "data-makeshift"
 
-	touch "$ssl_crt_created_log"
-
 	if [ ! -f "$ssl_dhparam_path" ]; then
 		echo "$ssl_dhparam_path.makeshift"
 		touch "$ssl_dhparam_path.makeshift"
@@ -40,6 +38,8 @@ ssl_data_makeshift_use_fn () {
 		cp ssl/prod.csr "$ssl_prod_csr"
 		cp ssl/prod.crt "$ssl_prod_crt"
 	fi
+
+	touch "$ssl_crt_created_log"
 
 	cd ..
 }
@@ -68,12 +68,21 @@ ssl_crt_signscript_create () {
 	echo "ssl_crt_signscript_create $ca_signscript"
 	{ echo "$(cat)" > "$ca_signscript"; } <<-EOF
 	#!/usr/bin/env sh
-	crt_csr="\$1"
-	crt_crt="\$2"
+	crt_csr="\$1"; crt_crt="\$2"
+
+	extracted_san="\$( \\
+		openssl req -text -noout -in "\$crt_csr" | tr \$'\n' ';' \\
+			| sed -e "s/.*X509v3 Subject Alternative Name: ; *\([^;]*\).*/\1/" \\
+	)"
+
+	extfile=\$(mktemp); trap "rm -f \$extfile" EXIT
+	echo "keyUsage = nonRepudiation, digitalSignature, keyEncipherment" > "\$extfile"
+	echo "subjectAltName = \$extracted_san" >> "\$extfile"
 
 	openssl x509 -req -sha256 -days 30 \\
-		-CAserial "$ca_crt.srl" -CAcreateserial \\
+		-CAcreateserial \\
 		-CA "$ca_crt" -CAkey "$ca_key" \\
+		-extfile "\$extfile" \\
 		-in "\$crt_csr" -out "\$crt_crt"
 	EOF
 	# -extfile $DIR/tmp.ext 
@@ -82,22 +91,34 @@ ssl_crt_signscript_create () {
 }
 ssl_crt_csr_create () {
 	echo "ssl_crt_csr_create $crt_csr"
-  # partly based on acme.sh
-  # TODO: fix idn support or just use acme.sh's createcsr fn
-  # oh, see acme.sh --createCSR
+	# partly based on acme.sh
+	# TODO: fix idn support or just use acme.sh's createcsr fn
+	# oh, see acme.sh --createCSR
 
-  printf "[ req_distinguished_name ]\n[ req ]\ndistinguished_name = req_distinguished_name\nreq_extensions = v3_req\n[ v3_req ]\n\nkeyUsage = nonRepudiation, digitalSignature, keyEncipherment" > "$crt_csr_conf"
+	{ echo "$(cat)" > "$crt_csr_conf"; } <<-EOF
+		[ req_distinguished_name ]
+		[ req ]
+		distinguished_name = req_distinguished_name
+		req_extensions = v3_req
+		[ v3_req ]
 
-  # domains="$(_idn "$domains")"
-  alt="DNS:$(echo "$crt_domains" | sed "s/,,/,/g" | sed "s/,/,DNS:/g")"
-  printf -- "\nsubjectAltName=$alt" >> "$crt_csr_conf"
+	EOF
+	echo "keyUsage = nonRepudiation, digitalSignature, keyEncipherment" >> "$crt_csr_conf"
+	# keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+	# authorityKeyIdentifier=keyid,issuer
+	# basicConstraints=CA:FALSE
 
-  # [ "$ocsp_use_letsencrypt" ] && printf -- "\nbasicConstraints = CA:FALSE\n1.3.6.1.5.5.7.1.24=DER:30:03:02:01:05" >> "$csrconf"
+	# domains="$(_idn "$domains")"
+	# subjectAltName = DNS:example.com, DNS:*.other.com, IP:127.0.0.1
+	alt="DNS:$(echo "$crt_domains" | sed "s/,,/,/g" | sed "s/,/,DNS:/g")"
+	echo "subjectAltName = $alt" >> "$crt_csr_conf"
 
-  # _csr_cn="$(_idn "$domain")"
-  # csr_key, not crt_key?
-  crt_displayname="$(first_domain_get "$crt_domains")" # has to be first domain name for letsencrypt
-  openssl req -new -sha256 -key "$crt_key" -subj "/CN=$crt_displayname" -config "$crt_csr_conf" -out "$crt_csr"
+	# [ "$ocsp_use_letsencrypt" ] && printf -- "\nbasicConstraints = CA:FALSE\n1.3.6.1.5.5.7.1.24=DER:30:03:02:01:05" >> "$csrconf"
+	# _csr_cn="$(_idn "$domain")"
+	# csr_key, not crt_key?
+
+	crt_displayname="$(first_domain_get "$crt_domains")" # has to be first domain name for letsencrypt
+	openssl req -new -sha256 -key "$crt_key" -subj "/CN=$crt_displayname" -config "$crt_csr_conf" -out "$crt_csr"
 }
 ssl_crt_csr_sign () {
 	echo "ssl_crt_csr_sign $crt_signscript '$crt_csr' '$crt_crt'"

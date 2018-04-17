@@ -1,20 +1,11 @@
-# terminal/ssl/workflows
+# terminal/ssl
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 19 mar 2018
 
 // secure sockets layer
 // 	- a cryptographic protocol
 
-
-// TODO
-// https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-in-ubuntu-16-04
-// http://nginx.org/en/docs/http/configuring_https_servers.html
-// https://miki725.github.io/docker/crypto/2017/01/29/docker+nginx+letsencrypt.html
-// http://www.automationlogic.com/using-lets-encrypt-and-docker-for-automatic-ssl/
-// https://certbot.eff.org/docs/using.html#webroot
-// https://www.digitalocean.com/community/tutorials/how-to-use-certbot-standalone-mode-to-retrieve-let-s-encrypt-ssl-certificates
-// https://certbot.eff.org/docs/install.html#running-with-docker
-// https://www.digitalocean.com/community/tutorials/openssl-essentials-working-with-ssl-certificates-private-keys-and-csrs
+// see https://gist.github.com/Soarez/9688998
 
 
 general:
@@ -80,3 +71,14 @@ see nginx.ssl
 	test: "https://hstspreload.org/"
 - setup on lpm
 - update deploy + server setup notes
+
+
+' some references: (?)
+	- https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-in-ubuntu-16-04
+	- http://nginx.org/en/docs/http/configuring_https_servers.html
+	- https://miki725.github.io/docker/crypto/2017/01/29/docker+nginx+letsencrypt.html
+	- http://www.automationlogic.com/using-lets-encrypt-and-docker-for-automatic-ssl/
+	- https://certbot.eff.org/docs/using.html#webroot
+	- https://www.digitalocean.com/community/tutorials/how-to-use-certbot-standalone-mode-to-retrieve-let-s-encrypt-ssl-certificates
+	- https://certbot.eff.org/docs/install.html#running-with-docker
+	- https://www.digitalocean.com/community/tutorials/openssl-essentials-working-with-ssl-certificates-private-keys-and-csrs

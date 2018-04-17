@@ -5,6 +5,7 @@
 
 
 leonardpauli/docs-ssl-manager published to docker-hub
+see the Dockerfile first
 
 
 - terminal.nginx.base.bootstrap ./my-app && cd $_ // create http server (necessary for acme verification)
@@ -13,6 +14,10 @@ leonardpauli/docs-ssl-manager published to docker-hub
 - vi docker-compose.yaml // add ssl-manager, see ssl-manager/Dockerfile
 - vi .env.example && vi .env // add/mod relevant parameters, including nginx_reload_through_file=true (todo)
 - docker-compose up
+- CA.cert.root.install data/ca.pem // + restart chrome
+- to inspect:
+	in chrome, click https -> show cert -> drag to finder
+	-> openssl x509 -inform der -noout -text -in the-file.cer
 
 
 - for production
