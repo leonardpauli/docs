@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+script_dir () { (a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; echo "$a"); }
+load_env () { [ -f .env ] && for a in $1; do
+	export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done; }
+
+cd "$(script_dir)"
+load_env "ssh_prod ssh_prod_prefix"
+
+echo deploying...
+
+deploy_command='git pull && ./start'
+ssh $ssh_prod "$ssh_prod_prefix $deploy_command"
+
+echo done

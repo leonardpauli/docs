@@ -167,4 +167,5 @@ cron_add () {
 	(crontab -l && echo "$1 cd '$(pwd)' && $3 # $cron_prefix $2") | crontab -
 }
 isnt_created () { ([ ! -f "$1" ] || [ -f "$1.makeshift" ]) && return 0 || return 1; }
+# isnt_created () { [ ! -f "$1" ] || [ -f "$1.makeshift" ]; } # enough? or $??
 keep_alive () { tail -f /dev/null; }

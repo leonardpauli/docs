@@ -1,11 +1,20 @@
-#!/bin/sh
+#!/usr/bin/env sh
 scriptname='setup-server.sh'
 arg1=${1:-false} # "instance"
 instanceUser='mydev'
 
 # helpers
-indentations=0
-p () { echo "$(printf %$(($indentations * 2))s | tr " " " ")$@"; }
+# p 'my log'; p +1; p 'my indented item'; p -1; p 'back to normal'
+use_p_indentations_logging () {
+  p_indentations=0
+  p () {
+    if   [ "$1" = "+1" ]; then p_indentations=$(($p_indentations+1))
+    elif [ "$1" = "-1" ]; then p_indentations=$(($p_indentations-1))
+    else echo "$(printf %$(($p_indentations * 2))s | tr " " " ")$@"
+    fi
+  }
+}
+use_p_indentations_logging
 
 
 # main
@@ -14,7 +23,7 @@ p 'Guide: How to setup (a digitalocean.com) instance (with docker-compose) to ru
 
 # on local computer
 
-p '- instance creation'; indentations=$(($indentations+1))
+p '- instance creation'; p +1
 if [ ! "$arg1" = "instance" ]; then
   p 'Is this running on the instance already? (y/N)'; read onInstance
 else
@@ -26,12 +35,12 @@ if [ ! "$onInstance" = "y" ]; then
   [ ! "$tmp" = "n" ] && open https://cloud.digitalocean.com
   # TODO: use digitalocean api to create droplet?
 
-  p '- droplet.create'; indentations=$(($indentations+1))
+  p '- droplet.create'; p +1
   p '- ubuntu 17'
   p '- enable ipv6'
   p '- add your ssh key: Create new? (Y/n)'; read sshKeyNeeded
   if [ ! "$sshKeyNeeded" = "n" ]; then
-    indentations=$(($indentations+1))
+    p +1
     if [ ! -f ~/.ssh/id_rsa.pub ]; then
       p '- ssh."generate public/private ssh key pair"'
       [ ! -d ~/.ssh ] && mkdir ~/.ssh && chmod 0700 ~/.ssh
@@ -43,18 +52,18 @@ if [ ! "$onInstance" = "y" ]; then
     p 'Your public ssh key is copied:'
     p "$pubKey"
     p ''
-    indentations=$(($indentations-1))
+    p -1
   fi
-  indentations=$(($indentations-1))
+  p -1
 
-  p 'optional:'; indentations=$(($indentations+1))
+  p 'optional:'; p +1
   p '- DNS.point domin name to instance # (DNS -> add A rule: @ -> IP)'
   p '- configure load-balancer'
-  indentations=$(($indentations-1))
+  p -1
   
   p 'Enter connected domain name (example.com) or IP: '; read instanceIP
 
-  p '- ssh.user.config.add-remote'; indentations=$(($indentations+1))
+  p '- ssh.user.config.add-remote'; p +1
   p 'Add entry in ~/.ssh/config? (Y/n)'; read tmp
   if [ ! "$tmp" = "n" ]; then
     { echo "$(cat)" >> ~/.ssh/config ; } <<- EOF
@@ -70,7 +79,7 @@ EOF
     p ''
     p ''
   fi
-  indentations=$(($indentations-1))
+  p -1
   
   p 'Instance setup from local done. To login: '"ssh root@$instanceIP"
   p 'Will now upload this script to instance. ↩︎'; read tmp
@@ -82,7 +91,7 @@ EOF
 
   exit 1
 fi
-indentations=$(($indentations-1))
+p -1
 
 
 
@@ -95,7 +104,7 @@ p '- ubuntu."fix locale issue" ↩︎'; read tmp # selected alt: prevent remote 
 sed -i -e 's/^AcceptEnv LANG/# AcceptEnv LANG/' /etc/ssh/sshd_config
 systemctl reload sshd
 
-p '- ubuntu."add secure user role" ↩︎'; read tmp; indentations=$(($indentations+1))
+p '- ubuntu."add secure user role" ↩︎'; read tmp; p +1
 instanceUser='mydev'
 iuhome="/home/$instanceUser"
 adduser $instanceUser && usermod -aG sudo $instanceUser
@@ -107,7 +116,7 @@ fi
 echo "$pubKey" >> $iuhome/.ssh/authorized_keys
 chmod 600 $iuhome/.ssh/authorized_keys
 chown $instanceUser:$instanceUser $iuhome/.ssh/authorized_keys
-indentations=$(($indentations-1))
+p -1
 
 p '- ubuntu."remove root ssh keys" ↩︎'; read tmp
 rm /root/.ssh/authorized_keys
@@ -123,7 +132,7 @@ systemctl reload sshd
 
 p '# - firewall setup? # https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04'
 
-p '- docker."install docker" ↩︎'; read tmp; indentations=$(($indentations+1))
+p '- docker."install docker" ↩︎'; read tmp; p +1
 p '- uninstall possibly old versions' \
 && sudo apt-get remove docker docker-engine docker.io \
 && p '- update the apt package index' \
@@ -146,13 +155,13 @@ p '- uninstall possibly old versions' \
 && p '- add user to docker group' && sudo usermod -aG docker $USER \
 && p '// done; test by writing "docker" on next login'
 # && p '- relogin to apply' && su - ${USER} // not from script
-indentations=$(($indentations-1))
+p -1
 
-p '- docker."install docker-compose" ↩︎'; read tmp; indentations=$(($indentations+1))
+p '- docker."install docker-compose" ↩︎'; read tmp; p +1
 sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose \
 && sudo chmod +x /usr/local/bin/docker-compose \
 && docker-compose -v # test
-indentations=$(($indentations-1))
+p -1
 
 
 # p '- docker."install docker-machine"'

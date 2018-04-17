@@ -52,7 +52,8 @@ fix_sites () {
 	cd sites
 	for site in *.inner.conf; do
 		site="$(echo "$site" | sed 's/.inner.conf//')"
-
+		
+		echo "# compiled" > "$site.conf"
 		if [ "$site" = "default" ]; then
 			fix_default_site
 		else

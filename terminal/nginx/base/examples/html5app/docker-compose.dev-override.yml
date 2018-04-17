@@ -8,3 +8,4 @@ services:
       target: dev
     volumes:
       - ./public:/app/public
+      - ./nginx:/app/nginx
