@@ -19,7 +19,7 @@ fix_snippets () {
 		cat ssl.force-https+acme.template.conf \
 			| sed "s/SERVER_NAME/$domains_local_spaced $domains_prod_spaced/g" \
 			> ssl.force-https+acme.conf
-		nginx_conf_middle="$nginx_conf_middle"$'\n'"include snippets/ssl.force-https+acme.conf;"
+		nginx_conf_middle="$nginx_conf_middle""include snippets/ssl.force-https+acme.conf;"$'\n'
 	fi
 
 	cd ..
@@ -42,6 +42,19 @@ fix_default_site () {
 				include sites/$site.inner.conf;
 			}
 			EOF
+		# https://stackoverflow.com/questions/7947030/nginx-no-www-to-www-and-www-to-no-www
+		[ "$server_default_redirect_from_www" = "true" ] && { echo "$(cat)" >> "$site.conf"; } <<-EOF
+			server {
+				listen $port_part;
+				listen [::]:$port_part;
+				server_name "~^www\.($(echo "$2" | tr ' ' '|'))\$";
+
+				$ssl_comment ssl_certificate ssl/$1.crt;
+				$ssl_comment ssl_certificate_key ssl/$1.key;
+
+				return 301 \$scheme://\$1\$request_uri;
+			}
+			EOF
 	}
 	[ "$server_prod_enable" = "true" ] && write_out_site prod "$domains_prod_spaced"
 	[ "$server_local_enable" = "true" ] && write_out_site local "$domains_local_spaced"
@@ -61,7 +74,7 @@ fix_sites () {
 			[ "$server_local_enable" = "true" ] && cat "$site.local.conf" 2> /dev/null >> "$site.conf"
 		fi
 
-		nginx_conf_middle="$nginx_conf_middle"$'\n'"include sites/$site.conf;"
+		nginx_conf_middle="$nginx_conf_middle""include sites/$site.conf;"$'\n'
 	done
 	cd ..
 }

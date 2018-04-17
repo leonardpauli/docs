@@ -20,6 +20,7 @@ ENV \
 	server_local_enable="true" \
 	server_default_prod_domains="my-app.com" \
 	server_default_local_domains="my-app.localhost,local.my-app.com" \
+	server_default_redirect_from_www="true" \
 	server_https_force="false"
 
 
