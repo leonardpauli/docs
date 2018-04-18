@@ -4,20 +4,56 @@
 
 // single page application
 
-// TODO
-- use static client // ie. don't generate it dynamically by backend code
-	// to allow client code to be only static resources served via CDN
-- use html5 mode // together with nginx + CDN
-- use build process // necessary? yaaah, browser support, cache bust and all...
+
+dictionary:
+	cli: "command line interface" // (program used in terminal)
+	os: "operating system" // (fundamental for your computer)
+
+
+
+get dev-dependencies.fundamental:
+	- get browser // (ie. google chrome), view and inspect the app
+		- see "https://www.google.com/chrome"
+	- get terminal // (ie. iTerm 3 + oh-my-zsh), interact with os through text commands
+		- see "https://www.iterm2.com/version3.html"
+		- see "https://github.com/robbyrussell/oh-my-zsh"
+	- get text-editor // (ie. VSCode / Sublime Text / vi / Atom + Nuclide), edit code with colors (syntax highlighting), auto suggestions, and other helpful features*
+		- see "https://www.sublimetext.com/3"
+			alt: "https://code.visualstudio.com/download"
+	- get source-control // (git, ie. through Xcode dev tools, collaborate and keep track of changes*
+		- open terminal/iTerm
+			- write `git`, hit `enter`, follow instructions to download Xcode dev tools if any
+	- get runtime // (ie. nodejs), runs your code
+		- see "https://nodejs.org/en/"
+	- get package-manager // (ie. npm or yarn), manages third party code, comes with nodejs
+	- get container-manager
+		- see terminal/containers/docker.install
+
+
+
+build process: // necessary? yaaah, browser support, cache bust and all...
 	- eg. webpack + babel
 	-> ./dist
-- use tests
-- use linting
-- use offline support // through service workers?
-- use ssl, see terminal."ssl-workflow"
 
-// spa boilerplate
-- vue-cli // TODO: setup + custom config
+	testing:
+		see "https://medium.com/welldone-software/an-overview-of-javascript-testing-in-2018-f68950900bc3"
+		types:
+			- unit testing // treat (more pure) functions/objects as black boxes and validate output of input
+			- integration testing // treat components (consisting of units) / processes as black boxes and validate side-effects of interactions
+			- "UI tests" // treat the app as a black box and validate side-effects and UI changes of UI interactions
+	linting:
+		- see eslint
+
+
+also use:
+	static client // ie. don't generate it dynamically by backend code
+		// to allow client code to be only static resources served via CDN
+	html5 mode // together with nginx + CDN
+	offline support // through service workers?
+	ssl: see terminal.ssl, included with terminal.nginx.base.example.html5app
+
+boilerplate
+	- see vue
 
 
 git/deploy workflow:
@@ -51,3 +87,12 @@ git/deploy workflow:
 	on server.deploy: // http hook?
 		- pull new images (delta auto detected)
 		- docker-compose up
+
+
+' notes:
+	- working with remote repositories
+	- setup ssh-key
+	- connect to remote
+	- terminal.git
+	scraping:
+		see "https://blog.phantombuster.com/web-scraping-in-2017-headless-chrome-tips-tricks-4d6521d695e8"

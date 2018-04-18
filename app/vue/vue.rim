@@ -1,0 +1,37 @@
+# app/vue
+' LeonardPauli/docs
+	Created by Leonard Pauli, 18 apr 2018
+
+// web app framework
+
+prerequisites:
+	- see app.spa.get dev-dependencies.fundamental
+	- get boilerplate-cli // (ie. vue-cli), get up and running quickly with necessary code* 
+		- `npm i -g @vue/cli` // https://github.com/vuejs/vue-cli
+
+
+generate boilerplate project
+	- `vue create -m npm my-app`, follow instructions // vue create -m npm base
+		// (vue-router, stylus, babel, pwa, eslint, unit-jest, e2e-cypress)
+		// You can now open Cypress by running: node_modules/.bin/cypress open
+		// https://on.cypress.io/installing-cypress
+		// added 1820 packages in 136.223s + added 74 packages, updated 1 package and moved 2 packages in 10.866s
+	- start project
+		- `cd my-app`
+		- `npm run dev`
+	- open project in text editor and browser
+	- change code, save file, see changes update live in browser
+	- auto lint fix
+		> `npm i -d onchange`
+		> `"lint:watch": "onchange '{{src}/**,.}/*.vue' -d 200 -w -- yarn lint {{changed}}",`
+
+get started:
+	- npm i // install dependencies
+	- npm run serve // to start dev server, it will auto-open browser or say how to do it
+	- npm run lint:watch // turn on auto-lint-fix on save
+	- git add . // stage all changes
+	- git commit -m "what you did" // commit staged changes
+	- git push // push commits
+	- git pull // pull new commits
+	- npm run build // create a package ready for production in /dist, just upload it to a server
+
