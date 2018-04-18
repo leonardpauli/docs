@@ -51,6 +51,9 @@ replace_with_multiline () {
 	cat - | sed "/$to_find/ r $tmp_file" | sed "/$to_find/d"
 }
 
+# sed "s/WEBROOT/$(sed_escaped_path "$ssl_acme_webroot")/g"
+sed_escaped_path () { echo "$1" | sed "s/\//\\\\\//g"; }
+
 
 # based on https://stackoverflow.com/questions/10909685/run-parallel-multiple-commands-at-once-in-the-same-terminal
 # background_cmds_use; background_cmds_add 'sleep 3'; background_cmds_await;

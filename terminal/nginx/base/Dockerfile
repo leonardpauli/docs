@@ -21,7 +21,8 @@ ENV \
 	server_default_prod_domains="my-app.com" \
 	server_default_local_domains="my-app.localhost,local.my-app.com" \
 	server_default_redirect_from_www="true" \
-	server_https_force="false"
+	server_https_force="false" \
+	ssl_acme_webroot="/data/ssl/acme/webroot"
 
 
 

@@ -11,6 +11,7 @@ main () {
 	fix_nginx_conf
 }
 
+sed_escaped_path () { echo "$1" | sed "s/\//\\\\\//g"; }
 
 fix_snippets () {
 	cd snippets
@@ -18,6 +19,7 @@ fix_snippets () {
 	if [ "$server_https_force" = "true" ]; then
 		cat ssl.force-https+acme.template.conf \
 			| sed "s/SERVER_NAME/$domains_local_spaced $domains_prod_spaced/g" \
+			| sed "s/ssl_acme_webroot/$(sed_escaped_path "$ssl_acme_webroot")/g" \
 			> ssl.force-https+acme.conf
 		nginx_conf_middle="$nginx_conf_middle""include snippets/ssl.force-https+acme.conf;"$'\n'
 	fi

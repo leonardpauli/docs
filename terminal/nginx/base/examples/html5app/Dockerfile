@@ -1,4 +1,4 @@
-FROM leonardpauli/docs-nginx-base as internal-base
+FROM leonardpauli/docs-nginx-base:latest as internal-base
 
 # target: dev
 FROM internal-base as dev

@@ -7,13 +7,13 @@ services:
     ports: ["80:80", "443:443"]
 
     volumes:
-      - ./data/ssl/acme/webroot/.well-known/acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge
+      - ./data/ssl/acme/webroot:/data/ssl/acme/webroot
       - ./data/ssl:/etc/nginx/ssl
     depends_on:
       - ssl-manager
   
   ssl-manager:
-    image: leonardpauli/docs-ssl-manager
+    image: leonardpauli/docs-ssl-manager:latest
     volumes: ["./data/ca:/data/ca", "./data/ssl:/data/ssl"]
     environment:
       ssl_prod_create: "$production"
@@ -22,3 +22,4 @@ services:
       ssl_prod_notify_email: "$ssl_prod_notify_email"
       ssl_prod_stageing: "$ssl_prod_stageing"
       ssl_crt_created_log: "$ssl_crt_created_log"
+      ssl_dhparam_create: "$ssl_dhparam_create"

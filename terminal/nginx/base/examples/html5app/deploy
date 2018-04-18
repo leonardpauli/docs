@@ -6,9 +6,24 @@ load_env () { [ -f .env ] && for a in $1; do
 cd "$(script_dir)"
 load_env "ssh_prod ssh_prod_prefix"
 
+cmd="$1"
+if [ ! -z "$cmd" ]; then
+	[ "$cmd" = "logs" ] && cmd="docker-compose logs -f --tail 200 -t"
+	ssh $ssh_prod "$ssh_prod_prefix $cmd"
+	exit
+fi
+
 echo deploying...
 
-deploy_command='git pull && ./start'
+# docker push leonardpauli/docs-ssl-manager
+# docker push leonardpauli/docs-nginx-base-example-html5app:prod
+# (update .env)
+deploy_command="git pull \
+&& docker pull leonardpauli/docs-ssl-manager:latest \
+&& docker pull leonardpauli/docs-nginx-base:latest \
+&& echo \"$(ls) $(pwd)\" \
+&& docker build -t leonardpauli/docs-nginx-base-example-html5app:prod . \
+&& ./start"
 ssh $ssh_prod "$ssh_prod_prefix $deploy_command"
 
 echo done
