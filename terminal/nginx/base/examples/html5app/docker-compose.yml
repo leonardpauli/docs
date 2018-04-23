@@ -1,8 +1,8 @@
-# docker build -t leonardpauli/docs-nginx-base-example-html5app:prod .
+# docker build -t $server_image:prod .
 version: '3.4'
 services:
   server:
-    image: leonardpauli/docs-nginx-base-example-html5app:prod
+    image: $server_image:prod
     env_file: .env
     ports: ["80:80", "443:443"]
 

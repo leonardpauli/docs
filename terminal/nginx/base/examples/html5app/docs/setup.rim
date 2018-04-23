@@ -2,6 +2,11 @@
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 17 apr 2018
 
-- vi .env.example && vi .env // add/mod relevant parameters, including nginx_reload_through_file=true (todo)
+prerequisites:
+	- docker
+
+- vi .env.example && vi .env // add/mod relevant parameters
+- optional, if data/ca already created, hard-link it
+	cd data && mkdir ca && ln ../path/to/original/files/data/ca/* ca/
 - ./start
 - CA.cert.root.install data/ca.pem // + restart chrome

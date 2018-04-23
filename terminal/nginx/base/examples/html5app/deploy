@@ -4,7 +4,7 @@ load_env () { [ -f .env ] && for a in $1; do
 	export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done; }
 
 cd "$(script_dir)"
-load_env "ssh_prod ssh_prod_prefix"
+load_env "ssh_prod ssh_prod_prefix server_image"
 
 cmd="$1"
 if [ ! -z "$cmd" ]; then
@@ -15,14 +15,14 @@ fi
 
 echo deploying...
 
-# docker push leonardpauli/docs-ssl-manager
-# docker push leonardpauli/docs-nginx-base-example-html5app:prod
+# docker push leonardpauli/docs-nginx-base leonardpauli/docs-ssl-manager
+# docker push $server_image:prod
 # (update .env)
 deploy_command="git pull \
 && docker pull leonardpauli/docs-ssl-manager:latest \
 && docker pull leonardpauli/docs-nginx-base:latest \
 && echo \"$(ls) $(pwd)\" \
-&& docker build -t leonardpauli/docs-nginx-base-example-html5app:prod . \
+&& docker build -t $server_image:prod . \
 && ./start"
 ssh $ssh_prod "$ssh_prod_prefix $deploy_command"
 

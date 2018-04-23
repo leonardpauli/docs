@@ -6,13 +6,17 @@ load_env () { [ -f .env ] && for a in $1; do
 cd "$(script_dir)"
 load_env "env"
 
+req_image () {
+	name="$1"; build_path="$2";
+	if ! (docker images | grep "$name "); then
+		echo "$name missing"; exit
+		# (cd "$build_path" && docker build -t "$name" .)
+	fi
+}
+
 if [ "$env" = "dev" ]; then
-	req_image="leonardpauli/docs-nginx-base"
-	# if ! (docker images | grep "$req_image "); then
-	# 	echo "$req_image missing, building it"
-		(cd ../.. && docker build -t leonardpauli/docs-nginx-base .)
-		(cd ../../../../ssl/ssl-manager && docker build -t leonardpauli/docs-ssl-manager .)
-	# fi
+	req_image "leonardpauli/docs-nginx-base" "../.."
+	req_image "leonardpauli/docs-ssl-manager" "../../../../ssl/ssl-manager"
 	docker-compose -f docker-compose.yml -f docker-compose.dev-override.yml up --build
 elif [ "$env" = "prod" ]; then
 	docker-compose up --build -d
