@@ -33,6 +33,6 @@ items:
 		https://github.com/cypress-io/cypress/pull/1582
 		https://github.com/CLAassistant
 	- terminal/create executable, see node.npm.commander, and printenv + readargs?
-
+	- add .rim to "https://github.com/github/linguist/blob/master/lib/linguist/languages.yml" and use it in .gitattributes
 
 // see https://github.com/sindresorhus/awesome

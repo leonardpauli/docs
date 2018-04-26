@@ -14,3 +14,72 @@ GDPR
 	// https://www.gdpreu.org/the-regulation/list-of-data-rights/right-of-access/
 	// https://ico.org.uk/for-organisations/guide-to-the-general-data-protection-regulation-gdpr/lawful-basis-for-processing/consent/
 	- don't forget "automatic" request logging including ip address etc
+
+' Notes:
+	data processing.in short:
+		we only have some control of our own software, not external factors such as insecure browser extensions or social engineering attacks
+		we try our best to make sure that you're in full control of your own data
+			though we are humans and might make mistakes
+				if that happens, and we find out, we'll do our best to inform you as fast as possible and to fix as much as we have ability to
+				because of this, we also try to reduce the risks by building smart
+					this means we try to minimize our own responsibility and access (and therefore also the hackers access) to your data
+						we do this by, eg. having "our client software" encrypt your data on your computer, before sending it to us for storage
+						this also means that there is no easy way to "reset your password", because we don't have it :)
+		appart from "our client software", the browser sends automatically some data
+			like IP address (which can be used to determine city), browser and os version, etc
+			your browser sends this to every page you visit, if you haven't turned it off in browser settings and by using a VPN (for IP scrambling), etc
+			by itself, this data generally isn't sensitive, though if combined with data from other sources, it can be used as an identifier for other sensitive data, etc
+			we might use it
+				- in logs to protect against "bad" traffic (hacker attacks, some bots, etc)
+				- in logs to get statistics of how/where our software is used and growing
+					eg. to better know which devices and languages we should focus on supporting
+				but then it is stored away from other data (less likely to be used as identifier)
+				and in some cases possibly "hashed" so that the original information is removed
+			we do not have a system in place to remove the data your browser have sent
+				reasons: takes some time to build, not that sensitive, is already sent to *every* site you visit anyhow
+					(and many, if not most, of them saves it by default), so if there are any privacy concerns,
+						the only practical way is to change what the browser sends, as described above
+					also, as it is saved in separate system, it's not automatically correlated with any other data, making it pretty anonymous
+		also, to not have you re-login each time you visit the page, we save that you're logged in with "cookies" to your browser
+		also, data that you create will be saved locally in your browser (but not necessarily sent to us)
+		when we save data locally (that is, on your computer, without us accessing it), we might not ask directly
+		for both these cases: if you don't want it, you can turn it off in your browser settings
+		"out client software" is built in such a way that it validates data coming from "our server software", thereby limiting our (and hackers) ability to tamper with the data
+			though we have the ability to delete it from our servers (but as all of the data you create should be stored on your computer anyhow, that should not be as much of a problem)
+		possible risk: our software have open source dependencies which aren't fully inspected (from a security standpoint) by us
+			though they are usually widely used (many other inspects and rely on them, which might be used to argue that they're more secure)
+		we might use third party services; though we'll describe what data will be sent and how it will be used before doing so, with the ability to decline (if the data isn't public already)
+
+' Notes:
+	data processing.in general:
+		(human (or machine)) interacts with "hardware device" (eg. keyboard, mouse, touchscreen, etc) generating "input event data"
+		"input event data" from ("hardware device" or software (such as remote desktop program or automation script)) is sent to "OS"
+		"OS" processes it and possibly sends processed data to "host software" (eg. "web browser")
+		"host software" processes it and possibly sends processed data to "client software"
+		"our client software" processes it together with data from local data store and possibly:
+			- sends it to local data store
+				where it will be encrypted (if chosen as such) when "logged out" / "at rest"
+			- sends it (possibly processed) to our remote data store or "our server software"
+				where the tranmission is encrypted through ssl
+					prevents eg. ISP to read the transmission (excepts its size and time)
+				where "our client software" can encrypt the data before the transmission, if user choses so
+					prevents "our server software" and therefore also "our 3rd party service" to read the contents of the data entries
+						exept the number of entries, and possibly relations from other unencrypted entries to the encrypted entries
+						also, in some cases, the user might choose to give part of "our server software" access to some entries (eg. for scheduled tasks etc)
+				which in turn can send it (possibly processed) to "our 3rd party service"
+					these 3rd party services should be listed publicly
+						if the data, after being processed, contains enough (even if combined with other sources) personal information to be identifiable
+							' eg. statistics about "how many data points are created in that city, during this time" (if large enough) can be sent out without notifying users
+								maybe not? that examble can be mostly derived (maybe not the city... or time) from public data (the entries data might be encrypted, but the count and ingoing relations might be public)
+						if any, as well as the data sent, when, and how it's processed, should be listed publicly
+						+ "user" should have the ability to approve and decline such use
+			- sends it (possibly processed) to "other 3rd party service"
+				first time when "our client software" recognizes that data is about to be transmitted to "other 3rd party service":
+					"our client software" will ask for how such requests should be handled (now and in the future)
+					' the "user" can thereby decline any such requests that "our client software" has control over or get to know about
+						risks: if any part of the above-mentioned "interaction data" input chain has been hijacked in any way
+							eg. if another human or program takes over the computer, or a "browser extension" modifies the source code of "our client software", etc
+							"our client software" might not be able to know if it was the "valid user" that allowed the request
+								or that a request happened at all
+						mitigation: make sure the environment is secure and that "users" have knowledge about common security practices (like avoiding "social engineering", etc)
+							+ possibly enable local logging of external requests and setup reminders to review the list + request rules
