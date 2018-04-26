@@ -7,3 +7,110 @@
 // TODO
 
 POSIX: "Portable Operating System Interface" // family of standards for compatibility between os:s
+
+
+osx.personal setup:
+	settings:
+		use gray traffic lights + dark and autohiding menubar
+	dock:
+		- make smaller: defaults write com.apple.dock tilesize -int 5 && killall Dock
+	quicklook:
+		install dev extensions (code + md + zip + improved image viewer etc) // search github
+	bettersnaptool:
+		- use snap to edge / expand to fullscreen on drag to top edge
+		- use fn/ctrl to move/resize window
+	preview // resizing, cropping, colors, signatures, image viewer
+	google chrome: alt safari, firefox, chrome canary // browser
+		alt-cmd-j to open dev tools
+			esc to toggle console
+			// TODO: a lot helpful to learn about devtools
+	virtualbox: alt: bootcamp, parallels // run ubuntu, windows (eg. with IE Edge)
+	iterm:
+		alt: default terminal
+		install oh-my-zsh:
+			customize .zshrc
+			"alias | grep git" afterwards to learn shortcuts
+		dark theme + do not show in menubar/dock
+		profiles:
+			- default:
+				- toggle activate with double tap ctrl
+				- fill halv right screen
+			- windowed:
+				- ctrl-cmd-t to create new // when using external monitor
+	sublime-text:
+		alt: vi{customize .vimrc}, vs-code, atom, (emacs), ...
+		- alt-up/down to move 7 lines up/down // + work with shift / selection
+		- shift-cmd-l to split selection into multiple cursors (1 / line)
+		- cmd-d to select word under cursor if selection.length is 0
+			then add next occurence to selection
+		- cmd-g after cmd-d to select next occurence
+		- shift-cmd-g (like cmd-g, but s/next/prev/)
+		- install package control
+		- add material theme (indexing perfomance issue solved?)
+			- small tabs + status bar etc
+			- use custom dark color theme, light when outside
+				- almost black bg + faded sidebar and line-numbers
+			- use colored toolbar
+		- cmd-k, cmd-b to toggle sidebar
+		- shift-ctrl-cmd-f to toggle distraction free mode
+		- cmd-n for new tab
+		- shift-cmd-n for new window
+		- shit-cmd-t to re-open last closed file // but undo history still lost
+		- install origami for cmd-k, [cmd][shift][alt]-arrow key to move/alias/split/merge panels
+		- alt-cmd-2/1 to toggle nr of vertical panels
+		- cmd-t, <text><enter> to goto existing tab
+		- use projects (.sublime-project)
+	docker: ...
+	adobe: lightroom, premiere pro, after effects, (photoshop alt affinity photo, alt gimp), illustator{alt: affinity design}
+	blender: alt: cinema 4d, sketch, voxel editor, etc?
+	sketch: alt: figma, invision studio
+	flinto: alt: principle, framer, fb origami-studios, after effects, plugins to sketch, invision studio, keynote/powerpoint
+	keynote: alt: google presentations, slides.io, (powerpoint)
+	pages: alt: google docs, (word), sketch, sublime-text (eg. md, rim, etc), realtimeboard, (nodenotes, soon)
+	quicktime:
+		simple screen, auto, and iphone screen recordings
+		needs compression afterwards:
+			- brew install ffmpeg
+			- ffmpeg -i recording.mov -vcodec libx264 -crf 24 out2.mp4
+			- brew install gifsicle
+			- ffmpeg -i recording.mov -s 600x400 -pix_fmt rgb24 -r 10 -f gif - | gifsicle --optimize=3 --delay=3 > out.gif
+	vlc // play video / audio files, large support of encodings + "simple" etc
+	spotify
+	finder
+		- defaults write com.apple.finder CreateDesktop -bool false; killall Finder
+		- defaults write com.apple.finder AppleShowAllFiles YES; killall Finder
+		settings{cmd-,}
+			general.new finder window shows: <some path better than slow "all files">
+			advanced:
+				show all filename extensions: true
+				show warning before changing extention: false
+				when performing search: current folder
+	display meny // ability to use full native resolution on retina screens
+	sip // pick colors
+	flux // screen blue light filter, make evening / night screen better
+	shady // make screen darker then lowest backlight level (using dark overlay)
+	selfcontrol // block netflix + youtube + twitter etc for longer periods
+	smcFanControl // see cpu temperature + increase and see fan rpm
+	networking:
+		bredbandskollen.se // check internet speed in sweden
+	desmos.com/calculator // simpler graphing calculator
+	wolframalpha.com/input/?i=(x-y)%5E5%2F(y-x)%5E3 // advanced knoledge graph + math "calculator"
+	logic pro: alt: garage band, fl studio, abelton, cubase, etc // DAW's - Digital Audio Workstation
+	source tree // good foe greater git history overview (ohmyzsh "glola" works pretty well though)
+	daisy disk // graphically view diskspace
+	slack, facebook messenger, telegram // chat apps
+	xcode, android studios // IDE's - Integrated Development Environment's
+	postico, sequel pro, mongohub // db viewers
+	the unarchiver // better than osx default unzip tool
+	icloud, google drive, dropbox, custom s3 solution // cloud document storage
+	alfred // faster spotlight
+		hide from menubar and dock
+		hide hat etc
+	image capture // import iphone images
+	keychain access // manage installed certs
+	resources:
+		images: unsplash.com
+		icons: thenounproject.com
+		random text generator:
+			osx: little ipsum
+			npm: faker
