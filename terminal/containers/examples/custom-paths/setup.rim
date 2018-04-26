@@ -1,0 +1,40 @@
+# terminal/containers/examples/custom-paths
+' LeonardPauli/docs
+	Created by Leonard Pauli, 25 apr 2018
+
+structure:
+	.env
+	.env.example
+	my-app
+		container
+			.dockerignore
+			.gitignore
+			.env
+			Dockerfile // declare volume + copy (dev/prod target)
+				// COPY ./../.. // .(container)/..(web)/..(custom-paths)
+				COPY: web/src // relative to context
+			data: data-file
+			docker-compose.dev-override.yml
+				image: xxx:dev
+				build.target: dev
+				volume: ../src // relative to docker-compose command or file
+			docker-compose.yml
+				image: xxx:prod
+				build.context: ../.. // .(container)/..(web)/..(custom-paths)
+				build.dockerfile: web/container/Dockerfile // relative to context
+				build.target: prod
+				envfile // presumable relative to docker-compose command or file
+				volume: ./data // relative to docker-compose command or file
+			start // build + docker-compose up
+				cd <script-location>
+				dev: docker-compose -f docker-compose.yml -f docker-compose.dev-override.yml up --build
+				prod: docker-compose up --build -d
+		src: src-file
+		vol: vol-file
+	start // -> container/start
+		(cd web/container && ./start $*)
+	setup.rim
+
+use:
+	sed -e 's/env=.*/env=dev/' -i "" .env; ./start
+	sed -e 's/env=.*/env=prod/' -i "" .env; ./start

@@ -1,0 +1,10 @@
+version: '3'
+services:
+  my-app: # docker-compose exec my-app sh; ls data; ls copy
+    image: leonardpauli/docs-containers-example-docker-ln
+    build:
+      context: ..
+      dockerfile: ./src/Dockerfile
+    entrypoint: ["tail", "-f", "/dev/null"]
+    volumes:
+      - ./vol:/data

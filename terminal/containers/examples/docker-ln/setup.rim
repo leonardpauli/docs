@@ -1,0 +1,9 @@
+# terminal/containers/examples/docker-ln
+' LeonardPauli/docs
+	Created by Leonard Pauli, 23 apr 2018
+
+Dockerfile.COPY
+	when source is soft link (ln -s source target), its target must be within the build context
+
+docker-compose.volumes
+	when source is soft link, that restriction is not active

@@ -1,0 +1,13 @@
+# docker-compose build server
+version: '3.4'
+services:
+  server:
+    image: $server_image:prod
+    build:
+      context: ../..
+      dockerfile: web/container/Dockerfile # relative to context root
+      target: prod
+    env_file: .env
+    entrypoint: ["tail", "-f", "/dev/null"]
+    volumes:
+      - ./data:/data # relative to docker-compose up or docker-compose.yml

@@ -1,0 +1,10 @@
+# docker-compose -f docker-compose.yml -f docker-compose.dev-overrride.yml up --build
+version: '3.4'
+services:
+  server:
+    image: $server_image:dev
+    build:
+      target: dev
+    volumes:
+      - ./data:/data
+      - ../src:/src

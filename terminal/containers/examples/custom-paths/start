@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+script_dir () { (a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; echo "$a"); }
+
+cd "$(script_dir)"
+
+(cd web/container && ./start $*)
