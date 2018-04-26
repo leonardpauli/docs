@@ -7,6 +7,7 @@ project="$1"
 mkdir -p "$project"
 cp -R "$DIR/example/*" "$project"
 
+# TODO: cleanup?
 # .env.example
 # .env
 # data

@@ -3,6 +3,8 @@
 -- LeonardPauli/docs
 -- Created/curated by Leonard Pauli, 25 apr 2018 (mostly snippets from apples docs, see their licensing/copyright rules)
 -- 
+-- Apple Script - used to automate osx
+--
 -- references/sources:
 -- https://developer.apple.com/library/content/documentation/AppleScript/Conceptual/AppleScriptLangGuide/conceptual/ASLR_variables.html
 -- TODO: first and last pages of apples guide not yet covered

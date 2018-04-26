@@ -5,6 +5,11 @@
 // secure shell
 // 	- "cryptographic network protocol for operating network services securely over an unsecured network"
 
+
+' TODO:
+	see /"https://www.digitalocean.com/community/tutorials/how-to-use-ssh-keys-with-putty-on-digitalocean-droplets-windows-users"
+
+
 - generate public/private ssh key pair
 	- ssh-keygen -t rsa // generate
 	- cat ~/.ssh/id_rsa.pub // print the public one (id_rsa is default name)

@@ -103,6 +103,7 @@ files:
 	- mv a b // move / rename
 	- cp a b // copy
 	- cp -R a b // copy directory
+	- scp / rsync // copy over network, rsync is to prefer (it does delta, scp just overwrites all)
 
 	- tail -f file // live follow last part of file, good for logs
 
@@ -129,6 +130,7 @@ files:
 			ln -s originals alias-directory
 			ln ../path/to/source-file/relative/to/target target 
 				// files only, could manually mkdir + ln the contents though			
+		stat -x myfile && ls -lah myfile // check rights etc, and if it's a link, its destination
 
 text processing:
 	- grep
@@ -158,6 +160,7 @@ text processing:
 					$fn "$x" $((i++))
 				[ "$xs" = "$x" ] && xs='' || xs="${xs#*$del}"; done
 			}
+	wc -l *.js // count lines of *.js files
 
 syntax
 	standard

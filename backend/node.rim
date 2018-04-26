@@ -8,3 +8,43 @@ v8: // compiler
 	optimization:
 		inlining:
 			compare: `node --max_inlined_bytecode_size=0 test.js` and `node test.js`
+
+	
+npm: // v5
+	package.json
+		preserves indentation
+	--prefer-offline
+	--offline
+
+Dockerfiles:
+	// https://engineering.busbud.com/2017/10/09/node-interactive-2017/
+	// https://engineering.busbud.com/2017/05/13/dockerfiles-history/
+	// https://engineering.busbud.com/2017/05/21/going-further-docker-multi-stage-builds/
+	// TODO: volume/copy for npm packages cache?
+	// TODO: dev image?
+
+	node:x.x.x-builder
+	' FROM node:x.x.x-alpine
+		WORKDIR /app/
+		# .
+		# RUN apk add --no-cache --virtual .build-deps python make g++
+		# RUN rm /usr/local/bin/yarn && npm install -g yarn
+		# .
+		ONBUILD COPY ./package.json ./yarn.lock /app/
+		ONBUILD RUN yarn --production
+		ONBUILD RUN apk del .build-deps
+
+	node:x.x.x-runtime
+	' FROM alpine:x.x
+		WORKDIR /app/
+		# .
+		ONBUILD COPY --from=builder /usr/local/bin/node /usr/local/bin/
+		ONBUILD COPY --from=builder /usr/lib/ /usr/lib/
+		ONBUILD COPY --from=builder /app/ /app/
+		ONBUILD COPY . /app/
+		# .
+		CMD ["node", "."]
+
+	example
+		FROM node:x.x.x-builder AS builder
+		FROM node:x.x.x-runtime

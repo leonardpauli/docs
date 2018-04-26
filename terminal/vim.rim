@@ -25,7 +25,8 @@ general:
 		":help"
 		":help command"
 
-
+notes:
+	"history | vi -", then "/something to search for<enter>" // see nearby history in vim
 
 navigation: // in normal mode
 	h / l: left / right // or arrow keys, but try to stick with defaults :)

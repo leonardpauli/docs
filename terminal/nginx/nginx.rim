@@ -2,7 +2,7 @@
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 23 mar 2018
 
-// [engine X]
+// [engine X] - a server
 // 	- "an HTTP and reverse proxy server, a mail proxy server, and a generic TCP/UDP proxy server"
 //	- https://nginx.org/en/
 

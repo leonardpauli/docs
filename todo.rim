@@ -22,5 +22,17 @@ thoughs:
 items:
 	- take out mainpoints for admin.privacy.gdpr
 	- s/sed -e/sed -E/ where necessary
+	- add terminal/git/templates etc for github
+	- add terminal/git: see https://github.com/node-gh/gh
+	- add terminal/project-setup: https://lernajs.io/
+		see https://github.com/pugjs/pug/blob/master/packages/pug-lexer/index.js
+		see https://github.com/cloudflare/cf-ui
+	- add terminal/ci // + "npm ci"
+	- add terminal/networking or nginx alt: see https://github.com/typicode/hotel
+		export npm_config_prefer_offline="true"
+		https://github.com/cypress-io/cypress/pull/1582
+		https://github.com/CLAassistant
+	- terminal/create executable, see node.npm.commander, and printenv + readargs?
+
 
 // see https://github.com/sindresorhus/awesome

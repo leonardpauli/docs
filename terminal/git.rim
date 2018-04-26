@@ -85,3 +85,4 @@ commands.reference
 	- `git filter-branch --prune-empty --tree-filter "rm -f myfile.txt"` - rewrite history; make changes in multiple commits; ie. remove a file from all commits
 	- `man git-submodules` - have one repository inside another, useful if two repositories shares some code
 	- `git clone` - create a local clone of a remote repository, and setup remote etc
+	- `git reflog` - if commit on HEAD got lost, find its sha there and `git checkout <sha>; git checkout -b my-new-branch`

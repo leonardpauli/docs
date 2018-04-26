@@ -6,6 +6,7 @@
 // TAB=$'\t';lsoutline | sed -E "s/\.rim|^${TAB}//g" | sed -E "s/^(${TAB})([\A-z])/\1- \2/" | pbcopy
 	
 
+// .editorconfig, .gitignore, lp-docs.sublime-project, contents
 LICENSE
 README.md
 admin
@@ -14,13 +15,17 @@ admin
 	- privacy
 	- readme
 app
+	- misc // source for misc files used in setups 
 	- realtime
 	- spa: "single page application"
+	- vue: "web app framework"
+	- webpack: "asset bundler"
 backend
 	- api-base
+	- node: "javascript runtime"
 	- server-base
-contents
 security
+	- production-environment
 	- security-checklist
 	- security-manifest
 	- security-principles
@@ -29,15 +34,42 @@ storage
 	- aws: "amazon web services" // cloud service provider
 	- cdn: "content delivery network"
 	- digitalocean // cloud service provider
-	- object-storage-api: Service
-		README.md
-		setup
+	- object-storage-api: Service // README.md, setup, ...
 	- storage
 terminal
+	- containers: "ability to manage software on virtually infinite hardware"
+		docker-compose: "automisation of docker management"
+		docker: "'A self-sufficient runtime for containers'"
+		examples
+			custom-paths // ...
+			docker-ln // ...
+		kubernetes
+	- git: "version control system"
+	- iterm: "nicer than osx default terminal"
+	- lib-example-usage.sh
+	- lib.sh: "own and collected shell utility function"
+	- network
+	- nginx: "[engine X] - a server"
+		base // docs, examples{html5app; simple}, ...
+		security
+		ssl
 	- os: "operating systems"
+	- osascript.applescript: "Apple Script - used to automate osx"
 	- pgp-workflows: "cryptographic security utility"
+	- ssh: "secure shell"
 	- ssl: "secure sockets layer"
-		workflows
-		...
+		example // setup, ...
+		// openssl_gen
+		self-signed
+		ssl-manager // docs.setup, example, ...
+		using-ca
 	- terminal: "text based access to os"
-	- vim
+	- ubuntu: "an operating system"
+		setup-server.sh
+	- vim: "full-featured terminal based code/text edito"
+todo
+tosort
+	- focus
+	- javascript
+	- open-data
+	- regex
