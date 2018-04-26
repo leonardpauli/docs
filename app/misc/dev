@@ -1,0 +1,30 @@
+#!/usr/env/bin bash
+
+key_left=123
+key_right=124
+key_up=126
+key_down=125
+
+do_keypress='tell application "System Events" to keystroke'
+do_keypress_code='tell application "System Events" to key code'
+osascript <<-EOF
+	$do_keypress "d" using {shift down, command down}
+	delay 0.01
+	$do_keypress "npm run serve\n"
+
+	$do_keypress "d" using {shift down, command down}
+	delay 0.01
+	$do_keypress "npm run lint:watch\n"
+
+	$do_keypress "d" using command down
+	delay 0.1
+	$do_keypress "npm run dev:gun\n"
+	
+	repeat 9 times
+		$do_keypress_code $key_down using {command down, control down}
+	end repeat
+
+	$do_keypress_code $key_up using {command down, option down}
+	$do_keypress_code $key_up using {command down, option down}
+	$do_keypress "npm run dev:edit\n"
+EOF
