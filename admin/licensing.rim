@@ -7,6 +7,7 @@
 // https://cla-assistant.io/
 // https://github.com/tvvocold/FOSS-for-Dev
 
+
 contributions
 	// see http://unlicense.org/
 	- make sure contributions are provided under the same licence
@@ -85,3 +86,12 @@ OSS licenses: // Open Source Software licenses
 			default: "GPL-3.0-or-later" // or "GPL-3.0-only"
 			library: "LGPL-3.0-or-later" // or "LGPL-3.0-only"
 			affero: "AGPL-3.0-or-later" // or "AGPL-3.0-only"
+
+
+' see http://tarantsov.com/blog/2012/02/the-third-definition-of-open/
+	dual licensing (eg. GPL + commercial), if all contributors agree
+	always have donate button; "if you're going to just take it or torrent anyhow,
+		please donate at least a bit of what you think my work is worth to you."
+	if used "free", as for "donation" after some active use, then again
+		after 3x that active use ("have you gotten more value out of this software? :)")
+		etc

@@ -1,0 +1,134 @@
+# app/node/examples/using-container/docs/setup
+' LeonardPauli/docs
+	Created by Leonard Pauli, 29 apr 2018
+
+prerequisites:
+	- terminal/vim.vimx
+	- app/node/using-container
+
+init:
+	- mkdir using-container && cd $_
+	- npm init -y &> /dev/null && vimx ':%s/  /\t/g\n' package.json
+	- echo "/node_modules/" > .dockerignore
+add builder:
+	- npm i -D babel-cli babel-preset-env
+	- echo '{"presets": ["env"]}' > .babelrc
+	- package-json-script-add () { vimx '/"scripts":\no\t\t'"$1"',\e' package.json; }
+	- package-json-script-add '"build": "babel src -d lib"'
+	- package-json-script-add '"start": "node lib/index.js"'
+add dev watcher:
+	- npm i -D onchange
+	- package-json-script-add '"dev:onchange": "npm run build && npm run start"'
+	- package-json-script-add '"dev": "npm i && dev:onchange && onchange '"'"'src/**/*.js'"'"' -d 200 -- npm run dev:onchange {{changed}}"'
+add src:
+	- mkdir src && echo 'const f = x=> 2*x; console.log(f(3))' > src/index.js
+	test: npm run build && cat lib/index.js && npm run start // 6
+	test: npm run dev & sleep 1 && vimx '$2bcw4\e' src/index.js // 8
+
+add docker:
+	- .env.example // template for .env
+		env=prod
+		image_name=leonardpauli/docs-node-example-using-containers
+	- cp .env.example .env
+	- rm -rf node_modules
+	- echo .env >> .gitignore
+	- echo data/ >> .gitignore
+	- Dockerfile
+		# dev
+		FROM node:9.11-alpine as dev
+		VOLUME /app
+		VOLUME /app/node_modules
+		VOLUME /root/.npm
+		VOLUME /data
+		ENV \
+			npm_config_prefer_offline=true \
+			NODE_ENV=development
+		WORKDIR /app
+		CMD ["npm", "run", "dev"]
+
+		# builder
+		FROM node:9.11-alpine as builder-installer
+		RUN rm /usr/local/bin/yarn
+		# rel. caching of dependencies, see docker.build.caching-issue
+		RUN mkdir /app
+		COPY ./package.json ./package-lock.json /app/
+		COPY ./data/node_modules-dev /app/node_modules
+		RUN export NODE_ENV=development; export npm_config_prefer_offline=true; npm install
+
+		FROM node:9.11-alpine as builder
+		COPY --from=builder-installer /app/node_modules /tmp/node_modules
+		COPY . /app
+		RUN cp -rf /tmp/node_modules /app/node_modules \
+			&& (export NODE_ENV=production; cd /app && npm run build)
+
+		# for lib
+		FROM alpine:3.7 as prod
+		COPY --from=builder /usr/local/bin/node /usr/local/bin/
+		COPY --from=builder /usr/lib/ /usr/lib/
+		# FROM node:9.11-alpine as prod
+		COPY --from=builder /app/node_modules /app/node_modules
+		# TODO: possibly copy in node_modules as well, with dev-dependencies removed
+		COPY --from=builder /app/lib /app/lib
+		VOLUME /data
+		WORKDIR /app
+		CMD ["node", "lib/index.js"]
+
+		# alt for dist
+		# FROM ... as prod
+		# COPY --from=builder /app/dist /app/dist
+		# CMD ["simple-server", "/app/dist"]
+	- docker-compose.yml
+		version: '3.4'
+		services:
+			app:
+				image: $image_name:$env
+				build:
+					context: .
+					target: $env
+				env_file: .env
+				volumes:
+					- ./data:/data
+	- docker-compose.dev.yml
+		version: '3.4'
+		services:
+			app:
+				volumes:
+					- .:/app
+					- ./data/node_modules-dev:/app/node_modules
+					- ~/npm:/root/.npm
+	- for f in docker-compose*.yml; vimx ':%s/\t/  /g\n' $f
+	- { echo "$(cat)" > start && chmod u+x start; } <<-'EOF'
+		#!/usr/bin/env sh
+		env=${env:-dev} # see terminal/lib.sh for load_env
+		if [ "$env" = "dev" ]; then
+			docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+		elif [ "$env" = "prod" ]; then
+			docker-compose -f docker-compose.yml up # -d
+		else echo "unknown env '$env', check .env"; fi
+		EOF
+
+	test:
+		prod working:
+			- mkdir -p data/node_modules-dev
+			- docker-compose up --build // 8
+			- docker-compose up --build // 8, check that caches are used
+			- vimx '$2bcw5\e' src/index.js
+			- docker-compose up --build // 10, check that caches are used correctly
+			- docker-compose down
+		dev working:
+			- vimx ':%s/env=prod/env=dev/\n' .env
+			- vimx '$2bcw6\e' src/index.js
+			- ./start // 12, should use dev
+			- vimx '$2bcw7\e' src/index.js // in new terminal; should reload and show 14 in first
+			- stop container
+		dev shared cache working:
+			- rm -rf data/node_modules
+			- turn off internet
+			- ./start // should re-install node_modules without problem
+
+
+notes:
+	for prod using dist:
+		mkdir assets && cp some-image.tiff assets/image.tiff
+		change build script to output to dist/ + to copy and process assets to dist/
+		change Dockerfile + docker-compose.yml according to app/node/using-container

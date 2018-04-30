@@ -16,13 +16,14 @@ admin
 	- readme
 app
 	- misc // source for misc files used in setups 
+	- node: "javascript runtime"
+		docker // builder, runtime, example
 	- realtime
 	- spa: "single page application"
 	- vue: "web app framework"
 	- webpack: "asset bundler"
 backend
 	- api-base
-	- node: "javascript runtime"
 	- server-base
 security
 	- production-environment

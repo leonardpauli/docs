@@ -29,6 +29,13 @@ commands: // expects a docker-compose.yml file to exist
 	- docker-compose build myservice
 	- docker-compose up --build // re-build existing images if needed
 
+	- docker-compose -f docker-compose.yml -f docker-compose.dev.yml up // override (last takes precedence)
+		// both need to specify same version
+		' merging strategy
+				// (simple value replace, array/object merge but replace on volume mount path, etc)
+				see https://docs.docker.com/compose/extends/
+			paths relative to base/first docker-compose file
+
 
 docker-compose.yml // definition file
 	version: '3.4'

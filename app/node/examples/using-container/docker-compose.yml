@@ -1,0 +1,10 @@
+version: '3.4'
+services:
+  app:
+    image: $image_name:$env
+    build:
+      context: .
+      target: $env
+    env_file: .env
+    volumes:
+      - ./data:/data

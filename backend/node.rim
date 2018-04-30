@@ -10,11 +10,16 @@ v8: // compiler
 			compare: `node --max_inlined_bytecode_size=0 test.js` and `node test.js`
 
 	
-npm: // v5
+npm: // v6
 	package.json
 		preserves indentation
-	--prefer-offline
-	--offline
+	update: sudo npm i -g npm
+	cache:
+		export npm_config_prefer_offline=true; npm i express
+		npm i --prefer-offline express
+		npm i --offline express
+		npm cache -h
+		posix default cache path: ~/.npm
 
 Dockerfiles:
 	// https://engineering.busbud.com/2017/10/09/node-interactive-2017/

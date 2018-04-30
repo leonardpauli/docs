@@ -1,0 +1,156 @@
+# app/node/using-container
+' LeonardPauli/docs
+	Created by Leonard Pauli, 30 apr 2018
+
+prerequisites:
+	- docker.build.caching-issue
+
+structure:
+	assets // non-code, raw, files to be included in production
+		// eg. image.tiff
+	src // source-code (eg. development source code)
+		// eg. index.mjs
+	lib // compiled source-code (eg. production ready code)
+		// eg. index.js
+	dist // distributable package of built source (eg. client app, inc. processed assets)
+		// eg. index.js
+		// eg. image.jpg
+	container // files related to running / building the container
+		.env // local config
+			env=dev
+			...
+		.env.example // template for .env
+			env=prod
+			image_name=my-org/my-app
+		data // persistent local container data
+		start
+			#!/usr/bin/env sh
+			load_env env # see terminal/lib.sh
+			if [ "$env" = "dev" ]; then
+				docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+			elif [ "$env" = "dev" ]; then
+				docker-compose -f docker-compose.yml up -d
+			else echo "unknown env '$env', check .env"; fi
+		docker-compose.yml
+			version: '3.4'
+			services:
+				app:
+					image: $image_name:$env
+					build:
+						context: ..
+						dockerfile: container/Dockerfile
+						target: $env
+					env_file: .env
+					volumes:
+						- ./data:/data
+		docker-compose.dev.yml // overriding docker-compose.yml
+			services:
+				app:
+					volumes:
+						- ..:/app
+						- ./data:/data
+						- ./data/node_modules-dev:/app/node_modules
+		
+		Dockerfile
+			FROM ... as dev
+			VOLUME /app
+			VOLUME /app/node_modules
+			VOLUME /data
+			CMD ["npm", "run", "dev"]
+
+			// builder
+			FROM ... as builder-installer
+			// rel. caching of dependensies, see docker.build.caching-issue
+			// esp. see its "volume cache in dev, copy cache from dev to build"
+			RUN mkdir /app
+			COPY ./package.json ./package-lock.json /app/
+			RUN export NODE_ENV=production; npm install
+			
+			FROM ... as builder
+			COPY --from=builder-installer /app/node_modules /tmp/node_modules
+			COPY . /app
+			RUN cp -rf /tmp/node_modules /app/node_modules \
+				&& (export NODE_ENV=production; cd /app && npm run build)
+
+			// for lib
+			FROM ... as prod
+			COPY --from=builder /app/lib /app/lib
+			VOLUME /data
+			CMD ["node", "lib/index.js"]
+
+			// alt for dist
+			FROM ... as prod
+			COPY --from=builder /app/dist /app/dist
+			CMD ["simple-server", "/app/dist"]
+
+
+
+notes:
+	docker.build.arg:
+		ONBUILD ARG NODE_ENV=production
+		docker build --build-arg NODE_ENV=production
+	for minimal resulting image size:
+		multistage builds:
+			build first, then COPY --from=builder /dist
+		"prevent bloated intermediate layers"
+			- docker build now accepts --squash ...
+		npm cache clean --force
+		npm uninstall -g npm // change cache dir first if through volume, to prevent local cache bust?
+		rm /usr/local/bin/yarn // npm install -g yarn // for latest yarn
+	cache node_modules:
+		echo "/node_modules/" > .dockerignore
+		COPY package.json + package-lock.json first
+		see docker.build.caching-issue
+		see node.npm.caching
+			export npm_config_prefer_offline=true
+		volume ./data/npm/cache:~/.npm
+			- package sources only or including native builds?
+				determines if can be shared cross os
+					ie. one for osx and one shared with all node-alpine images
+		volume ./date/npm/node_modules:/app/node_modules
+			alt. use anon volume?
+
+	for native dependensies:
+		RUN apk add --no-cache --virtual .build-deps make gcc g++ python \
+			&& npm install \
+			&& npm cache clean \
+			&& apk del .build-deps
+
+	using multistage builds:
+		Dockerfile-runtime:
+			FROM alpine:3.7
+			ONBUILD COPY --from=builder /usr/local/bin/node /usr/local/bin/
+			ONBUILD COPY --from=builder /usr/lib/ /usr/lib/
+			ONBUILD COPY --from=builder /app/ /app/
+			WORKDIR /app/
+			ONBUILD COPY . /app/
+			CMD ["node", "."]
+		Dockerfile-example:
+			FROM my-builder AS builder
+			FROM my-runtime
+
+	docker:
+		// https://github.com/mhart/alpine-node#example-dockerfile-for-your-own-nodejs-project
+		// https://github.com/nodejs/docker-node/blob/9023f588717d236a92d91a8483ff0582484c22d1/docs/BestPractices.md
+
+	TODO:
+		- use "USER node" // for security. Req. changing root in ~/npm:/root/.npm, etc
+		- NODE_ENV, is production for building or when running built?
+
+	- make separate test in app/node/builder/(., example)
+		node
+			node.rim
+			builder
+				Dockerfile-builder
+				Dockerfile-runtime
+				example
+					.env: env=prod
+					./start
+						(node_alpine_ver=3.7 cd .. && docker build -t leonardpauli/docs-node-builder -f Dockerfile-builder .)
+						(node_alpine_ver=3.7 cd .. && docker build -t leonardpauli/docs-node-runtime -f Dockerfile-runtime .)
+
+
+' notes:
+	// https://engineering.busbud.com/2017/10/09/node-interactive-2017/
+	// https://engineering.busbud.com/2017/05/13/dockerfiles-history/
+	// https://engineering.busbud.com/2017/05/21/going-further-docker-multi-stage-builds/

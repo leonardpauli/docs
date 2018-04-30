@@ -16,7 +16,7 @@ GDPR
 	- don't forget "automatic" request logging including ip address etc
 
 ' Notes:
-	data processing.in short:
+	data processing.in short: // intentions
 		we only have some control of our own software, not external factors such as insecure browser extensions or social engineering attacks
 		we try our best to make sure that you're in full control of your own data
 			though we are humans and might make mistakes
@@ -51,7 +51,7 @@ GDPR
 		we might use third party services; though we'll describe what data will be sent and how it will be used before doing so, with the ability to decline (if the data isn't public already)
 
 ' Notes:
-	data processing.in general:
+	data processing.in general: // intentions
 		(human (or machine)) interacts with "hardware device" (eg. keyboard, mouse, touchscreen, etc) generating "input event data"
 		"input event data" from ("hardware device" or software (such as remote desktop program or automation script)) is sent to "OS"
 		"OS" processes it and possibly sends processed data to "host software" (eg. "web browser")

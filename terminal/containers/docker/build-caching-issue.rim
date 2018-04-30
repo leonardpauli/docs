@@ -1,0 +1,92 @@
+# terminal/containers/docker/build-caching-issue
+' LeonardPauli/docs
+	Created by Leonard Pauli, 30 apr 2018
+
+
+docker.build.caching-issue:
+	- tries to be pure
+	- no way of "marking" external processes as pure
+		- no way of having external cache
+			- causes enormous cache-misses with dependency management tools
+				- eg. npm ~/.npm cache folder
+					- is it specific per os?
+				solution: eg. ability to attach "pure cache volumes" to docker build
+				workarounds:
+					- create image manually
+						- eg. with docker commit
+					- container + shell script
+						- execute cache-dependent process in container with volume
+						- COPY result (volume) in Dockerfile
+						- automate with shell script
+						' eg.
+							build.sh
+								docker run --rm -it \
+									-e NODE_ENV=production
+									-v ./data/build/node_modules:/app/node_modules \
+									-v ./package.json:/app/package.json \
+									-v ./package-lock.json:/app/package-lock.json \
+									node:9.11-alpine npm install
+								docker build -t my-app:prod .
+							Dockerfile
+								FROM node:9.11-alpine
+								COPY . /app
+								COPY ./data/build/node_modules /app/node_modules
+								CMD ["node", "index.js"]
+					- use local caching registry service
+						see "use network cache proxy service", but:
+							- replace cache-service with, eg:
+								- for npm: https://github.com/verdaccio/
+								- etc
+							- more efficient (tailor made for that registry)
+					- use network cache proxy service
+						eg.
+							- cache-service
+								nginx.conf
+									...
+									server {
+										...
+										# proxy cache all get requests to the npm registry
+									}
+								Dockerfile
+									FROM nginx...
+									COPY nginx.conf /etc/nginx/nginx.conf
+								docker-compose.yml
+									version: '3.4'
+									services:
+										npm-cache:
+											image: ...
+											networks: ...
+							- start cache-service: docker-compose up
+							- optional: use nginx reverse-proxy service with /etc/hosts
+								- to remap http://my-npm-registry.localhost to IP of the service
+							- in project:
+								.env:
+									npm_registry_url=http://my-npm-registry.localhost
+								docker-compose:
+									...
+									env_file: .env
+									...
+								Dockerfile
+									...
+									FROM ... as builder
+									ENV npm_registry_url
+									RUN npm install ...
+									...
+					- volume cache in dev, copy cache from dev to build
+						docker-compose.dev.yml
+							...
+							volumes:
+								- ./data/node_modules-dev:/app/node_modules
+								- ~/npm:/root/.npm // ~/ resolves. Is .npm cache os-independent? (seems so) (else use different location)
+								...
+						Dockerfile
+							FROM ... as dev
+							VOLUME /app/node_modules
+							VOLUME /root/.npm // cache
+
+							FROM ... as builder-installer
+							COPY ./package.json ./package-lock.json /app/
+							COPY ./data/node_modules-dev /app/node_modules
+							RUN export NODE_ENV=production; npm install
+							...
+

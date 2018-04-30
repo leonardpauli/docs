@@ -1,0 +1,23 @@
+# app/node
+' LeonardPauli/docs
+	Created by Leonard Pauli, 6 apr 2018
+
+// javascript runtime
+
+v8: // compiler
+	optimization:
+		inlining:
+			compare: `node --max_inlined_bytecode_size=0 test.js` and `node test.js`
+
+	
+npm: // v6
+	package.json
+		preserves indentation
+	update: sudo npm i -g npm
+	cache:
+		export npm_config_prefer_offline=true; npm i express
+		npm i --prefer-offline express
+		npm i --offline express
+
+Dockerfiles:
+	see ./using-container

@@ -28,6 +28,13 @@ general:
 notes:
 	"history | vi -", then "/something to search for<enter>" // see nearby history in vim
 
+command mode:
+	vimx () { vi -s <(echo "$1"':wq') "$2" &> /dev/null; } // 1> /dev/null 2>&1
+	vimx 'iThe brow fox jumped.\e' foo; cat foo
+	vimx 'wcwred\efjdwiclimbed\e' foo; cat foo
+	echo $(cp foo bar; vimx 'dw2wd$' bar; cat bar; rm bar)
+	
+
 navigation: // in normal mode
 	h / l: left / right // or arrow keys, but try to stick with defaults :)
 	j / k: down / up // feels a bit reversed, but was logical with keyboard layout when created for decades ago...

@@ -1,0 +1,7 @@
+version: '3.4'
+services:
+  app:
+    volumes:
+      - ./:/app
+      - ./data/node_modules-dev:/app/node_modules
+      - ~/npm:/root/.npm
