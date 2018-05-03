@@ -19,11 +19,3 @@ volumes:
 networks:
   verdaccio:
     name: verdaccio
-
-# in other docker-compose files to connect  
-# networks:
-#   default:
-#   verdaccio:
-#     external: verdaccio
-# services.my-service.networks: default, verdaccio
-# services.environment.npm_config_registry: http://verdaccio

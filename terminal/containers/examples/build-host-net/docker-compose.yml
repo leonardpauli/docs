@@ -1,0 +1,8 @@
+version: '3.6'
+services:
+  app:
+    image: leonardpauli/docs-containers-examples-build-host-net
+    build:
+      context: .
+      args:
+        endpoint: http://docker.for.mac.localhost:4873

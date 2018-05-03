@@ -1,14 +1,8 @@
-# app/node
+# app/node/registry
 ' LeonardPauli/docs
-	Created by Leonard Pauli, 6 apr 2018
+	Created by Leonard Pauli, 3 may 2018
 
 // javascript runtime
-
-v8: // compiler
-	optimization:
-		inlining:
-			compare: `node --max_inlined_bytecode_size=0 test.js` and `node test.js`
-
 	
 npm: // v6
 	package.json
@@ -18,7 +12,52 @@ npm: // v6
 		export npm_config_prefer_offline=true; npm i express
 		npm i --prefer-offline express
 		npm i --offline express
-		see ./registry-local
+	npm get registry: https://registry.npmjs.org/
 
-Dockerfiles:
-	see ./using-container
+local: verdaccio
+	see ./local
+	usage:
+		- $lpdocs/app/node/registry/local/start
+		osx:
+			- "http://0.0.0.0:4873/"
+			- npm set registry http://0.0.0.0:4873
+				alt: export npm_config_registry='http://0.0.0.0:4873'
+			- optional: npm adduser --registry http://0.0.0.0:4873
+		docker-compose.prod:
+			see terminal/containers/examples/build-host-net
+			- Dockerfile
+				...
+				ARG npm_config_registry
+				ENV npm_config_registry=$npm_config_registry
+				RUN npm install
+				...
+			- docker-compose.dev.yml:
+				services:
+					my-app:
+						image: ...
+						build:
+							context: ...
+							args:
+								npm_config_registry: $npm_config_registry
+			- .env.example
+				npm_config_registry=https://registry.npmjs.org/
+			- .env
+				npm_config_registry=http://docker.for.mac.localhost:4873
+		docker-compose.dev:
+			- docker-compose.dev.yml:
+				services:
+					my-app:
+						environment:
+							npm_config_registry: "http://verdaccio"
+						networks:
+							default
+							verdaccio	
+				networks:
+					default:
+					verdaccio:
+						external: verdaccio
+						// or external: true, name: verdaccio (version: '3.6')?
+
+
+
+
