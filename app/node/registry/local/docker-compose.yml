@@ -1,0 +1,29 @@
+version: '3.6'
+services:
+  verdaccio:
+    image: leonardpauli/docs-node-registry-verdaccio
+    build: .
+    container_name: verdaccio
+    cap_add: ["NET_ADMIN"]
+    expose: ["80"]
+    ports: ["4873:80"]
+    volumes:
+      - verdaccio:/verdaccio
+    networks:
+      verdaccio:
+
+volumes:
+  verdaccio:
+    driver: local
+
+networks:
+  verdaccio:
+    name: verdaccio
+
+# in other docker-compose files to connect  
+# networks:
+#   default:
+#   verdaccio:
+#     external: verdaccio
+# services.my-service.networks: default, verdaccio
+# services.environment.npm_config_registry: http://verdaccio

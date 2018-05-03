@@ -9,7 +9,16 @@ v8: // compiler
 		inlining:
 			compare: `node --max_inlined_bytecode_size=0 test.js` and `node test.js`
 
-npm: see (./registry).npm
+	
+npm: // v6
+	package.json
+		preserves indentation
+	update: sudo npm i -g npm
+	cache:
+		export npm_config_prefer_offline=true; npm i express
+		npm i --prefer-offline express
+		npm i --offline express
+		see ./registry-local
 
 Dockerfiles:
 	see ./using-container

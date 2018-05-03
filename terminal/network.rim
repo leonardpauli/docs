@@ -61,12 +61,22 @@ dictionary:
 		to scan:
 			nmap: "network map" // see https://nmap.org
 				// see https://blog.appcanary.com/2017/improve-security-port-scan-yourself.html
-				- brew info nmap
-				- brew install nmap
+				insall:
+					- osx:
+						- brew info nmap
+						- brew install nmap
+					- docker:
+						FROM alpine:3.7
+						ENV NMAP_VERSION 7.60-r2
+						RUN apk add --update --no-cache nmap==${NMAP_VERSION}
+						VOLUME ["/data"]
+						ENTRYPOINT ["/usr/bin/nmap"]
+						CMD ["--help"]
 				- nmap localhost
 				- nmap -p22 example.com
 				- nmap --script-help=ssh-hostkey
 				- nmap -p22 github.com --script ssh-hostkey
+
 			locally: sudo lsof -i :8081
 
 	firewall // "monitors and controls incoming and outgoing network traffic"

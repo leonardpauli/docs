@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+script_dir () { (a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; echo "$a"); }
+cd "$(script_dir)"
+
+docker-compose up -d
+myport=4873; myservice=verdaccio
+docker-compose exec --privileged -u root $myservice sh -c 'iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-port '"$myport"
+#docker-compose logs -f --tail=10

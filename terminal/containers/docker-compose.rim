@@ -69,6 +69,11 @@ docker-compose.yml // definition file
 			networks:
 				default:
 					ipv4_address: 10.100.0.3
+				my-existing: // service will be reachable on my-pre-existing-network at http://other-service, the-other-service, and 10.100.0.3
+					aliases:
+						- the-other-service
+					ipv4_address: 10.100.0.3
+				my-new // ip address might be random, but host name will be other-service if available
 
 		networks: // neat to be explicit, see https://docs.docker.com/compose/networking/#specify-custom-networks
 			// - simpler to setup multiple subnetworks (eg. maybe isolate like (api, db) + (api, web)) (TODO)
@@ -79,5 +84,12 @@ docker-compose.yml // definition file
 					config:
 						- subnet: 10.100.0.0/16
 							gateway: 10.100.0.1
+
+			// if network already started by other compose or directly by
+			// 	docker 
+			my-new: // no need to specify anything
+			my-existing:
+				external:
+					name: my-pre-existing-network
 
 		// TODO: volumes

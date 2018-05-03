@@ -67,6 +67,7 @@ base images:
 	- alpine:3.7 // ~5MB, faster buildtime, use eg. apk add --update git
 		// If you have native dependencies, you'll need extra tools
 		// RUN apk add --no-cache make gcc g++ python
+		// apk add --no-cache curl
 	- ubuntu:16.04 // ~150MB, slower buildtime, use eg. apt-get update -q && apt-get install -yq git-core
 	- node:9.11.1-alpine // https://github.com/nodejs/docker-node/blob/9023f588717d236a92d91a8483ff0582484c22d1/9/alpine/Dockerfile
 		alt: mhart/alpine-node:10.0.0 // https://github.com/mhart/alpine-node/blob/master/Dockerfile
@@ -82,7 +83,8 @@ base images:
 
 Dockerfile // see https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#build-cache
 	# comment
-	FROM org/image:tag
+	// # FROM node:9.5.0-alpine@sha256:50ae5f22356c5a0b0c0ea76d27a453b0baf577c61633aee25cea93dcacec1630
+	FROM org/image:tag@sha256:50ae5f... // add sha for security, prevents unexpected base image modifications
 	RUN echo "hello" && echo "world" // each comman (RUN, FROM, etc) creates a new layer, so be mindful
 	COPY host/rel-path host/other-path /container/abs/dest/ // dist ending with / -> put all inside (if source is folder, put its content inside (different from normal posix behavior))
 		// if "COPY file1 file2 /destination/", "RUN mkdir -p /destination" first
@@ -91,6 +93,31 @@ Dockerfile // see https://docs.docker.com/develop/develop-images/dockerfile_best
 	ENTRYPOINT ["command", "--flag", "argument", "etc"] // run by default when starting container
 	EXPOSE 80 // allow port to be attached
 	VOLUME /abs/container/path // declare possible volume, eg. for persistent db data, or for caches between re-builds, COPY/ADD commands won't affect directory after it's been declared as volume
+
+	// avoid running server etc as root
+	// https://stackoverflow.com/a/18949557/1054573
+	// https://stackoverflow.com/questions/16573668/best-practices-when-running-node-js-with-port-80-ubuntu-linode
+	ENV APPDIR /usr/local/app
+	RUN addgroup -S mydev && adduser -S -G mydev mydev && \
+		chown -R mydev:mydev "$APPDIR" && \
+		chown -R mydev:mydev /mydev
+	USER mydev
+	// ENTRYPOINT ["start-server", ...
+
+	// redirect port 80 (belov 1024 restricted by sudo) to port above 1024
+	// RUN apk add iptables && iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 3000
+	// requires: "docker run --cap-add=NET_ADMIN" or cap_add: ["NET_ADMIN"] in docker-compose
+	USER root
+	RUN apk --no-cache add iptables
+	' RUN iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-port $PORT
+		requires "add_cap: NET_ADMIN" which docker annoyingly prevents during build..
+		idea: wrapp entrypoint and prepend the command
+			- catch22: command still requires sudo, but entrypoint + container should be run with limited user
+		workaround: run after docker-compose up:
+			myport=3000; myservice=my-service
+			docker-compose exec --privileged -u root $myservice sh -c 'iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-port '"$myport"
+	EXPOSE 80
+	USER mydev // back to limited user
 
 
 multi-stage-builds:
