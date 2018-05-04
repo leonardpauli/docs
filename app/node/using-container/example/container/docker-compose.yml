@@ -1,0 +1,18 @@
+version: '3.6'
+services:
+  app:
+    image: $image_name:$env
+    build:
+      context: ..
+      dockerfile: container/Dockerfile
+      target: $env
+      args:
+        npm_config_registry: $npm_config_registry
+    env_file: .env
+    volumes:
+      - ./data:/data
+    networks:
+      default:
+
+networks:
+  default:

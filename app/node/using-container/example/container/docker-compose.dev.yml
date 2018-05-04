@@ -1,0 +1,16 @@
+version: '3.6'
+services:
+  app:
+    environment:
+      npm_config_registry: "http://verdaccio"
+    volumes:
+      - ..:/app
+      - ./data/node_modules-dev:/app/node_modules
+      - ~/.npm:/root/.npm
+    networks:
+      verdaccio:
+
+networks:
+  verdaccio:
+    external: true
+    name: verdaccio

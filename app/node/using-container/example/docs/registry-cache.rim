@@ -1,0 +1,158 @@
+// mixin
+
+add docker.alt."use local caching registry service":
+	// see ../registry.local.usage
+	mkdir container && cd $_
+	ln -s ../.env .env
+	- echo data/ >> .gitignore
+
+	- echo "npm_config_registry=https://registry.npmjs.org/" >> .env.example
+	- echo "npm_config_registry=http://docker.for.mac.localhost:4873" >> .env
+	- setup.rim
+		- fix env
+			cp .env.example .env
+				env=dev
+				npm_config_registry=http://docker.for.mac.localhost:4873
+					// optional, but recommended; see $lpdocs/app/node/registry.local for setup
+
+	- Dockerfile 
+		ARG imageWithSha=node:9.11-alpine@sha256:5149aec8f508d48998e6230cdc8e6832cba192088b442c8ef7e23df3c6892cd3
+
+		// dev
+		FROM $imageWithSha as dev
+		VOLUME /app
+		VOLUME /app/node_modules
+		VOLUME /root/.npm
+		VOLUME /data
+		WORKDIR /app
+		CMD ["npm", "run", "dev"]
+
+		// lib
+		# builder
+		FROM $imageWithSha as builder-installer
+		WORKDIR /app
+		COPY ./package.json ./package-lock.json /app/
+
+		ARG npm_config_registry
+		ENV npm_config_registry=$npm_config_registry
+		RUN npm install
+		
+		FROM $imageWithSha as builder
+		COPY --from=builder-installer /app/node_modules /tmp/node_modules
+		COPY . /app
+		RUN cp -rf /tmp/node_modules /app/node_modules \
+			&& (export NODE_ENV=production; cd /app && npm run build)
+
+		# runtime
+		FROM $imageWithSha as prod
+		COPY --from=builder /app/lib /app/lib
+		VOLUME /data
+		WORKDIR /app
+		CMD ["node", "lib/index.js"]
+
+		' // alt for dist with prod deps
+			# prod-deps-installer
+			FROM $imageWithSha as prod-deps-installer
+			WORKDIR /app
+			COPY ./package.json ./package-lock.json /app/
+			#
+			ARG npm_config_registry
+			ENV npm_config_registry=$npm_config_registry
+			RUN export NODE_ENV=production; npm install
+			#
+			# server
+			FROM $imageWithSha as prod
+			WORKDIR /app
+			COPY --from=prod-deps-installer /app/node_modules /app/node_modules
+			COPY --from=builder /app/dist /app/dist
+			ENV NODE_ENV=production
+			CMD ["node", "lib/index.js"]
+
+		' // alt for pure dist
+			# server
+			FROM ... as prod
+			COPY --from=builder /app/dist /app/dist
+			CMD ["simple-server", "/app/dist"]
+
+	- docker-compose.yml:
+		version: '3.6'
+		services:
+			app:
+				image: $image_name:$env
+				build:
+					context: ..
+					dockerfile: container/Dockerfile
+					target: $env
+					args:
+						npm_config_registry: $npm_config_registry
+				env_file: .env
+				volumes:
+					- ./data:/data
+				networks:
+					default:
+
+		networks:
+			default:
+
+	- docker-compose.dev.yml: // overriding docker-compose.yml
+		version: '3.6'
+		services:
+			app:
+				environment:
+					npm_config_registry: "http://verdaccio"
+				volumes:
+					- ..:/app
+					- ./data/node_modules-dev:/app/node_modules # // could be anonymous
+					- ~/.npm:/root/.npm # // optional, improves install slightly
+				networks:
+					verdaccio:
+
+		networks:
+			verdaccio:
+				external: true
+				name: verdaccio
+
+	- for f in docker-compose*.yml; vimx ':%s/\t/  /g\n' $f
+	- { echo "$(cat)" > start && chmod u+x start; } <<-'EOF'
+		#!/usr/bin/env sh
+		load_env () { [ -f .env ] && for a in $1; do
+			export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done; }
+
+		load_env "env" # see terminal/lib.sh
+
+		if [ "$env" = "dev" ]; then
+			docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+		elif [ "$env" = "prod" ]; then
+			docker-compose -f docker-compose.yml up -d
+		else echo "unknown env '$env', check .env"; fi
+		EOF
+
+
+
+
+
+
+
+
+	test:
+		- ./$lpdocs/app/node/registry/local/start
+		prod working:
+			- vimx ':%s/env=dev/env=prod/\n' .env
+			- ./start && docker-compose logs app // 8
+			- docker-compose down && docker-compose up --build // 8, check that caches are used
+			- vimx '$2bcw5\e' ../src/index.js
+			- docker-compose up --build // 10, check that caches are used correctly
+			- docker-compose down
+		dev working:
+			- vimx ':%s/env=prod/env=dev/\n' .env
+			- vimx '$2bcw6\e' ../src/index.js
+			- ./start // 12, should use dev
+			- vimx '$2bcw7\e' ../src/index.js // in new terminal; should reload and show 14 in first
+			- docker-compose down
+		dev shared cache working:
+			- rm -rf data/node_modules-dev
+			- turn off internet
+			- ./start // should re-install node_modules without problem
+				' if ~/.npm:/root/.npm is added + --prefer-offline in npm run dev script, local registry shouldn't have to be hit at all
+					(cd $lpdocs/app/node/registry/local && docker-compose logs -f --tail=10)
+					otherwise, local reg should be hit, but internet should still not be necessary
