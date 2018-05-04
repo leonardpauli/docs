@@ -1,37 +1,8 @@
-# app/node/examples/using-container/docs/setup
-' LeonardPauli/docs
-	Created by Leonard Pauli, 29 apr 2018
+// mixin
 
-prerequisites:
-	- terminal/vim.vimx
-	- app/node/using-container
-
-init:
-	- mkdir using-container && cd $_
-	- npm init -y &> /dev/null && vimx ':%s/  /\t/g\n' package.json
-	- echo "/node_modules/" > .dockerignore
-add builder:
-	- npm i -D babel-cli babel-preset-env
-	- echo '{"presets": ["env"]}' > .babelrc
-	- package-json-script-add () { vimx '/"scripts":\no\t\t'"$1"',\e' package.json; }
-	- package-json-script-add '"build": "babel src -d lib"'
-	- package-json-script-add '"start": "node lib/index.js"'
-add dev watcher:
-	- npm i -D onchange
-	- package-json-script-add '"dev:onchange": "npm run build && npm run start"'
-	- package-json-script-add '"dev": "npm i && dev:onchange && onchange '"'"'src/**/*.js'"'"' -d 200 -- npm run dev:onchange {{changed}}"'
-add src:
-	- mkdir src && echo 'const f = x=> 2*x; console.log(f(3))' > src/index.js
-	test: npm run build && cat lib/index.js && npm run start // 6
-	test: npm run dev & sleep 1 && vimx '$2bcw4\e' src/index.js // 8
-
-add docker:
-	- .env.example // template for .env
-		env=prod
-		image_name=leonardpauli/docs-node-example-using-containers
-	- cp .env.example .env
-	- rm -rf node_modules
-	- echo .env >> .gitignore
+add docker.alt."volume cache in dev, copy cache from dev to build":
+	mkdir container && cd $_
+	ln -s ../.env .env
 	- echo data/ >> .gitignore
 	- Dockerfile
 		# dev
@@ -52,7 +23,7 @@ add docker:
 		# rel. caching of dependencies, see docker.build.caching-issue
 		RUN mkdir /app
 		COPY ./package.json ./package-lock.json /app/
-		COPY ./data/node_modules-dev /app/node_modules
+		COPY ./container/data/node_modules-dev /app/node_modules
 		RUN export NODE_ENV=development; export npm_config_prefer_offline=true; npm install
 
 		FROM node:9.11-alpine as builder
@@ -83,7 +54,8 @@ add docker:
 			app:
 				image: $image_name:$env
 				build:
-					context: .
+					context: ..
+					dockerfile: container-dev-cache/Dockerfile
 					target: $env
 				env_file: .env
 				volumes:
@@ -93,7 +65,7 @@ add docker:
 		services:
 			app:
 				volumes:
-					- .:/app
+					- ..:/app
 					- ./data/node_modules-dev:/app/node_modules
 					- ~/npm:/root/.npm
 	- for f in docker-compose*.yml; vimx ':%s/\t/  /g\n' $f
@@ -112,23 +84,16 @@ add docker:
 			- mkdir -p data/node_modules-dev
 			- docker-compose up --build // 8
 			- docker-compose up --build // 8, check that caches are used
-			- vimx '$2bcw5\e' src/index.js
+			- vimx '$2bcw5\e' ../src/index.js
 			- docker-compose up --build // 10, check that caches are used correctly
 			- docker-compose down
 		dev working:
 			- vimx ':%s/env=prod/env=dev/\n' .env
-			- vimx '$2bcw6\e' src/index.js
+			- vimx '$2bcw6\e' ../src/index.js
 			- ./start // 12, should use dev
-			- vimx '$2bcw7\e' src/index.js // in new terminal; should reload and show 14 in first
-			- stop container
+			- vimx '$2bcw7\e' ../src/index.js // in new terminal; should reload and show 14 in first
+			- docker-compose down
 		dev shared cache working:
 			- rm -rf data/node_modules
 			- turn off internet
 			- ./start // should re-install node_modules without problem
-
-
-notes:
-	for prod using dist:
-		mkdir assets && cp some-image.tiff assets/image.tiff
-		change build script to output to dist/ + to copy and process assets to dist/
-		change Dockerfile + docker-compose.yml according to app/node/using-container

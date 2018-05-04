@@ -3,7 +3,8 @@ services:
   app:
     image: $image_name:$env
     build:
-      context: .
+      context: ..
+      dockerfile: container-dev-cache/Dockerfile
       target: $env
     env_file: .env
     volumes:

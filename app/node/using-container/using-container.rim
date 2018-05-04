@@ -16,25 +16,35 @@ structure:
 		// eg. index.js
 		// eg. image.jpg
 	container // files related to running / building the container
-		.env // local config
+		see example/docs
+		
+		- .env // local config
 			env=dev
-			...
-		.env.example // template for .env
+		- .env.example // template for .env
 			env=prod
 			image_name=my-org/my-app
-		data // persistent local container data
-		start
-			#!/usr/bin/env sh
-			load_env env # see terminal/lib.sh
-			if [ "$env" = "dev" ]; then
-				docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
-			elif [ "$env" = "dev" ]; then
-				docker-compose -f docker-compose.yml up -d
-			else echo "unknown env '$env', check .env"; fi
-		docker-compose.yml
-			version: '3.4'
+		- data // persistent local container data
+		- start // run docker-compose up depending on .env.env
+		- Dockerfile
+			ARG imageWithSha=...
+
+			// dev
+			FROM $imageWithSha as dev
+			VOLUME /app
+			VOLUME /data
+			CMD ["dev-entrypoint..."]
+
+			...
+			// lib
+			# runtime
+			FROM ... as prod
+			COPY --from=builder /app/dist /app/dist
+			CMD ["simple-server", "/app/dist"]
+
+		- docker-compose.yml:
+			version: '3.6'
 			services:
-				app:
+				my-app:
 					image: $image_name:$env
 					build:
 						context: ..
@@ -43,46 +53,13 @@ structure:
 					env_file: .env
 					volumes:
 						- ./data:/data
-		docker-compose.dev.yml // overriding docker-compose.yml
+
+		- docker-compose.dev.yml: // overriding docker-compose.yml
+			version: '3.6'
 			services:
-				app:
+				my-app:
 					volumes:
 						- ..:/app
-						- ./data:/data
-						- ./data/node_modules-dev:/app/node_modules
-		
-		Dockerfile
-			FROM ... as dev
-			VOLUME /app
-			VOLUME /app/node_modules
-			VOLUME /data
-			CMD ["npm", "run", "dev"]
-
-			// builder
-			FROM ... as builder-installer
-			// rel. caching of dependensies, see docker.build.caching-issue
-			// esp. see its "volume cache in dev, copy cache from dev to build"
-			RUN mkdir /app
-			COPY ./package.json ./package-lock.json /app/
-			RUN export NODE_ENV=production; npm install
-			
-			FROM ... as builder
-			COPY --from=builder-installer /app/node_modules /tmp/node_modules
-			COPY . /app
-			RUN cp -rf /tmp/node_modules /app/node_modules \
-				&& (export NODE_ENV=production; cd /app && npm run build)
-
-			// for lib
-			FROM ... as prod
-			COPY --from=builder /app/lib /app/lib
-			VOLUME /data
-			CMD ["node", "lib/index.js"]
-
-			// alt for dist
-			FROM ... as prod
-			COPY --from=builder /app/dist /app/dist
-			CMD ["simple-server", "/app/dist"]
-
 
 
 notes:

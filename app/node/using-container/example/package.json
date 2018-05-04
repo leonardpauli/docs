@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"dev": "npm i && npm run dev:onchange && onchange 'src/**/*.js' -d 200 -- npm run dev:onchange {{changed}}",
+		"dev": "npm --prefer-offline i && npm run dev:onchange && onchange 'src/**/*.js' -d 200 -- npm run dev:onchange {{changed}}",
 		"dev:onchange": "npm run build && npm run start",
 		"start": "node lib/index.js",
 		"build": "babel src -d lib",
