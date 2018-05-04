@@ -17,6 +17,11 @@ script_dir () { (a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; echo "$a"); }
 load_env () { [ -f .env ] && for a in $1; do
 	export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done; }
 
+# see https://linux.die.net/man/1/sponge (my own re-implementation)
+# see terminal."editing file in place"
+# TODO: should exit on error - instead of possibly emptying the file?
+sponge () { if [ -z "$1" ]; then cat; else mytmp="$(mktemp)"; cat > $mytmp; mv $mytmp "$1"; fi }
+
 # like cp -r, but only adds/overwrites files, no deletion (ie. no dir replacement)
 # overlay_folder /base /target && overlay_folder /on-top /target
 overlay_folder () {

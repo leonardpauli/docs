@@ -1,0 +1,33 @@
+# app/data
+' LeonardPauli/docs
+	Created by Leonard Pauli, 4 may 2018
+
+// data - information containers and processing
+
+
+formats:
+	json:
+		example: {"data": {"somelist": [1, 2.2, true, {}, null, "hello"]}, "there": "yaa"}
+		value:
+			// no comments (except from having a {"// comment": "my comment"} field in an object)
+			object: {"key": value, "key2": value, ...} // ie. nesting allowed
+			array: [value, value, ...]
+			number: 8, 8.2
+			boolean: true, false
+			null: null
+			string: "my string\nwith escaped new line" // no unescaped newlines in string allowed
+		terminal:
+			- jq
+				see "https://github.com/stedolan/jq"
+				install.osx: brew info jq && brew install jq
+				usage:
+					see "https://stedolan.github.io/jq/tutorial/
+					cat d.json | jq '[.[] | {message: .commit.message, name: .commit.committer.name}]'"
+						| jq '.[0]' | jq '.message = "hello"'
+					cat package.json | jq '.scripts += {myscript: "value"}' | sponge package.json
+					see "https://stedolan.github.io/jq/manual/"
+	yaml:
+		superset of json // ie. all json is valid yaml
+		ability to use indentation instead of brackets
+			forced as two spaces
+		strings need not be quoted if no risk for mixup

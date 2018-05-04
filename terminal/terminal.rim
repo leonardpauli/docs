@@ -184,6 +184,10 @@ syntax
 		a > file 2>> err // write output to file, and append error output to err file
 		a &> /dev/null // discard both stdout and stderr output
 		a 1> /dev/null 2>&1 // same as above; redirect stdout to null device (discard), and redirect stderr to stdout (ie. also to stdout)
+		editing file in place:
+			cat file | grep '#' > file // will result in empty file
+			see ./lib/sponge
+			cat file | grep '#' | sponge file
 
 	operators:
 		- a & b // run both "async"?

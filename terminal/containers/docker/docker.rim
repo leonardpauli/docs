@@ -81,6 +81,15 @@ base images:
 			ports: ["80:80"]
 	- ...
 
+image.sha: // ensure validity for production
+	# image=node:9.11-alpine; docker pull $image;
+	# (security test/inspect the image)
+	# sha=$(docker inspect --format='{{index .RepoDigests 0}}' $image)
+	# imageWithSha=$(echo $sha | sed "s/.*@/$image@/")
+	# node:9.11-alpine@sha256:5149aec8f508d48998e6230cdc8e6832cba192088b442c8ef7e23df3c6892cd3
+	ARG imageWithSha
+	FROM imageWithSha ...
+
 Dockerfile // see https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#build-cache
 	# comment
 	// # FROM node:9.5.0-alpine@sha256:50ae5f22356c5a0b0c0ea76d27a453b0baf577c61633aee25cea93dcacec1630
