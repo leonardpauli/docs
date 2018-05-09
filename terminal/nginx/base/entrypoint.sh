@@ -13,9 +13,11 @@ overlay_folder () {
 
 overlay_nginx () {
 	echo 'overlay /nginx'
-	mkdir -p /app/nginx \
-	&& overlay_folder /app/nginx-base /etc/nginx \
-	&& overlay_folder /app/nginx /etc/nginx # "/etc/nginx/init.sh"
+	mkdir -p /app-nginx/nginx \
+	&& overlay_folder /app-nginx/nginx-base /etc/nginx \
+	&& ([ -d /app/nginx ] \
+		&& overlay_folder /app/nginx /etc/nginx \
+		|| overlay_folder /app-nginx/nginx /etc/nginx ) # "/etc/nginx/init.sh"
 }
 
 reload_nginx_on_new_ssl_cert () {

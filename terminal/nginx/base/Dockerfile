@@ -5,13 +5,12 @@ RUN apk add --update nginx \
 	&& rm -rf /var/cache/apk/* \
 	&& mkdir -p /run/nginx
 
-COPY nginx /app/nginx-base
+COPY nginx /app-nginx/nginx-base
 
 # set start
 EXPOSE 80 443
-WORKDIR /app
-COPY entrypoint.sh ./
-ENTRYPOINT ["./entrypoint.sh"]
+COPY entrypoint.sh /app-nginx/
+CMD (cd /app-nginx && ./entrypoint.sh)
 
 
 VOLUME /data/ssl
