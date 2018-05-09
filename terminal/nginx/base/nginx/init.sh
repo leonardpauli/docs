@@ -1,26 +1,15 @@
 #!/usr/bin/env sh
-nginx_conf_http_middle=""
+nginx_conf_http_middle="" # hi
 
 main () {
 	echo 'fix /nginx'
 	sites_fix
 
-	echo "---- sites_fix done"
-	echo "---- cat snippets/ssl.force-https+acme.template.conf:"
-	cat snippets/ssl.force-https+acme.template.conf
-	echo "---- eval_template"
 	name="default"; envi="prod";
 	nginx_conf_http_middle="$nginx_conf_http_middle""$([ "$server_https_force" = "true" ] \
-		&& (cat snippets/ssl.force-https+acme.template.conf | eval_template) || echo '')"'\n'
-	echo "---- nginx_conf_http_middle:"
-	echo "$nginx_conf_http_middle"
+		&& (cat snippets/ssl.force-https+acme.template.conf | eval_template) || echo '')"$'\n'
 	
-	echo "---- cat nginx.template.conf:"
-	cat nginx.template.conf
-	echo "---- cat nginx.template.conf | eval_template > nginx.conf:"
 	(cat nginx.template.conf | eval_template) > nginx.conf
-	cat nginx.conf
-	echo "---- done"
 }
 
 get_var () { eval echo "\$$1"; }
@@ -30,41 +19,46 @@ sites_wrap () {
 	innerContent="$2"
 	name="$3"
 
-	echo "{{name='$name'; envi='$envi'}}"
-	cat <<-'EOF'
-		{{domains="$(get_var "server_${name}_${envi}_domains" | sed 's/,/ /g')"}}
-		{{port_part="$([ "$server_https_force" = "true" ] && echo "443 ssl" || echo "80")"}}
-		server {
-			listen {{=$port_part}};
-			listen [::]:{{=$port_part}};
-			server_name {{=$domains}};
+	echo "{{&=name='$name'}}{{&=envi='$envi'}}"
+	cat <<'EOF'
+{{&=domains="$(get_var "server_${name}_${envi}_domains" | sed 's/,/ /g')"}}
+{{&=port_part="$([ "$server_https_force" = "true" ] && echo "443 ssl" || echo "80")"}}
 
-			{{ if [ "$server_https_force" = "true" ]; then
-				ssl_certificate ssl/{{=$envi}}.crt;
-				ssl_certificate_key ssl/{{=$envi}}.key;
-			fi }}
-		EOF
+
+# site {{=$name}}, {{=$envi}}
+server {
+	listen {{=$port_part}};
+	listen [::]:{{=$port_part}};
+	server_name {{=$domains}};
+	{{ if [ "$server_https_force" = "true" ]; then
+		echo "ssl_certificate ssl/$envi.crt;"
+		echo "ssl_certificate_key ssl/$envi.key;"
+	fi }}
+EOF
 	echo "$innerContent"
 	echo '}'
 	
 	# https://stackoverflow.com/questions/7947030/nginx-no-www-to-www-and-www-to-no-www
-	cat <<-'EOF'
-		{{ [ "$server_default_redirect_from_www" = "true" ] && cat <<-EOF
-			server {
-				listen $port_part;
-				listen [::]:$port_part;
+	cat <<'EOF'
 
-				server_name "~^www\.($(echo "$domains" | tr ' ' '|'))\$";
+{{ [ "$server_default_redirect_from_www" = "true" ] && cat <<EOwwwF
 
-				$(if [ "$server_https_force" = "true" ]; then
-					echo "ssl_certificate ssl/$envi.crt;"
-					echo "ssl_certificate_key ssl/$envi.key;"
-				fi)
+# server_default_redirect_from_www
+server {
+	listen $port_part;
+	listen [::]:$port_part;
+	server_name "~^www\.($(echo "$domains" | tr ' ' '|'))\$";
+	$( if [ "$server_https_force" = "true" ]; then
+		echo "ssl_certificate ssl/$envi.crt;"
+		echo "ssl_certificate_key ssl/$envi.key;"
+	fi )
+	return 301 \$scheme://\$1\$request_uri;
+}
 
-				return 301 \$scheme://\$1\$request_uri;
-			}
-		}}
-		EOF
+EOwwwF
+}}
+
+EOF
 }
 
 
@@ -117,12 +111,7 @@ sites_fix () {
 		fi
 
 		# replace env + fns
-		echo "----- $site.conf ready:"
-		cat "$site.conf"
-		echo "----- eval_template:"
-		(cat "$site.conf" | eval_template) > "$site.conf"
-		cat "$site.conf"
-		echo "----- done"
+		cat "$site.conf" | eval_template | sponge "$site.conf"
 
 		nginx_conf_http_middle="$nginx_conf_http_middle""include sites/$site.conf;"$'\n'
 	done
@@ -131,6 +120,8 @@ sites_fix () {
 
 
 # helpers
+sponge () { if [ -z "$1" ]; then cat; else mytmp="$(mktemp)"; cat > $mytmp; mv $mytmp "$1"; fi }
+
 replace_with_multiline () {
 	to_find="$1"
 	to_repl="$2"
@@ -145,10 +136,18 @@ replace_with_multiline () {
 eval_template () { # not "safe" in terms of eval
 	# echo 'a\na {{echo "b\nb"}} c {{echo d}} e' | eval_template # -> 'a\na b\nb c d e'
 	# hello=hi; echo '{{=$hello}} there' | eval_template # -> {{echo "$hello"}} there -> 'hi there'
+	# echo '{{&=b="hello"}} {{&:a="$(sleep 1 && date)"}} {{=$a}} {{=$a}} {{echo there $b}}!' | eval_template
+	#  use {{&=varname="$(code)"}} if you only need varname (eval:ed once)
+	#  use {{&:code}} if code sets multiple vars (though will be run for every {{}})
+	varstore=$(mktemp); trap "rm -rf $varstore" EXIT; echo "# TMP" > "$varstore"
 	fn () {
 		middle="$(cat)"
-		case "$middle" in =*) middle="echo \"${middle#=}\"" ;; *);; esac # '=$a' -> 'echo "$a"'
-		eval "$middle"
+		case "$middle" in
+			'='*) eval "$(cat "$varstore")"$'\n'"echo \"${middle#=}\"" ;; # '=$a' -> 'echo "$a"'
+			'&='*) echo "$(echo "${middle#&=}" | sed 's/=.*//')='$(eval "$(cat "$varstore")"$'\n'"$(echo "${middle#&=}" | sed 's/[^=]*=/echo /')")'" >> "$varstore";;
+			'&:'*) echo "${middle#&:}" >> "$varstore";;
+			*) eval "$(cat "$varstore")"$'\n'"$middle";;
+		esac
 	}
 	cat | replace_multiline_enclosed '{{' fn '}}'
 }
@@ -163,7 +162,7 @@ replace_multiline_enclosed () {
 	while [[ ! -z "$left" ]]; do
 		left="$(echo "$left" | sed "s/$sub_start/_SUBSTART_/")" # a\ra _SUBSTART_echo "b\rb"}} c {{echo d}} e
 		printf '%s' "$(echo "$left" | sed 's/_SUBSTART_.*//' | sed 's/_ASUB/_SUB/g' | tr '\r' '\n')" # a\na
-		
+
 		lefttmp="$(echo "$left" | sed 's/.*_SUBSTART_//' | sed "s/$sub_end/_SUBEND_/")" # echo "b\rb"_SUBEND_ c {{echo d}} e
 		if [ "$lefttmp" = "$left" ]; then left=''; break; fi
 		left="$lefttmp"

@@ -82,10 +82,18 @@ background_cmds_use () {
 eval_template () { # not "safe" in terms of eval
 	# echo 'a\na {{echo "b\nb"}} c {{echo d}} e' | eval_template # -> 'a\na b\nb c d e'
 	# hello=hi; echo '{{=$hello}} there' | eval_template # -> {{echo "$hello"}} there -> 'hi there'
+	# echo '{{&=b="hello"}} {{&:a="$(sleep 1 && date)"}} {{=$a}} {{=$a}} {{echo there $b}}!' | eval_template
+	#  use {{&=varname="$(code)"}} if you only need varname (eval:ed once)
+	#  use {{&:code}} if code sets multiple vars (though will be run for every {{}})
+	varstore=$(mktemp); trap "rm -rf $varstore" EXIT; echo "# TMP" > "$varstore"
 	fn () {
 		middle="$(cat)"
-		case "$middle" in =*) middle="echo \"${middle#=}\"" ;; *);; esac # '=$a' -> 'echo "$a"'
-		eval "$middle"
+		case "$middle" in
+			'='*) eval "$(cat "$varstore")"$'\n'"echo \"${middle#=}\"" ;; # '=$a' -> 'echo "$a"'
+			'&='*) echo "$(echo "${middle#&=}" | sed 's/=.*//')='$(eval "$(cat "$varstore")"$'\n'"$(echo "${middle#&=}" | sed 's/[^=]*=/echo /')")'" >> "$varstore";;
+			'&:'*) echo "${middle#&:}" >> "$varstore";;
+			*) eval "$(cat "$varstore")"$'\n'"$middle";;
+		esac
 	}
 	cat | replace_multiline_enclosed '{{' fn '}}'
 }

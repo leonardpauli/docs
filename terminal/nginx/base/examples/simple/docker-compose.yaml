@@ -7,3 +7,5 @@ services:
       target: example-simple
     env_file: .env
     ports: ["80:80"]
+    # volumes:
+    #   - ../../nginx/init.sh:/etc/nginx/init.sh

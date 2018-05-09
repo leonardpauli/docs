@@ -36,3 +36,8 @@ prerequisites:
 		auto-renew isn't thoroughly tested
 			+ it will restart nginx every second day, even though cert wasn't updated
 			+ local auto-renew won't restart nginx
+
+' TODO:
+	see http://jasonwilder.com/blog/2014/03/25/automated-nginx-reverse-proxy-for-docker/
+	see https://github.com/jwilder/nginx-proxy
+		neat docker reverse-proxy, with ssl + IPv6, etc

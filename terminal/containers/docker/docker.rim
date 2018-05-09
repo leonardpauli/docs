@@ -79,6 +79,10 @@ base images:
 			image: nginx:1.13-alpine
 			volumes: ["./public:/usr/share/nginx/html"]
 			ports: ["80:80"]
+	- leonardpauli/docs-nginx-base // see: terminal/nginx/base
+		alt: jwilder/nginx-proxy:alpine
+			// see: https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion
+
 	- ...
 
 image.sha: // ensure validity for production
