@@ -274,6 +274,27 @@ variables:
 		- ${1:-foo}
 		- ${myvar-defaultvalue}
 
+	dynamic:
+		for POSIX:
+			#!/usr/bin/env sh
+
+			option=vendor_name
+			value="my vendor"
+
+			eval $option="'$value'" # be careful with ', \n, and \ in value
+			eval echo "\$$option" # my vendor
+			echo "$vendor_name" # my vendor
+			get_var () { eval echo "\$$1"; }
+			echo "$(get_var $option)" # my vendor
+
+		working in bash but not POSIX compatible:
+			#!/usr/bin/env sh
+			printf -v "var" "val" # prints the flag, var not set
+			declare var=val # sh: declare: not found
+			echo ${!var} # sh: syntax error: bad substitution
+		// I don't like eval, but are there any POSIX options?
+
+
 loops
 	see variables.local
 	// TODO

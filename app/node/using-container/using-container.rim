@@ -17,6 +17,10 @@ structure:
 		// eg. image.jpg
 	container // files related to running / building the container
 		see example/docs
+		' - supports offline installs and builds
+			- pin registry images with sha
+			- dev using docker as only dependency
+			- multistage builds + avoids huge cache misses, etc
 		
 		- .env // local config
 			env=dev

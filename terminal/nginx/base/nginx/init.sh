@@ -1,91 +1,132 @@
 #!/usr/bin/env sh
-
-domains_prod_spaced="$(echo "$server_default_prod_domains" | sed 's/,/ /g')"
-domains_local_spaced="$(echo "$server_default_local_domains" | sed 's/,/ /g')"
-nginx_conf_middle=""
+nginx_conf_http_middle=""
 
 main () {
 	echo 'fix /nginx'
-	fix_snippets
-	fix_sites
-	fix_nginx_conf
+	sites_fix
+
+	echo "---- sites_fix done"
+	echo "---- cat snippets/ssl.force-https+acme.template.conf:"
+	cat snippets/ssl.force-https+acme.template.conf
+	echo "---- eval_template"
+	name="default"; envi="prod";
+	nginx_conf_http_middle="$nginx_conf_http_middle""$([ "$server_https_force" = "true" ] \
+		&& (cat snippets/ssl.force-https+acme.template.conf | eval_template) || echo '')"'\n'
+	echo "---- nginx_conf_http_middle:"
+	echo "$nginx_conf_http_middle"
+	
+	echo "---- cat nginx.template.conf:"
+	cat nginx.template.conf
+	echo "---- cat nginx.template.conf | eval_template > nginx.conf:"
+	(cat nginx.template.conf | eval_template) > nginx.conf
+	cat nginx.conf
+	echo "---- done"
 }
 
-sed_escaped_path () { echo "$1" | sed "s/\//\\\\\//g"; }
+get_var () { eval echo "\$$1"; }
 
-fix_snippets () {
-	cd snippets
+sites_wrap () {
+	envi="$1" # prod/local
+	innerContent="$2"
+	name="$3"
 
-	if [ "$server_https_force" = "true" ]; then
-		cat ssl.force-https+acme.template.conf \
-			| sed "s/SERVER_NAME/$domains_local_spaced $domains_prod_spaced/g" \
-			| sed "s/ssl_acme_webroot/$(sed_escaped_path "$ssl_acme_webroot")/g" \
-			> ssl.force-https+acme.conf
-		nginx_conf_middle="$nginx_conf_middle""include snippets/ssl.force-https+acme.conf;"$'\n'
-	fi
+	echo "{{name='$name'; envi='$envi'}}"
+	cat <<-'EOF'
+		{{domains="$(get_var "server_${name}_${envi}_domains" | sed 's/,/ /g')"}}
+		{{port_part="$([ "$server_https_force" = "true" ] && echo "443 ssl" || echo "80")"}}
+		server {
+			listen {{=$port_part}};
+			listen [::]:{{=$port_part}};
+			server_name {{=$domains}};
 
-	cd ..
-}
-
-
-fix_default_site () {
-	write_out_site () {
-		port_part="80"; [ "$server_https_force" = "true" ] && port_part="443 ssl"
-		ssl_comment="#"; [ "$server_https_force" = "true" ] && ssl_comment=""
-		{ echo "$(cat)" >> "$site.conf"; } <<-EOF
+			{{ if [ "$server_https_force" = "true" ]; then
+				ssl_certificate ssl/{{=$envi}}.crt;
+				ssl_certificate_key ssl/{{=$envi}}.key;
+			fi }}
+		EOF
+	echo "$innerContent"
+	echo '}'
+	
+	# https://stackoverflow.com/questions/7947030/nginx-no-www-to-www-and-www-to-no-www
+	cat <<-'EOF'
+		{{ [ "$server_default_redirect_from_www" = "true" ] && cat <<-EOF
 			server {
 				listen $port_part;
 				listen [::]:$port_part;
-				server_name $2;
 
-				$ssl_comment ssl_certificate ssl/$1.crt;
-				$ssl_comment ssl_certificate_key ssl/$1.key;
+				server_name "~^www\.($(echo "$domains" | tr ' ' '|'))\$";
 
-				include sites/$site.inner.conf;
-			}
-			EOF
-		# https://stackoverflow.com/questions/7947030/nginx-no-www-to-www-and-www-to-no-www
-		[ "$server_default_redirect_from_www" = "true" ] && { echo "$(cat)" >> "$site.conf"; } <<-EOF
-			server {
-				listen $port_part;
-				listen [::]:$port_part;
-				server_name "~^www\.($(echo "$2" | tr ' ' '|'))\$";
-
-				$ssl_comment ssl_certificate ssl/$1.crt;
-				$ssl_comment ssl_certificate_key ssl/$1.key;
+				$(if [ "$server_https_force" = "true" ]; then
+					echo "ssl_certificate ssl/$envi.crt;"
+					echo "ssl_certificate_key ssl/$envi.key;"
+				fi)
 
 				return 301 \$scheme://\$1\$request_uri;
 			}
-			EOF
-	}
-	[ "$server_prod_enable" = "true" ] && write_out_site prod "$domains_prod_spaced"
-	[ "$server_local_enable" = "true" ] && write_out_site local "$domains_local_spaced"
+		}}
+		EOF
 }
 
 
-fix_sites () {
+# sites
+# 	x.conf -> used
+# 	x.inner.conf -> x.inner.prod.conf -> forces compilation of x.conf
+# 	x.inner.local.conf -> overrides x.inner.conf for local in x.conf if exists
+# 	x.prod.conf -> overrides whole prod part of x.conf
+# 	x.local.conf -> overrides whole local part of x.conf
+# 	
+# 	x.conf
+# 		x.prod.conf
+# 			wrapper
+# 			x.inner.conf
+# 		x.local.conf
+# 			wrapper
+# 			x.inner.local.conf
+# 				x.inner.conf
+# 
+# for f in *.inner.conf
+# 	$site: f - .inner.conf
+# 	"# compiled" > $site.conf
+# 	# prod
+# 	$site.prod.conf >> $site.conf if exists, else:
+# 		$(wrapped prod $site.inner.conf) >> $site.conf
+# 	$site.local.conf >> $site.conf if exists, else:
+# 		inner: $site.inner.local.conf or $site.inner.conf
+# 		$(wrapped local inner) >> $site.conf
+
+
+sites_fix () {
 	cd sites
 	for site in *.inner.conf; do
 		site="$(echo "$site" | sed 's/.inner.conf//')"
 		
 		echo "# compiled" > "$site.conf"
-		if [ "$site" = "default" ]; then
-			fix_default_site
-		else
-			[ "$server_prod_enable" = "true" ] && cat "$site.prod.conf" 2> /dev/null >> "$site.conf"
-			[ "$server_local_enable" = "true" ] && cat "$site.local.conf" 2> /dev/null >> "$site.conf"
+		
+		# prod
+		if [ "$server_prod_enable" = "true" ]; then
+			# $site.conf += $site.prod.conf, if exists, else: wrapped prod $site.inner.conf
+			([ -f "$site.prod.conf" ] && cat "$site.prod.conf" || sites_wrap prod "$(cat "$site.inner.conf")" "$site") >> "$site.conf"
 		fi
 
-		nginx_conf_middle="$nginx_conf_middle""include sites/$site.conf;"$'\n'
+		# local
+		if [ "$server_local_enable" = "true" ]; then
+			# inner: $site.inner.local.conf or $site.inner.conf
+			inner="$([ -f "$site.inner.local.conf" ] && echo "$site.inner.local.conf" || echo "$site.inner.conf")"
+			# $site.conf += $site.local.conf, if exists, else: wrapped local inner
+			([ -f "$site.local.conf" ] && cat "$site.local.conf" || sites_wrap local "$(cat "$inner")" "$site") >> "$site.conf"
+		fi
+
+		# replace env + fns
+		echo "----- $site.conf ready:"
+		cat "$site.conf"
+		echo "----- eval_template:"
+		(cat "$site.conf" | eval_template) > "$site.conf"
+		cat "$site.conf"
+		echo "----- done"
+
+		nginx_conf_http_middle="$nginx_conf_http_middle""include sites/$site.conf;"$'\n'
 	done
 	cd ..
-}
-
-
-fix_nginx_conf () {
-	cat nginx.template.conf \
-		| replace_with_multiline "MIDDLE" "$nginx_conf_middle" \
-		> nginx.conf
 }
 
 
@@ -99,6 +140,38 @@ replace_with_multiline () {
 	echo "$to_repl" > $tmp_file
 
 	cat - | sed "/$to_find/ r $tmp_file" | sed "/$to_find/d"
+}
+
+eval_template () { # not "safe" in terms of eval
+	# echo 'a\na {{echo "b\nb"}} c {{echo d}} e' | eval_template # -> 'a\na b\nb c d e'
+	# hello=hi; echo '{{=$hello}} there' | eval_template # -> {{echo "$hello"}} there -> 'hi there'
+	fn () {
+		middle="$(cat)"
+		case "$middle" in =*) middle="echo \"${middle#=}\"" ;; *);; esac # '=$a' -> 'echo "$a"'
+		eval "$middle"
+	}
+	cat | replace_multiline_enclosed '{{' fn '}}'
+}
+
+replace_multiline_enclosed () {
+	sub_start="$1"; shift; fn_name="$1"; shift; sub_end="$1"; shift; left="$(cat)";
+	# uppercase () { cat | tr 'a-z' 'A-Z'; }; echo 'Hello [there]!' | replace_multiline_enclosed '\[' uppercase '\]'
+
+	# make single-line, sanitize input against _SUB(START|END)_, a\ra {{echo "b\rb"}} c {{echo d}} e
+	left="$(echo "$left" | tr '\n' '\r' | sed 's/_SUB/_ASUB/g')"
+
+	while [[ ! -z "$left" ]]; do
+		left="$(echo "$left" | sed "s/$sub_start/_SUBSTART_/")" # a\ra _SUBSTART_echo "b\rb"}} c {{echo d}} e
+		printf '%s' "$(echo "$left" | sed 's/_SUBSTART_.*//' | sed 's/_ASUB/_SUB/g' | tr '\r' '\n')" # a\na
+		
+		lefttmp="$(echo "$left" | sed 's/.*_SUBSTART_//' | sed "s/$sub_end/_SUBEND_/")" # echo "b\rb"_SUBEND_ c {{echo d}} e
+		if [ "$lefttmp" = "$left" ]; then left=''; break; fi
+		left="$lefttmp"
+
+		middle="$(echo "$left" | sed 's/_SUBEND_.*//' | tr '\r' '\n')" # echo "b\nb"
+		[ ! -z "$middle" ] && printf '%s' "$(echo "$middle" | $fn_name | sed 's/_ASUB/_SUB/g')" # b\nb
+		left="$(echo "$left" | sed 's/.*_SUBEND_//')" # c {{echo d}} e
+	done
 }
 
 

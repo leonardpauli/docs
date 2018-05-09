@@ -16,7 +16,7 @@ RUN rm /usr/local/bin/yarn
 # rel. caching of dependencies, see docker.build.caching-issue
 WORKDIR /app
 COPY ./package.json ./package-lock.json /app/
-COPY ./container/data/node_modules-dev /app/node_modules
+COPY ./container/data/node_modules /app/node_modules
 # CMD ["tail", "-f", "/dev/null"]
 RUN export NODE_ENV=development; export npm_config_prefer_offline=true; npm install
 

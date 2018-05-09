@@ -23,7 +23,7 @@ add docker.alt."volume cache in dev, copy cache from dev to build":
 		# rel. caching of dependencies, see docker.build.caching-issue
 		RUN mkdir /app
 		COPY ./package.json ./package-lock.json /app/
-		COPY ./container/data/node_modules-dev /app/node_modules
+		COPY ./container/data/node_modules /app/node_modules
 		RUN export NODE_ENV=development; export npm_config_prefer_offline=true; npm install
 
 		FROM node:9.11-alpine as builder
@@ -66,7 +66,7 @@ add docker.alt."volume cache in dev, copy cache from dev to build":
 			app:
 				volumes:
 					- ..:/app
-					- ./data/node_modules-dev:/app/node_modules
+					- ./data/node_modules:/app/node_modules
 					- ~/npm:/root/.npm
 	- for f in docker-compose*.yml; vimx ':%s/\t/  /g\n' $f
 	- { echo "$(cat)" > start && chmod u+x start; } <<-'EOF'
@@ -81,7 +81,7 @@ add docker.alt."volume cache in dev, copy cache from dev to build":
 
 	test:
 		prod working:
-			- mkdir -p data/node_modules-dev
+			- mkdir -p data/node_modules
 			- docker-compose up --build // 8
 			- docker-compose up --build // 8, check that caches are used
 			- vimx '$2bcw5\e' ../src/index.js

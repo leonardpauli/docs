@@ -102,7 +102,7 @@ add docker.alt."use local caching registry service":
 					npm_config_registry: "http://verdaccio"
 				volumes:
 					- ..:/app
-					- ./data/node_modules-dev:/app/node_modules # // could be anonymous
+					- ./data/node_modules:/app/node_modules # // could be anonymous
 					- ~/.npm:/root/.npm # // optional, improves install slightly
 				networks:
 					verdaccio:
@@ -118,7 +118,8 @@ add docker.alt."use local caching registry service":
 		load_env () { [ -f .env ] && for a in $1; do
 			export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done; }
 
-		load_env "env" # see terminal/lib.sh
+		# // npm_config_registry needed to not be overriden by local definition
+		load_env "env npm_config_registry" # see terminal/lib.sh
 
 		if [ "$env" = "dev" ]; then
 			docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
@@ -150,7 +151,7 @@ add docker.alt."use local caching registry service":
 			- vimx '$2bcw7\e' ../src/index.js // in new terminal; should reload and show 14 in first
 			- docker-compose down
 		dev shared cache working:
-			- rm -rf data/node_modules-dev
+			- rm -rf data/node_modules
 			- turn off internet
 			- ./start // should re-install node_modules without problem
 				' if ~/.npm:/root/.npm is added + --prefer-offline in npm run dev script, local registry shouldn't have to be hit at all

@@ -3,5 +3,5 @@ services:
   app:
     volumes:
       - ../:/app
-      - ./data/node_modules-dev:/app/node_modules
+      - ./data/node_modules:/app/node_modules
       - ~/npm:/root/.npm

@@ -7,5 +7,5 @@ services:
       context: .
       target: dev
     volumes:
-      - ./public:/app/public
+      - ./dist:/app/dist
       - ./nginx:/app/nginx

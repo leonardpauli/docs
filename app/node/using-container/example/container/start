@@ -2,7 +2,7 @@
 load_env () { [ -f .env ] && for a in $1; do
 	export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done; }
 
-load_env "env" # see terminal/lib.sh
+load_env "env npm_config_registry" # see terminal/lib.sh
 
 if [ "$env" = "dev" ]; then
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build

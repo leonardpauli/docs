@@ -184,6 +184,12 @@ network:
 
 
 notes:
+	.dockerignore
+		put in context root
+		like .gitignore, but relative to build context root + can only exist once
+		use to exclude files/folders in contexts from being sent as context to docker
+			eg. excluding node_modules can save a lot of time
+			volumes can be excluded (they're attached after build, so doesn't have enything to do with build context anyhow)
 	npm
 		- npm install exclusively on Host or Container OS // if shared volume; installation (native modules) isn't same
 	- lsof -n -i:PORT // list listening processes

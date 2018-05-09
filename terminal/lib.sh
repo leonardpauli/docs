@@ -78,3 +78,37 @@ background_cmds_use () {
 # heartbeat a & pid_a=$!; trap "kill $pid_a" EXIT
 # heartbeat b
 
+
+eval_template () { # not "safe" in terms of eval
+	# echo 'a\na {{echo "b\nb"}} c {{echo d}} e' | eval_template # -> 'a\na b\nb c d e'
+	# hello=hi; echo '{{=$hello}} there' | eval_template # -> {{echo "$hello"}} there -> 'hi there'
+	fn () {
+		middle="$(cat)"
+		case "$middle" in =*) middle="echo \"${middle#=}\"" ;; *);; esac # '=$a' -> 'echo "$a"'
+		eval "$middle"
+	}
+	cat | replace_multiline_enclosed '{{' fn '}}'
+}
+
+
+replace_multiline_enclosed () {
+	sub_start="$1"; shift; fn_name="$1"; shift; sub_end="$1"; shift; left="$(cat)";
+	# uppercase () { cat | tr 'a-z' 'A-Z'; }; echo 'Hello [there]!' | replace_multiline_enclosed '\[' uppercase '\]'
+
+	# make single-line, sanitize input against _SUB(START|END)_, a\ra {{echo "b\rb"}} c {{echo d}} e
+	left="$(echo "$left" | tr '\n' '\r' | sed 's/_SUB/_ASUB/g')"
+
+	while [[ ! -z "$left" ]]; do
+		left="$(echo "$left" | sed "s/$sub_start/_SUBSTART_/")" # a\ra _SUBSTART_echo "b\rb"}} c {{echo d}} e
+		printf '%s' "$(echo "$left" | sed 's/_SUBSTART_.*//' | sed 's/_ASUB/_SUB/g' | tr '\r' '\n')" # a\na
+		
+		lefttmp="$(echo "$left" | sed 's/.*_SUBSTART_//' | sed "s/$sub_end/_SUBEND_/")" # echo "b\rb"_SUBEND_ c {{echo d}} e
+		if [ "$lefttmp" = "$left" ]; then left=''; break; fi
+		left="$lefttmp"
+
+		middle="$(echo "$left" | sed 's/_SUBEND_.*//' | tr '\r' '\n')" # echo "b\nb"
+		[ ! -z "$middle" ] && printf '%s' "$(echo "$middle" | $fn_name | sed 's/_ASUB/_SUB/g')" # b\nb
+		left="$(echo "$left" | sed 's/.*_SUBEND_//')" # c {{echo d}} e
+	done
+}
+
