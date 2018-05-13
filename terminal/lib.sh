@@ -13,9 +13,24 @@
 # cd "$(script_dir)"
 script_dir () { (a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; echo "$a"); }
 
-# load_env "my_env_var SOME_OTHER_VAR etc"
-load_env () { [ -f .env ] && for a in $1; do
-	export $a="$(cat .env | grep $a= | sed -e "s/.*=//g")"; done; }
+# load_env () {
+# 	# load_env -> load_env -f .env list of all # exports all vars from .env file
+# 	# load_env var1 PORT some_other_var
+# 	# env file: lines starting with # are skipped, var_name_1=value with spaces # and hashes = and equals
+# 	# returns 1 if env file not found; if ! load_env; then echo 'no .env file found'; exit; fi
+# 	envfile='.env'; if [ "$1" = "-f" ]; then shift; envfile="$1"; shift; fi
+# 	if [ ! -f "$envfile" ]; then return 1; fi
+# 	toload="$*"
+# 	while read a <&3; do ([ "${a#'#'}" = "$a" ] && [ ! -z "$a" ]) \
+# 		&& ([ -z "$toload" ] || (echo "$toload " | grep "$(echo "$a" | sed "s/=.*//") ")) \
+# 		&& export "$a"
+# 	done 3< "$envfile";
+# }
+# if ! load_env; then echo 'Please add it.'; exit; fi # load_env = load_env .env;
+# lines starting with # are skipped, var_name_1=value with spaces # and hashes = and equals
+load_env () { while read a <&3; do [ "${a#'#'}" = "$a" ] && [ ! -z "$a" ] && export "$a"; done 3< "${1:-.env}"; }
+
+debug () { [ ! -z $debug_enabled ] && echo $*; }
 
 # see https://linux.die.net/man/1/sponge (my own re-implementation)
 # see terminal."editing file in place"
@@ -24,6 +39,7 @@ sponge () { if [ -z "$1" ]; then cat; else mytmp="$(mktemp)"; cat > $mytmp; mv $
 
 # like cp -r, but only adds/overwrites files, no deletion (ie. no dir replacement)
 # overlay_folder /base /target && overlay_folder /on-top /target
+# TODO: will it have problem with filenames using spaces?
 overlay_folder () {
 	source_d="$1"; target_d="$2"
 	cd "$source_d"

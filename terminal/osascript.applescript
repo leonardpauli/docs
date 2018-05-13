@@ -19,8 +19,8 @@
 
 tell application "System Events" to keystroke "d" using {shift down, command down}
 tell application "System Events" to keystroke "hello there\n"
-set arrowkeys to {left:123, right:124, up:126, down:125}
-tell application "System Events" to key code (left of arrowkeys) -- using {command down, control down, option down, shift down}
+set arrowkeys to {k_left:123, k_right:124, k_up:126, k_down:125} -- left, right, etc seems to be reserved words...
+tell application "System Events" to key code (k_left of arrowkeys) -- using {command down, control down, option down, shift down}
 repeat 9 times
 	-- do something
 end repeat
@@ -48,6 +48,16 @@ tell application "Google Chrome"
 	set win's active tab's URL to chromeURL
 	activate
 end tell
+tell application "Safari"
+	activate
+	make new document with properties {URL:"https://google.com"}
+end tell
+tell application "System Events"
+	tell process "Safari"
+		set position of first window to {-1920, -1380}
+		set value of attribute "AXFullScreen" of first window to true
+	end tell
+end tell
 # Helpers
 on makeTab()
 	tell application "System Events" to keystroke "t" using {command down}
@@ -56,6 +66,13 @@ end makeTab
 on lastA(array)
 	return item -1 of array
 end lastA
+-- https://gist.github.com/reyjrar/1769355
+on isAppRunning(appName)
+	tell application "System Events" to (name of processes) contains appName
+end isAppRunning
+
+set AppleScript's text item delimiters to {"\n"}
+tell application "System Events" to log (name of processes as string)
 
 
 -- Reference

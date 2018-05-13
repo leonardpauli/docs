@@ -1,30 +1,22 @@
-#!/usr/env/bin bash
+#!/usr/bin/env sh
 
-key_left=123
-key_right=124
-key_up=126
-key_down=125
+script_dir () { (a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; echo "$a"); }
+load_env () { while read a <&3; do [ "${a#'#'}" = "$a" ] && [ ! -z "$a" ] && export "$a"; done 3< "${1:-.env}"; }
 
-do_keypress='tell application "System Events" to keystroke'
-do_keypress_code='tell application "System Events" to key code'
-osascript <<-EOF
-	$do_keypress "d" using {shift down, command down}
-	delay 0.01
-	$do_keypress "npm run serve\n"
+cd "$(script_dir)"
+if ! load_env; then # lpdocs dev_window_setup
+	echo 'No .env file created'; echo 'Please see docs/setup.rim/"get running"'; exit; fi
 
-	$do_keypress "d" using {shift down, command down}
-	delay 0.01
-	$do_keypress "npm run lint:watch\n"
+if [ ! -d "$lpdocs" ]; then
+	echo 'Please run:\necho "lpdocs=\$(cd .. && git clone git@github.com:LeonardPauli/docs.git && pwd)/docs" >> .env && ./dev'
+	sleep 1; exit; fi
 
-	$do_keypress "d" using command down
-	delay 0.1
-	$do_keypress "npm run dev:gun\n"
-	
-	repeat 9 times
-		$do_keypress_code $key_down using {command down, control down}
-	end repeat
-
-	$do_keypress_code $key_up using {command down, option down}
-	$do_keypress_code $key_up using {command down, option down}
-	$do_keypress "npm run dev:edit\n"
+"$lpdocs/app/misc/workspace_setup.sh" "$dev_window_setup" <<-EOF
+	{type: "sublime", h: p's h, w: p's w / 2}
+	{type: "finder", x: p's w / 2, h: p's h, w: p's w / 2}
+	{type: "iterm", in_new: "tab", cmd: "pwd"}
+	{type: "iterm", in_new: "v_panel", cmd: "git status", m_down: 9}
 EOF
+# {type: "finder", h: p's h / 2, w: p's w / 3}
+# {type: "finder", x: p's w / 3, h: p's h / 2, w: p's w / 3, path: "$HOME/desktop"}
+echo "closing in 3..."; sleep 3 # to keep iterm happy / suppress fast exit message

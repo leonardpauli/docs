@@ -35,6 +35,13 @@ acquire information:
 	- which command // show command location / path
 	- alias // if using ohmyzsh
 
+get os info:
+	df -h // memory stats
+	du -sh // memory used by pwd
+	uname -a // get version
+		then, for more:
+			osx: sw_vers, system_profiler SPSoftwareDataType
+
 navigation
 	- pwd // process working directory / current directory path
 	- ls // list files/folders
@@ -86,6 +93,7 @@ navigation
 			if [[ -d $p ]]; then
 				local savedpwd="$(pwd)"; cd $p
 				echo "$indent$p"
+				# TODO: issue with filenames with space?
 				[ "$(ls -A)" ] && (for f in $(echo $(ls -A)); do lsoutline $f "$indent\t"; done)
 				cd $savedpwd
 			fi
@@ -152,6 +160,14 @@ text processing:
 
 	string manipulation:
 		// see https://www.tldp.org/LDP/abs/html/string-manipulation.html
+		// see "Parameter Expansion section of man sh/bash"
+
+		remove prefix: ${a%pattern} // - a='hi'; b='# txt'; echo ${a#'# '} ${b#'# '} // hi txt
+		remove suffix: ${a#pattern} // - a='hello'; echo ${a%'llo'}
+		${a#'# text'} // string match
+		${a#te*xt} // shortest pattern match
+		${a%%te*xt} ${a##te*xt} // longest pattern match
+		// https://unix.stackexchange.com/a/310243/137784
 
 		split + map over string:
 			# usage: t="";fn(){t+="$2: $1\n";};itera fn "," "some,values,here";echo $t
@@ -169,6 +185,9 @@ syntax
 		- stderr
 	null device:
 		/dev/null // discards any data it receives
+	file-descriptors:
+		// 0/1/2 are stdin, stdout, and stderr.
+		// 3-9 available for custom use
 	redirect:
 		a > file // (redirect) write stdout to file
 		a | tee file // what really happens? also, when requiring sudo for write access to file:
@@ -180,9 +199,9 @@ syntax
 		>> // append stdout
 		1> // stdout
 		2> // stderr
-		&> // stdout and stderr (newer syntax)
+		// &> // stdout and stderr (newer syntax)
 		a > file 2>> err // write output to file, and append error output to err file
-		a &> /dev/null // discard both stdout and stderr output
+		// a &> /dev/null // discard both stdout and stderr output
 		a 1> /dev/null 2>&1 // same as above; redirect stdout to null device (discard), and redirect stderr to stdout (ie. also to stdout)
 		editing file in place:
 			cat file | grep '#' > file // will result in empty file
@@ -198,6 +217,10 @@ syntax
 	loops:
 		- xs="a b c"; for x in $(echo "$xs"); do echo $x; done // possibly need "unset IFS" or "IFS=' '" first
 		- xs=("a" b 'c'); for x in $xs; do echo $x; done
+		looping over lines: // https://stackoverflow.com/questions/1521462/looping-through-the-content-of-a-file-in-bash
+			while read a; do echo "$a"; done < file.txt
+			while read a <&3; do ssh $a "uname -a" ; done 3< file.txt // use different file-descriptor to avoid commands inside loop body that eats stdin to mess up
+
 
 	other:
 		- cmd a1 a2 && cmd2 $_ // cmd a1 a2 && cmd2 a2, $_ = last arg in prev command
