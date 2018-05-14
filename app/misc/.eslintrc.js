@@ -5,8 +5,12 @@
 // see https://eslint.org/docs/user-guide/configuring
 // install:
 // 	see app/node/registry.npm."package.json"
-// 	to json: package-json-script-add '"lint:compile": "echo \"'"require('fs').writeFileSync('.eslintrc', JSON.stringify(require('./.eslintrc.js')), 'utf-8')"'\" | node"'
-// 	cp $lpdocs/app/misc/.eslintrc.js ./
+// 	- cp $lpdocs/app/misc/.eslintrc.js ./
+// 	to json:
+// 		- package-json-script-add '"lint:compile": "echo \"'"require('fs').writeFileSync('.eslintrc', JSON.stringify(require('./.eslintrc.js')), 'utf-8')"'\" | node"'
+// 	watch script:
+// 		- npm i -D onchange
+// 		- package-json-script-add '"lint:watch": "onchange '"'"'{{src}/**,.}/*.{vue,js}'"'"' -d 200 -w -- npm run --silent lint {{changed}}"'
 // 
 
 

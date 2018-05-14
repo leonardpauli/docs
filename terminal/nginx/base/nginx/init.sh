@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-nginx_conf_http_middle="" # hi
+nginx_conf_http_middle=""
 
 main () {
 	echo 'fix /nginx'
