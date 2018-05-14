@@ -7,6 +7,8 @@
 npm: // v6
 	package.json
 		preserves indentation
+		package-json-script-add () { vimx '/"scripts":\no\t\t'"$1"',\e' package.json; }
+		package-json-script-add '"dev": "..."'
 	update: sudo npm i -g npm
 	cache:
 		export npm_config_prefer_offline=true; npm i express

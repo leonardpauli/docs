@@ -51,6 +51,7 @@ also use:
 	html5 mode // together with nginx + CDN
 	offline support // through service workers?
 	ssl: see terminal.ssl, included with terminal.nginx.base.example.html5app
+	header: see ./meta-seo.rim
 
 boilerplate
 	- see vue
