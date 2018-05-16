@@ -1,3 +1,6 @@
 [submodule "terminal/ssl/ssl-manager/acme.sh"]
 	path = terminal/ssl/ssl-manager/acme.sh
 	url = git@github.com:Neilpang/acme.sh.git
+[submodule "app/vue/base"]
+	path = app/vue/base
+	url = git@github.com:LeonardPauli/lp-vue-base.git
