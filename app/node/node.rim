@@ -13,3 +13,11 @@ npm: see (./registry).npm
 
 Dockerfiles:
 	see ./using-container
+
+
+' Notes:
+	shell from node:
+		https://stackoverflow.com/questions/20643470/execute-a-command-line-binary-with-node-js
+	cleanup / on exit:
+		https://stackoverflow.com/questions/14031763/doing-a-cleanup-action-just-before-node-js-exits
+	use pipes / streams

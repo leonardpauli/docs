@@ -35,3 +35,20 @@ get started:
 	- git pull // pull new commits
 	- npm run build // create a package ready for production in /dist, just upload it to a server
 
+
+cli utils:
+	vue_file_html_to_pug:
+		// for once through UI, see "http://html2jade.org/"
+		- npm i -g html2pug
+		- add script
+			# see terminal/lib.sh/(replace_multiline_enclosed, sponge)
+			vue_file_html_to_pug () {
+				# vue_file_html_to_pug < View.vue | sponge View.vue
+				fn () {
+					echo '<template lang="pug">' 
+					html2pug -f -t
+					echo '</template>'
+				}
+				cat | replace_multiline_enclosed '<template>' fn '<\/template>'
+			}
+		- for f in src/**/*.vue; do vue_file_html_to_pug < "$f" | sponge "$f"; done

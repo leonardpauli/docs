@@ -169,6 +169,10 @@ text processing:
 		${a%%te*xt} ${a##te*xt} // longest pattern match
 		// https://unix.stackexchange.com/a/310243/137784
 
+		// assumes paths to be resolved
+		get filename from filepath: p="$(pwd)/some-file.txt"; echo ${p##*/}
+		get directory from filepath: p="$(pwd)/some-file.txt"; echo ${p%/*}
+
 		split + map over string:
 			# usage: t="";fn(){t+="$2: $1\n";};itera fn "," "some,values,here";echo $t
 			itera () { local fn=${1:-"echo"} del=${2:-","} xs=${3:-"a,b,c"} i=0;

@@ -1,0 +1,44 @@
+# app/node/memory
+' LeonardPauli/docs
+	Created by Leonard Pauli, 16 may 2018
+
+' debugging / inspecting / workings:
+	https://tech.residebrokerage.com/debugging-node-js-memory-problems-d450787d9253
+	https://stackoverflow.com/questions/12023359/what-do-the-return-values-of-node-js-process-memoryusage-stand-for
+
+' utils:
+	https://yomguithereal.github.io/mnemonist/?utm_source=javascriptweekly&utm_medium=email
+
+' interesting:
+	https://bugs.chromium.org/p/v8/issues/detail?id=847
+	https://www.future-processing.pl/blog/a-curious-case-of-memory-leak-in-a-node-js-app/
+
+' gunjs arr mem test:
+	// see projects/open-source/web/gunjs/memtest/test.js
+	// todo: change log output to stream so it won't affect ram usage as much
+	node --max-old-space-size=10000 test.js
+		const getTopMem = ()=> shexec(`top -l 1 | grep node | grep "${process.pid}" | awk '{print $8}'`)
+			.then(s=> parseFloat(s, 10)*(s.indexOf('M')>0?1024*1024:1))
+		const stat = async ()=> {
+			const extra = {
+				topmem: await getTopMem(),
+				...process.memoryUsage(),
+				freemem: os.freemem(),
+			}
+			return { mbIncs, t: new Date().getTime(), ...extra }
+		}
+		on start: Object.keys(stat).join('\t')+'\n' >> out.tsv, do some memory expensive process
+		on every 10ms: Object.values(await stat()).join('\t')+'\n' >> out.tsv
+	https://docs.google.com/spreadsheets/d/1wmzNnhTR96AT2UV6oZSZT3zUB7Rnh-jk3eBJvaPe5XY/edit#gid=0
+	https://files.gitter.im/amark/gun/CtWr/image.png
+	A hypoteses / breakdown of the results:
+		RAM (fast mem), disk/swap (slow mem), theoretical -> looks like:
+			- at the beginning: theory = RAM, free ram = tot ram - theory
+			- when free ram almost 0: everything gets very slow, I assume the data is being moved between ram and swap
+			- when free ram hits 0: it goes just as fast as in the beginning again (suppose the data has been fully copied to swap, and now the ram is being overwritten), at the same time, topmem + rss decreases (suppose node detected that some heap data wasn't used as often and moved it further to disk from swap???)
+			- after ram "buffer" is full again (like before): it goes very slow like before, topmem stays the same (when moving data, tot. stays the same from outside), while rss increases to same level as theory
+			- when rss=theory: topmem jumps to same level (did node just notify that some disk memory is actually part of the swap??)
+			- repeat from start, though each time, node only dares to offload less and less to disk from ram (??), which decreases the ram buffer, and decreases the "fast" intervals
+		-> node tries to be smart and put the data at different places, it might very well be possible to have 100GB in heap (that's put on disk bc not "used"), with 1GB ram limit...
+		-> this depends on the usage
+		-> to be sure, just use totalHeap if the usage is similar as to this test, rss doesn't seem to go higher

@@ -11,7 +11,7 @@
 
 # https://www.jasan.tk/posix/2017/05/11/posix_shell_dirname_replacement
 # cd "$(script_dir)"
-script_dir () { (a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; echo "$a"); }
+script_dir () { (a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}; echo "$a"); }
 
 # load_env () {
 # 	# load_env -> load_env -f .env list of all # exports all vars from .env file
