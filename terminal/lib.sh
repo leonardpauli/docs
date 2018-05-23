@@ -105,7 +105,7 @@ eval_template () { # not "safe" in terms of eval
 	fn () {
 		middle="$(cat)"
 		case "$middle" in
-			'='*) eval "$(cat "$varstore")"$'\n'"echo \"${middle#=}\"" ;; # '=$a' -> 'echo "$a"'
+			'='*) middle="${middle% }"; eval "$(cat "$varstore")"$'\n'"echo \"${middle#=}\"" ;; # '=$a' -> 'echo "$a"'
 			'&='*) echo "$(echo "${middle#&=}" | sed 's/=.*//')='$(eval "$(cat "$varstore")"$'\n'"$(echo "${middle#&=}" | sed 's/[^=]*=/echo /')")'" >> "$varstore";;
 			'&:'*) echo "${middle#&:}" >> "$varstore";;
 			*) eval "$(cat "$varstore")"$'\n'"$middle";;

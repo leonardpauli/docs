@@ -95,3 +95,14 @@ OSS licenses: // Open Source Software licenses
 	if used "free", as for "donation" after some active use, then again
 		after 3x that active use ("have you gotten more value out of this software? :)")
 		etc
+	.
+	see Hatch.js // https://github.com/inventures/hatchjs/blob/master/LICENSE
+		// https://www.npmjs.com/package/hatchjs
+		"Hatch.js dual-licensed under AGPL and Hatch Commercial License. AGPL means that if you fork the Hatch.js code or write a derivative application (an application which runs on the same CPU process), you must open-source and distribute your project freely under the same AGPL terms. Alternatively a commercial closed-source license is available. More details on our website."
+
+' Notes:
+	https://github.com/npm/npm/issues/8918
+	package.json:
+		"licence": "AGPL-3.0-or-later",
+
+

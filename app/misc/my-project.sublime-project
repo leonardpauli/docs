@@ -1,13 +1,13 @@
 {
 	"folders": [
-		{ "path": "web", "name": "web",
+		{ "path": "subname", "name": "subname",
 			"folder_exclude_patterns": ["node_modules", "src"],
 			"file_exclude_patterns": ["package-lock.json"],
 		},
-		{ "path": "web/src", "name": "web-src" },
+		{ "path": "subname/src", "name": "subname-src" },
 		{
 			"path": "/",
-			"folder_exclude_patterns": ["web"],
+			"folder_exclude_patterns": ["subname"],
 			"follow_symlinks": true
 		}
 	],
@@ -35,7 +35,7 @@
 			"eslint": {
 				"@disable": true,
 				"args": [
-					"-c", "${project}/../.eslintrc.js",
+					"-c", "${project}/../subname/.eslintrc",
 				],
 			},
 			"flow": {

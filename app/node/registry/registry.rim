@@ -7,8 +7,12 @@
 npm: // v6
 	package.json
 		preserves indentation
-		package-json-script-add () { vimx '/"scripts":\no\t\t'"$1"',\e' package.json; }
-		package-json-script-add '"dev": "..."'
+		// TODO: append instead of prepend + make add + set-(toplevel-)val both use same abstraction
+		- package-json-script-add () { vimx '/"scripts":\no\t\t'"$1"',\e' package.json; }
+			package-json-script-add '"dev": "..."'
+		- package-json-set-val () {key="$1"; val="$2"; [ "$val" = "-" ] && val="$(cat)" || val="\"$val\""; [ -z "$(cat package.json | grep '"'"$key"'":')" ] && vimx 'o\t"'"$key"'": '"$val"',\e' package.json || vimx ':%s/\("'"$key"'":\) ".*"\(\,\?\)$/\1 '"$val"'\2/\n' package.json; }
+			package-json-set-val license "AGPL-3.0-or-later"
+			echo "true" | package-json-set-val private -
 		// see https://docs.npmjs.com/files/package.json
 	update: sudo npm i -g npm
 	cache:

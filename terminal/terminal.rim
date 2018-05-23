@@ -162,8 +162,8 @@ text processing:
 		// see https://www.tldp.org/LDP/abs/html/string-manipulation.html
 		// see "Parameter Expansion section of man sh/bash"
 
-		remove prefix: ${a%pattern} // - a='hi'; b='# txt'; echo ${a#'# '} ${b#'# '} // hi txt
-		remove suffix: ${a#pattern} // - a='hello'; echo ${a%'llo'}
+		remove prefix: ${a#pattern} // - a='hi'; b='# txt'; echo ${a#'# '} ${b#'# '} // hi txt
+		remove suffix: ${a%pattern} // - a='hello'; echo ${a%'llo'}
 		${a#'# text'} // string match
 		${a#te*xt} // shortest pattern match
 		${a%%te*xt} ${a##te*xt} // longest pattern match

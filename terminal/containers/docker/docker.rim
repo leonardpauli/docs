@@ -84,6 +84,8 @@ base images:
 			// see: https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion
 
 	- ...
+	// see https://github.com/jessfraz/dockerfiles for some dockerized linux apps, incl. GUI
+
 
 image.sha: // ensure validity for production
 	# image=node:9.11-alpine; docker pull $image;

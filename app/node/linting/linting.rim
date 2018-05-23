@@ -1,0 +1,63 @@
+# app/node/linting
+' LeonardPauli/docs
+	Created by Leonard Pauli, 23 may 2018
+
+// see https://eslint.org/docs/user-guide/configuring
+
+prerequisites:
+	- lint_config_name='@leonardpauli/eslint-config'
+
+install:
+	see app/node/registry.npm."package.json"
+	raw:
+		- cp $lpdocs/app/node/linting/.eslintrc.js ./
+		to json:
+			- package-json-script-add '"lint:compile": "echo \"'"require('fs').writeFileSync('.eslintrc', JSON.stringify(require('./.eslintrc.js')), 'utf-8')"'\" | node"'
+			- npm run lint:compile
+	module:
+		- npm i -D $lint_config_name eslint-plugin-vue
+		- echo '{ "extends": "'"$lint_config_name"'" }' > .eslintrc
+		// alt: { "extends": "@scope/eslint-config" } -> { "extends": "@scope" }
+		// alt: { "extends": "@scope/eslint-config-some-name" } -> { "extends": "@scope/eslint-config-some-name" }
+		// alt: { "extends": "eslint-config-some-name" } -> { "extends": "some-name" }
+		// note: possible to override rules by adding "rules": { "some-rule": "off", ... } to  .eslintrc
+	watch script:
+		prerequisites:
+			- lint_glob='{{src}/**,.}/*.{vue,js}'
+		- npm i -D onchange
+		- package-json-script-add '"lint:watch": "onchange '"'$lint_glob'"' -d 200 -w -- npm run --silent lint {{changed}}"'
+	eslint:
+		- npm i -D eslint babel-eslint
+		- package-json-script-add '"lint": "eslint --fix '"'$lint_glob'"'"'
+
+npm module:
+	// see https://github.com/strongloop/eslint-config-strongloop
+	// see https://eslint.org/docs/developer-guide/shareable-configs
+	// TODO: add examples/ with linted coding style examples + syntax explanations, eg. arrow fn + destructuring, etc
+	// TODO: see section about adding multiple variants from same package + fix for options (eg. to enable flow)
+	// 	- {"extends": "@scope/eslint-config/my-special-config"} -> repo/my-special-config.js
+	// TODO: add eg. eslint-plugin-vue to devDependencies or peerDevDependencies, if it will allow to skip adding it to main project?
+	update:
+		- edit .eslintrc.js
+		// - npm run lint:compile
+			// TODO: use .eslintrc with '{ "extends": "./.eslintrc.js" }' instead if working
+		test:
+			- npm link
+			- (cd $other-project && npm link $lint_config_name && npm run lint) // check as expected
+		- bump tag:
+			- npm bump (package.json)? git tag?
+			- npm publish --tag beta --access public
+
+
+' TODO:
+	- error should only be on potential issues, not formatting)
+	- https://github.com/thejameskyle/babel-plugin-react-flow-props-to-prop-types
+	- "Severity should be one of the following: 0 = off, 1 = warning, 2 = error"
+	- make more modular
+
+' see https://medium.com/the-node-js-collection/why-and-how-to-use-eslint-in-your-project-742d0bc61ed7
+	- .eslintignore replaces (or extends?) .gitignore, better to just have .gitignore, don't forget to add dist/lib to .gitignore
+	- if correct, a lint_glob might be unnecessary
+	// - use package-json-script-add pretest lint // or not, use lint on watch and before commit instead, testing should just test?
+	- extra auto fix when adding to existing project:
+		npm i -g prettier && prettier --single-quote --trailing-comma es5 --print-width 80 --write --no-bracket-spacing ** / *.js

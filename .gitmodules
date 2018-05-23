@@ -4,3 +4,6 @@
 [submodule "app/vue/base"]
 	path = app/vue/base
 	url = git@github.com:LeonardPauli/lp-vue-base.git
+[submodule "app/vue/lib"]
+	path = app/vue/lib
+	url = git@github.com:LeonardPauli/lp-vue-lib.git

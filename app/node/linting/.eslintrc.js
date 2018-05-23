@@ -1,35 +1,23 @@
-// $lpdocs/app/misc/.eslint.js
+// $lpdocs/app/node/linting/.eslintrc.js
 // Created by Leonard Pauli, 2017-2018
 // javascript style rules
 // 
-// see https://eslint.org/docs/user-guide/configuring
-// install:
-// 	see app/node/registry.npm."package.json"
-// 	- cp $lpdocs/app/misc/.eslintrc.js ./
-// 	to json:
-// 		- package-json-script-add '"lint:compile": "echo \"'"require('fs').writeFileSync('.eslintrc', JSON.stringify(require('./.eslintrc.js')), 'utf-8')"'\" | node"'
-// 	watch script:
-// 		- npm i -D onchange
-// 		- package-json-script-add '"lint:watch": "onchange '"'"'{{src}/**,.}/*.{vue,js}'"'"' -d 200 -w -- npm run --silent lint {{changed}}"'
-// 
-
+// see $lpdocs/app/node/linting
 
 /* eslint max-lines:0, import/no-commonjs:0, import/no-nodejs-modules:0 */
 
 /* global process */
 // eslint-disable-next-line no-process-env
 const isProduction = process.env.NODE_ENV === 'production'
-const useWebpackResolve = false
 const isRoot = true
-const pureJS = false
 const allowConsoleLog = true
-
-
-// TODO:
-// - error should only be on potential issues, not formatting)
-// - https://github.com/thejameskyle/babel-plugin-react-flow-props-to-prop-types
-// - "Severity should be one of the following: 0 = off, 1 = warning, 2 = error"
-// - make more modular
+const useVue = true
+const useReact = false
+const useImport = false
+const useImportWebpackResolve = false
+const useImportNoCommonjs = false
+const useFlow = false
+const useNode = false
 
 
 module.exports = {
@@ -39,31 +27,31 @@ module.exports = {
 		sourceType: 'module',
 		// ecmaVersion: 2018,
 	},
-	env: {
+	env: Object.assign({
 		browser: true,
 		// es6: true,
-  	// node: true,
-	},
-	// extends: 'eslint:recommended',
-	extends: ['plugin:vue/recommended'],
-	// required to lint *.vue files
+	}, useNode? {
+		node: true,
+	}:{}),
+	extends: useVue? ['plugin:vue/recommended']: 'eslint:recommended',
+		// required to lint *.vue files
 	plugins: [
-		'vue',
-		// 'react',
-		// 'jsx-a11y',
-		// 'import',
-		// 'flowtype',
+		useVue && 'vue',
+		useReact && 'react',
+		useReact && 'jsx-a11y',
+		useImport && 'import',
+		useFlow && 'flowtype',
 		// 'prefer-object-spread',
-	],
+	].filter(function (a) {return !!a}),
 	// check if imports actually resolve
-	settings: {
+	settings: Object.assign({}, useImportWebpackResolve && {
 		'import/resolver': {
 			webpack: {
 				config: 'build/webpack.base.conf.js',
 			},
 		},
-	},
-	rules: {
+	} || {}),
+	rules: Object.assign({
 
 		'no-underscore-dangle': ['off', { allowAfterThis: true }],
 
@@ -193,7 +181,7 @@ module.exports = {
 			? ['error', { allow: ['warn', 'error'] }]
 			: ['warn', { allow: [
 				'warn', 'error',
-				'ignoredYellowBox', 'disableYellowBox',
+				'ignoredYellowBox', 'disableYellowBox', // for react native
 				...!allowConsoleLog?[]:['log', 'dir'],
 			] }],
 		'no-constant-condition': 'warn',
@@ -396,10 +384,14 @@ module.exports = {
 
 		// added
 		'no-multiple-empty-lines': ['warn', { max: 3, maxEOF: 0, maxBOF: 0 }],
+		
+		// misc
+		/*
+		'prefer-object-spread/prefer-object-spread': 2,
+		*/
 
 
-
-		/* import
+	}, useImport? {
 		'import/named': 2,
 		'import/no-unresolved': 'warn',
 		'import/default': 2,
@@ -408,7 +400,7 @@ module.exports = {
 		'import/first': 'warn',
 		'import/no-duplicates': 2,
 		'import/prefer-default-export': 0,
-		'import/no-commonjs': pureJS? 0: 2,
+		'import/no-commonjs': useImportNoCommonjs? 0: 2,
 		'import/no-amd': 2,
 		'import/no-nodejs-modules': 2,
 		'import/extensions': ['error', 'never', { js: 'never' }],
@@ -416,10 +408,9 @@ module.exports = {
 		// 'import/no-extraneous-dependencies': ['error', {
 		// 	optionalDependencies: ['test/unit/index.js'],
 		// }],
-		*/
 
 
-		/* react
+	}:{}, useReact? {
 		'react/prop-types': 2, // TODO
 		// 'no-unused-vars': 'off', // TODO
 		'no-unused-vars': ['warn', {
@@ -451,10 +442,9 @@ module.exports = {
 		'react/no-unknown-property': 2,
 		'react/react-in-jsx-scope': 2,
 		'react/require-render-return': 2,
-		*/
 
 
-		/* flowtype
+	}:{}, useFlow? {
 		// https://github.com/gajus/eslint-plugin-flowtype
 		// TODO: go through, config, and fix
 		'flowtype/boolean-style': [1, 'boolean'],
@@ -479,13 +469,12 @@ module.exports = {
 		'flowtype/union-intersection-spacing': [1, 'always'],
 		'flowtype/use-flow-type': 1,
 		'flowtype/valid-syntax': 1,
-		*/
 
 
-		// misc
-		/* 'prefer-object-spread/prefer-object-spread': 2, */
-
+	}:{}, useVue? {
 		'vue/max-attributes-per-line': 'off',
 		'vue/require-default-prop': 'off',
-	},
+
+		
+	}:{}),
 }

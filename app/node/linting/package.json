@@ -1,0 +1,22 @@
+{
+	"name": "@leonardpauli/eslint-config",
+	"version": "0.1.0",
+	"description": "Personal JS style",
+	"main": "index.js",
+	"scripts": {
+		"lint:compile": "echo \"require('fs').writeFileSync('.eslintrc', JSON.stringify(require('./.eslintrc.js')), 'utf-8')\" | node",
+		"test": "eslint ."
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com:LeonardPauli/docs.git"
+	},
+	"keywords": [
+		"eslint-config"
+	],
+	"author": "Leonard Pauli (https://leonardpauli.com)",
+	"devDependencies": {
+		"eslint": "^4.19.1"
+	},
+	"license": "ISC"
+}
