@@ -1,0 +1,48 @@
+# app/node/testing
+' LeonardPauli/docs
+	Created by Leonard Pauli, 24 may 2018
+
+
+jest.install:
+	prerequisites:
+		// see node/module/docs/base-setup-from-scratch
+		- eslint (optional)
+		- babel (optional)
+
+	// (app/node/linting includes necessary eslint fixes)
+	- npm i -D jest babel-jest babel-core@7.0.0-bridge.0
+	// - mkdir tests
+	- echo '{ "verbose": true }' | package-json-set-val jest -
+	- package-json-script-add '"test": "jest"'
+	- package-json-script-add '"test:watch": "jest --changedFilesWithAncestor --watch"'
+	- package-json-script-add '"test:coverage": "jest --coverage"'
+	// --logHeapUsage --runInBand --expose-gc
+	// --detectLeaks
+	// --json
+
+	' note:
+		- put tests in **/__tests__/**/*.js, or **/*.test.js
+		- importing from ../src (or lp-node-module-base/src) will not require npm run build:watch
+			though using lib instead of src with build:watch might be better depending on build setup
+
+coverage:
+	// TODO
+	' notes
+		// see https://softwareengineering.stackexchange.com/questions/272794/how-do-you-check-that-code-has-been-covered-automatically
+	' commit hook
+		// https://stackoverflow.com/questions/48345760/jest-running-tests-with-coverage-in-pre-commit-hook-exits-with-1-if-no-coverage
+		"jest": {
+			"collectCoverageFrom": ["src/**/*.js"],
+			"coveragePathIgnorePatterns": ["<rootDir>/src/models/"],
+			"coverageThreshold": {
+				"global": {
+					"branches": 80,
+					"functions": 80,
+					"lines": 80,
+					"statements": 80
+				}
+			}
+		},
+		"lint-staged": {
+			"*.js": ["eslint --fix", "git add", "jest --bail --passWithNoTests --coverage"]
+		}

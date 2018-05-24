@@ -487,7 +487,7 @@ module.exports = {
 			// https://stackoverflow.com/a/49211283/1054573
 			// for extend in overrides, see https://github.com/eslint/eslint/issues/8813
 			files: [
-				'**/__tests__/*-test.js',
+				'**/__tests__/**/*.js',
 				'**/*.test.js',
 			],
 			env: {
