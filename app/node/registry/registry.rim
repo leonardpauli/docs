@@ -6,6 +6,28 @@
 	
 npm: // v6
 	package.json
+		fields:
+			name: alt:
+				- my-package
+				- @org-or-username/my-package // has to be logged in with write access to @org...
+			version: 0.1.0
+			description:
+			main: see publish
+			scripts:
+				- test: "package commands ..." // npm test, exit 1 on errors
+					-> sh -c './node_modules/.bin/package commands ...'
+					// ./node_modules/.bin is in $PATH
+				- start: "..." // npm start
+				- custom: "..." // npm run custom
+				- custom:variant: "npm run custom -- additional args ..." // npm run custom:variant
+			author: "Fname Lname <name@email.com> (https://example.com)"
+			private: see publish
+			license: see admin/licensing/SPDX
+			keywords: []
+			files: see publish
+			devDependencies: ... // exclude when rm -rf node_modules; NODE_ENV=production && npm i
+			dependencies: ...
+
 		preserves indentation
 		// TODO: append instead of prepend + make add + set-(toplevel-)val both use same abstraction
 		- package-json-script-add () { vimx '/"scripts":\no\t\t'"$1"',\e' package.json; }
@@ -22,8 +44,9 @@ npm: // v6
 	npm get registry: https://registry.npmjs.org/
 
 	publish:
+		// warning: hard to unpublish + overwrite same version nr, see deprecate instead
 		- make edits
-		- fix entrypoint:
+		- fix entrypoint: // require('my-package') will use this script
 			alt:
 				- echo "module.exports = require('./lib')" > index.js
 				- package-json-set-val main "lib/index.js"
@@ -34,8 +57,9 @@ npm: // v6
 			- npm bump (package.json)? git tag?
 		- ensure you're logged in correctly to npm: npm whoami, or npm login ...
 		- inspect included files:
-			- echo 'true' | package-json-set-val private -
-			- npm publish --tag beta --access public // should fail because of private: true field, but still list included files
+			- echo 'true' | package-json-set-val private - // make npm publish fail
+			- npm publish --tag beta --access public // should fail, but still list included files
+				// TODO: better: use npm run-script build / npm build . ? (used by npm publish)
 			- to change: alt:
 				- using blacklist:
 					- package-json.remove "files"
@@ -44,10 +68,15 @@ npm: // v6
 				- using whitelist:
 					- echo '[ "lib/", "index.js", "__tests__/" ]' | package-json-set-val files -
 		- publish:
-			- echo 'false' | package-json-set-val private -
+			- echo 'false' | package-json-set-val private - // allow npm publish
 			- npm publish --access public
 		- check:
 			- npm info $name-of-package
+	deprecate:
+		- npm deprecate my-thing@"< 0.2.3" "critical bug fixed in v0.2.3"
+		reset:
+			- npm deprecate my-thing@"< 0.2.3" "" // note: empty message
+
 
 
 local: verdaccio

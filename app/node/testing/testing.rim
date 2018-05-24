@@ -25,7 +25,7 @@ jest.example.create:
 		- name="name-in-package-json"
 	- mkdir __tests__
 	- { cat > __tests__/example.js; } <<EOF
-		import lib from '$name' // see note in $lpdocs/app/node/testing
+		import lib from '$name/src' // see note in $lpdocs/app/node/testing
 
 		describe('simple', ()=> {
 			it('adds', ()=> {
@@ -33,11 +33,17 @@ jest.example.create:
 			})
 		})
 		EOF
+	
 
 	' note:
 		- put tests in **/__tests__/**/*.js, or **/*.test.js
 		- importing from ../src (or lp-node-module-base/src) will not require npm run build:watch
 			though using lib instead of src with build:watch might be better depending on build setup
+		- if using built ./lib
+			- use build:watch + test:watch during dev
+			- prevent tests from running twice:
+				- package.json."jest"."watchPathIgnorePatterns": ["src/"]
+
 
 coverage:
 	// TODO

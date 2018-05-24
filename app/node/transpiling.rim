@@ -50,6 +50,7 @@ babel // transpiles between different versions of JavaScript, eg. ES6+ (with new
 
 
 emscripten // C to webasm (JS)
+	// see http://kripken.github.io/emscripten-site/index.html
 coffeescript // custom version of JS to ES5
 
 ' refs:
