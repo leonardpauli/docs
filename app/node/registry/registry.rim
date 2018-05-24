@@ -12,7 +12,7 @@ npm: // v6
 			package-json-script-add '"dev": "..."'
 		- package-json-set-val () {key="$1"; val="$2"; [ "$val" = "-" ] && val="$(cat)" || val="\"$val\""; [ -z "$(cat package.json | grep '"'"$key"'":')" ] && vimx 'o\t"'"$key"'": '"$val"',\e' package.json || vimx ':%s/\("'"$key"'":\) ".*"\(\,\?\)$/\1 '"$val"'\2/\n' package.json; }
 			package-json-set-val license "AGPL-3.0-or-later"
-			echo "true" | package-json-set-val private -
+			echo 'true' | package-json-set-val private -
 		// see https://docs.npmjs.com/files/package.json
 	update: sudo npm i -g npm
 	cache:
@@ -21,15 +21,48 @@ npm: // v6
 		npm i --offline express
 	npm get registry: https://registry.npmjs.org/
 
+	publish:
+		- make edits
+		- fix entrypoint:
+			alt:
+				- echo "module.exports = require('./lib')" > index.js
+				- package-json-set-val main "lib/index.js"
+		- test:
+			- npm link
+			- (cd $other-project && npm link $project && npm run start or test) // check that it works as expected
+		- bump tag:
+			- npm bump (package.json)? git tag?
+		- ensure you're logged in correctly to npm: npm whoami, or npm login ...
+		- inspect included files:
+			- echo 'true' | package-json-set-val private -
+			- npm publish --tag beta --access public // should fail because of private: true field, but still list included files
+			- to change: alt:
+				- using blacklist:
+					- package-json.remove "files"
+					- modify .gitignore or:
+						- cp .gitignore .npmignore && vi .npmignore
+				- using whitelist:
+					- echo '[ "lib/", "index.js", "__tests__/" ]' | package-json-set-val files -
+		- publish:
+			- echo 'false' | package-json-set-val private -
+			- npm publish --access public
+		- check:
+			- npm info $name-of-package
+
+
 local: verdaccio
 	see ./local
 	usage:
 		- $lpdocs/app/node/registry/local/start
 		osx:
-			- "http://0.0.0.0:4873/"
-			- npm set registry http://0.0.0.0:4873
-				alt: export npm_config_registry='http://0.0.0.0:4873'
-			- optional: npm adduser --registry http://0.0.0.0:4873
+			- npm_local_reg="http://0.0.0.0:4873/"
+			- usage:
+				- npm (i, whoami, publish ...) --registry $npm_local_reg
+				- npm (i, whoami, publish ...)
+					prerequisites:
+						- npm set registry $npm_local_reg
+							alt: export npm_config_registry="$npm_local_reg"
+			- optional: npm adduser --registry $npm_local_reg
 		docker-compose.prod:
 			see terminal/containers/examples/build-host-net
 			- Dockerfile

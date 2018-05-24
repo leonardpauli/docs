@@ -20,6 +20,20 @@ jest.install:
 	// --detectLeaks
 	// --json
 
+jest.example.create:
+	prerequisites:
+		- name="name-in-package-json"
+	- mkdir __tests__
+	- { cat > __tests__/example.js; } <<EOF
+		import lib from '$name' // see note in $lpdocs/app/node/testing
+
+		describe('simple', ()=> {
+			it('adds', ()=> {
+				expect(1+1).toBe(2)
+			})
+		})
+		EOF
+
 	' note:
 		- put tests in **/__tests__/**/*.js, or **/*.test.js
 		- importing from ../src (or lp-node-module-base/src) will not require npm run build:watch

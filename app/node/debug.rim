@@ -1,0 +1,11 @@
+# app/node/debug
+' LeonardPauli/docs
+	Created by Leonard Pauli, 24 may 2018
+
+' TODO:
+	- using node --inspect flag etc
+	- chrome dev tools (+ own file with all tricks)
+	- vue dev tools (in vue)
+	- react dev tools (in react)
+	- see memory
+	- see testing

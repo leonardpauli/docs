@@ -41,12 +41,7 @@ npm module:
 		- edit .eslintrc.js
 		// - npm run lint:compile
 			// TODO: use .eslintrc with '{ "extends": "./.eslintrc.js" }' instead if working
-		test:
-			- npm link
-			- (cd $other-project && npm link $lint_config_name && npm run lint) // check as expected
-		- bump tag:
-			- npm bump (package.json)? git tag?
-			- npm publish --tag beta --access public
+		- do $lpdocs/app/node/registry.npm.publish		
 
 
 ' TODO:
