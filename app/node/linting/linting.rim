@@ -15,7 +15,7 @@ install:
 			- package-json-script-add '"lint:compile": "echo \"'"require('fs').writeFileSync('.eslintrc', JSON.stringify(require('./.eslintrc.js')), 'utf-8')"'\" | node"'
 			- npm run lint:compile
 	module:
-		- npm i -D $lint_config_name eslint-plugin-vue
+		- npm i -D $lint_config_name eslint-plugin-vue eslint-plugin-jest
 		- echo '{ "extends": "'"$lint_config_name"'" }' > .eslintrc
 		// alt: { "extends": "@scope/eslint-config" } -> { "extends": "@scope" }
 		// alt: { "extends": "@scope/eslint-config-some-name" } -> { "extends": "@scope/eslint-config-some-name" }

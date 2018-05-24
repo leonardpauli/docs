@@ -1,6 +1,6 @@
 {
 	"name": "@leonardpauli/eslint-config",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Personal JS style",
 	"main": "index.js",
 	"scripts": {
@@ -15,8 +15,10 @@
 		"eslint-config"
 	],
 	"author": "Leonard Pauli (https://leonardpauli.com)",
-	"devDependencies": {
-		"eslint": "^4.19.1"
+	"peerDependencies": {
+		"eslint": ">= 4",
+		"eslint-plugin-jest": ">= 21",
+		"eslint-plugin-vue": ">= 4"
 	},
 	"license": "ISC"
 }

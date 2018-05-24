@@ -23,6 +23,11 @@ SPDX // Software Package Data Exchange
 	// TODO
 - use a file with all acknowledgements
 
+- dual licensing
+	// see https://caddyserver.com/products/licenses
+	// https://github.com/mholt/caddy/blob/master/.github/CONTRIBUTING.md
+
+
 OSS licenses: // Open Source Software licenses
 	// see https://choosealicense.com/
 	// see https://choosealicense.com/licenses/
