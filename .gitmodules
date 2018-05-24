@@ -7,3 +7,6 @@
 [submodule "app/vue/lib"]
 	path = app/vue/lib
 	url = git@github.com:LeonardPauli/lp-vue-lib.git
+[submodule "app/data/moduler"]
+	path = app/data/moduler
+	url = git@github.com:LeonardPauli/data-moduler.git
