@@ -376,3 +376,6 @@ cronjob: // helper for interacting with cron (from greek work for time), schedul
 			MAILTO=email@domain.com
 		add: (crontab -l && echo "$schedule cd '$(pwd)' && $command # $cron_prefix $name") | crontab -
 		remove: (crontab -l | sed -E "s/.* # $cron_prefix.*/ /g" | sed '/^ $/d') | crontab -
+
+date:
+	currentYear="$(date +"%Y")" // 2018

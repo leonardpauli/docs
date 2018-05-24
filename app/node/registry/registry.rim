@@ -34,6 +34,7 @@ npm: // v6
 			package-json-script-add '"dev": "..."'
 		- package-json-set-val () {key="$1"; val="$2"; [ "$val" = "-" ] && val="$(cat)" || val="\"$val\""; [ -z "$(cat package.json | grep '"'"$key"'":')" ] && vimx 'o\t"'"$key"'": '"$val"',\e' package.json || vimx ':%s/\("'"$key"'":\) ".*"\(\,\?\)$/\1 '"$val"'\2/\n' package.json; }
 			package-json-set-val license "AGPL-3.0-or-later"
+			// TODO: won't work for package-json-set-val author "... http://..." // the / conflics with %s
 			echo 'true' | package-json-set-val private -
 		// see https://docs.npmjs.com/files/package.json
 	update: sudo npm i -g npm
