@@ -1,0 +1,32 @@
+# docs/backend/nginx/base/docs/todo
+' LeonardPauli/docs
+	Added by Leonard Pauli, 27 may 2018
+
+// ssl.prod
+	// test let's encrypt manually
+		// fix linked permissions
+			// first on local
+			// check kept on renew
+			// make sure nginx can read
+			// move to prod
+	// make it into the ssl.prod.sh script
+	// try using deploy
+	// switch from staging to prod (let's encrypt)
+	// commit
+// make reusable
+	// plan
+	// rename
+	// ssl/ssl-manager
+		// - test ssl-manager server
+		// - test ssl-manager with local
+		// - test renewal
+		// - test simple deploy and prod staging
+		// example
+		// test generate
+		// test renewal
+	// nginx/base
+		// example-simple
+	// nginx/base/example
+		// ssl/ssl-manager/example but with example-simple as server
+	// creates nginx/base/example at desired location
+// www redirect option

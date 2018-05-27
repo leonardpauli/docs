@@ -86,3 +86,43 @@ commands.reference
 	- `man git-submodules` - have one repository inside another, useful if two repositories shares some code
 	- `git clone` - create a local clone of a remote repository, and setup remote etc
 	- `git reflog` - if commit on HEAD got lost, find its sha there and `git checkout <sha>; git checkout -b my-new-branch`
+
+
+submodule:
+	// what does git clone inside existing repo do?
+	prerequisites:
+		- cd $project // the parent repo
+		repository="git@github.com:user/repo.git"
+		parent_path="path/to"
+		folder_name="my-sub"
+		s_path="$parent_path/$folder_name"
+	fix git:
+		- git config --global status.submoduleSummary true
+	add existing:
+		- cd $parent_path
+		- git submodule add $repository $folder_name
+			' will add:
+				- $parent_path/$folder_name/.git: file with "gitdir: $project/modules/$parent_path/$folder_name/.git"
+				- $project/.git/modules/$parent_path/$folder_name: actual .git directory
+				-	$project/.git/config.[submodule "$parent_path/$folder_name"]
+					url = $repository
+		- git commit -m "added submodule $folder_name"
+	edit:
+		- cd $folder_name
+		- make changes
+		- git add . && git commit -m "changes ..." && git push // commit child
+		- cd ..
+		- git add $folder_name && git commit -m "updated submodule" && git push // commit parent
+	move:
+		- git mv $s_path $parent_path_changed/$folder_name_changed
+		- git commit -m "renamed / mv:ed submodule"
+	remove:
+		// https://stackoverflow.com/a/36593218
+		- git submodule deinit -f $s_path // remove submodule entry from .git/config
+			// - git config -f .git/config --remove-section submodule.$parent_path/$folder_name 2> /dev/null
+		- rm -rf .git/modules/$s_path // remove submodule .git directory
+		- git rm -f $s_path // remove entry in .gitmodules and remove submodule directory ($s_path)
+	init project: // after clone / pull with new submodule
+		- git submodule update --init --recursive
+		// git pull --recurse-submodules origin master
+

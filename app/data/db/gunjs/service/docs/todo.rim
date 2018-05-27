@@ -1,0 +1,16 @@
+# app/data/db/gunjs/service/docs/todo
+' LeonardPauli/docs
+	Created by Leonard Pauli, 27 may 2018
+
+LeonardPauli/docs-data-gundb-service
+	- create service
+	- use docker + volume
+	- use example docker-compose + .env
+	- configure storage engine with .env, with good defaults, use config.js format
+	- use node --max-old-space-size=10000 ... if wanted
+	// later: - allow backups to s3
+	- add simple readme + AGPL licence
+	- commit
+	- git + docker tag + docker build + docker push
+	// later: - fix update script that bumps tags + pushes
+	- add comments on how to use with lp-vue-base (in docker-compose, etc) + test // or enable by default?
