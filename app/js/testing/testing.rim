@@ -1,0 +1,10 @@
+# app/node/testing
+' LeonardPauli/docs
+	Created by Leonard Pauli, 24 may 2018
+
+jest: ./jest
+
+coverage:
+	// TODO
+	' notes
+		// see https://softwareengineering.stackexchange.com/questions/272794/how-do-you-check-that-code-has-been-covered-automatically

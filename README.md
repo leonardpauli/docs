@@ -1,7 +1,7 @@
 # Docs
 *Personal collection of development related notes, snippets, and workflows*
 
-_See contents.rim_
+_See docs/contents.rim_
 
 
 ### How to read
@@ -18,3 +18,4 @@ Copyright © Leonard Pauli, 2018
 Licence: GNU Affero General Public License v3.0
 
 (except when noted otherwise, eg. external submodules etc)
+For commersial / closed-source / custom licencing needs, please contact us.

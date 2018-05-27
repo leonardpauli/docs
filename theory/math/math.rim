@@ -1,0 +1,41 @@
+# math
+' LeonardPauli/docs
+	Created by Leonard Pauli, 29 mar 2018
+
+// https://github.com/rossant/awesome-math
+
+Notes
+
+arithmetic // https://en.wikipedia.org/wiki/Arithmetic
+algebra // https://en.wikipedia.org/wiki/Algebra
+
+number sets
+	natural // https://en.wikipedia.org/wiki/Natural_number
+		N: {0, 1, 2, ...}
+	integer
+		Z: {..., -2, -1, 0, 1, 2, ...}
+	rational // https://en.wikipedia.org/wiki/Rational_number
+		Q: {x | x = a/b; a, b in Z and b isn't 0}
+	irrational // https://en.wikipedia.org/wiki/Irrational_number
+
+	real
+		R: 
+division
+exponentiation // https://en.wikipedia.org/wiki/Exponentiation
+	with integer exponent
+	with rational exponent
+absolute value
+square root
+
+
+' interesting fields
+	- category theory
+		- set theory
+			https://www.quora.com/Whats-the-difference-between-category-theory-and-set-theory
+		// https://math.stackexchange.com/questions/1519330/is-it-possible-to-formulate-category-theory-without-set-theory
+		// https://gilkalai.wordpress.com/2008/12/04/can-category-theory-serve-as-the-foundation-of-mathematics/
+	- lambda calculus
+	- graph theory
+	- algebra
+	- linear algebra
+	- linear optimisation

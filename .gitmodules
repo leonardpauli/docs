@@ -1,5 +1,5 @@
 [submodule "terminal/ssl/ssl-manager/acme.sh"]
-	path = terminal/ssl/ssl-manager/acme.sh
+	path = os/network/ssl/ssl-manager/acme.sh
 	url = git@github.com:Neilpang/acme.sh.git
 [submodule "app/vue/base"]
 	path = app/vue/base
@@ -10,3 +10,6 @@
 [submodule "app/data/moduler"]
 	path = app/data/moduler
 	url = git@github.com:LeonardPauli/data-moduler.git
+[submodule "app/js/module/base"]
+	path = app/js/module/base
+	url = git@github.com:LeonardPauli/lp-node-module-base.git

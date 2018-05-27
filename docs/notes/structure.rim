@@ -1,0 +1,35 @@
+
+js utilities
+	base/environment
+	object-to-string
+js modules
+	base/environment
+		container, dev + ci
+			for node
+				local registry caching
+		admin
+	data-moduler
+
+vue
+	web-base
+		is base from cli
+		is js module base
+			container,
+				dev
+					nginx proxy + ssl
+				ci/tests
+				prod
+					nginx serve static + ssl
+		js utilities
+		web-components
+		data-moduler
+	web-components
+		data-moduler
+
+
+todo:
+	node
+		rename
+			using-container to container
+			*ing to *
+			it to js?
