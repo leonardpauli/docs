@@ -7,21 +7,21 @@
 
 cleanup structure:
 	- os / ubuntu
-	- ssl / nginx.ssl
 	- security/* names
-	- sort tosort/*
 
 thoughs:
-	- use submodules? or better way to get nested git repos? // eg. for services, other resources, etc
-		- no licence problems? ok to just state, submodules are just for referenceing, with their own licences etc?
+	// - use submodules? or better way to get nested git repos? // eg. for services, other resources, etc
+		// - no licence problems? ok to just state, submodules are just for referenceing, with their own licences etc?
 	- sync with nodenotes when ready
-	- open up personal todo list?
+	- open up personal todo list? nah, keep it "personal"
+		- freedom to include info possibly sensitive to other people (meeting locations, etc)
+		- try extract + open up sublist as much as possible + copy back completed tasks
 	- improved guides // eg. practical example with all technologies, step by step using refs
 	- move terminal.server.troubleshooting to new devops file?
 
 items:
 	- take out mainpoints for admin.privacy.gdpr
-	- s/sed -e/sed -E/ where necessary
+	- s/sed -e/sed -E/ where necessary?
 	- add terminal/git/templates etc for github
 	- add terminal/git: see https://github.com/node-gh/gh
 	- add terminal/project-setup: https://lernajs.io/

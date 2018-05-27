@@ -1,9 +1,9 @@
-# app/node/testing
+# app/node/testing/jest
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 24 may 2018
 
 
-jest.install:
+install:
 	prerequisites:
 		// see node/module/docs/base-setup-from-scratch
 		- eslint (optional)
@@ -20,7 +20,7 @@ jest.install:
 	// --detectLeaks
 	// --json
 
-jest.example.create:
+example.create:
 	prerequisites:
 		- name="name-in-package-json"
 	- mkdir __tests__
@@ -47,8 +47,6 @@ jest.example.create:
 
 coverage:
 	// TODO
-	' notes
-		// see https://softwareengineering.stackexchange.com/questions/272794/how-do-you-check-that-code-has-been-covered-automatically
 	' commit hook
 		// https://stackoverflow.com/questions/48345760/jest-running-tests-with-coverage-in-pre-commit-hook-exits-with-1-if-no-coverage
 		"jest": {

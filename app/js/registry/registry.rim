@@ -24,6 +24,8 @@ npm: // v6
 			private: see publish
 			license: see admin/licensing/SPDX
 			keywords: []
+			homepage: "https://github.com/owner/repo#readme"
+			repository: {type: "git", url: "https://github.com/owner/repo.git"}
 			files: see publish
 			devDependencies: ... // exclude when rm -rf node_modules; NODE_ENV=production && npm i
 			dependencies: ...
