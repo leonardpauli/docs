@@ -13,3 +13,12 @@
 [submodule "app/js/module/base"]
 	path = app/js/module/base
 	url = git@github.com:LeonardPauli/lp-node-module-base.git
+[submodule "design/sketch/plugins/sketch-dev-tools"]
+	path = design/sketch/plugins/sketch-dev-tools
+	url = git@github.com:skpm/sketch-dev-tools.git
+[submodule "app/node/streams/modules/split"]
+	path = app/node/streams/modules/split
+	url = git@github.com:dominictarr/split.git
+[submodule "app/node/streams/stream-handbook"]
+	path = app/node/streams/stream-handbook
+	url = git@github.com:substack/stream-handbook.git

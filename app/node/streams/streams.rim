@@ -1,0 +1,13 @@
+# app/node/streams
+' LeonardPauli/docs
+	Created by Leonard Pauli, 31 may 2018
+
+// process data continuously
+
+see ./example.js
+see ./utils.js
+
+' refs:
+	https://github.com/substack/stream-handbook
+	https://github.com/maxogden/mississippi
+	https://www.npmjs.com/package/split
