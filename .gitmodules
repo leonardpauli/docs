@@ -12,7 +12,7 @@
 	url = git@github.com:LeonardPauli/data-moduler.git
 [submodule "app/js/module/base"]
 	path = app/js/module/base
-	url = git@github.com:LeonardPauli/lp-node-module-base.git
+	url = git@github.com:LeonardPauli/js-module-base.git
 [submodule "design/sketch/plugins/sketch-dev-tools"]
 	path = design/sketch/plugins/sketch-dev-tools
 	url = git@github.com:skpm/sketch-dev-tools.git
