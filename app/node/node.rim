@@ -4,6 +4,10 @@
 
 // javascript runtime
 
+learn:
+	// see "https://www.youtube.com/watch?v=pFw-hEroqFs&list=PLfiFyFs7K9sw_8vM_9fDPJrGO2YTm1yR0
+		// TUTORIALS AND TRAINING, TODO: find the original (on lynda ?)
+
 v8: // compiler
 	optimization:
 		inlining:

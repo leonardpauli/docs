@@ -88,6 +88,24 @@ commands.reference
 	- `git reflog` - if commit on HEAD got lost, find its sha there and `git checkout <sha>; git checkout -b my-new-branch`
 
 
+branch:
+	move/rename:
+		// https://www.w3docs.com/snippets/git/how-to-rename-git-local-and-remote-branches.html
+		- git branch -m new-name // if current
+			alt: - git branch -m old-name new-name // if other
+		- git push -u origin new-name // push new branch + set tracking to origin
+		// if origin is github + changeing main branch: change main branch
+		- git push origin :old-name // push deletion of old-name to origin
+		' if repo-name changed:
+			- git remote set-url origin git@github.com:LeonardPauli/new-name
+			if submodule:
+				// https://stackoverflow.com/questions/913701/changing-remote-repository-for-a-git-submodule
+				alt: - vi $project/.gitmodules
+				- git config --file=.gitmodules submodule.$submodule.url $new-repo
+				// - git config --file=.gitmodules submodule.$submodule.branch $new-branch
+				// - git submodule sync
+
+
 submodule:
 	// what does git clone inside existing repo do?
 	prerequisites:

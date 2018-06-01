@@ -14,7 +14,7 @@ babel // transpiles between different versions of JavaScript, eg. ES6+ (with new
 		- { cat > .babelrc } <<EOF
 			{
 				"presets": [
-					["@vue/app", { targets: { node: "current" }, modules: "commonjs" }]
+					["@vue/app", { "targets": { "node": "current" }, "modules": "commonjs" }]
 				]
 			}
 			EOF

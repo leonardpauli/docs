@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-#	docs/app/misc/git-hook-runner-inner.sh
+#	docs/app/repo/git-hook-runner-inner.sh
 # Created by Leonard Pauli, 24 apr 2018
 # based on script from yorkie (husky), made reusable by Leonard Pauli, 24 apr 2018
 # usage: (cd repo && ./git-hook-runner.sh pre-commit $*) || exit 1

@@ -1,13 +1,14 @@
 #!/usr/bin/env sh
-#	docs/app/misc/git-hook-runner.sh
+#	docs/app/repo/git-hook-runner.sh
 # Created by Leonard Pauli, 24 apr 2018
 # <script> install all; <script> install pre-commit commit-msg;
 # <script> install -noop all
+project="$(pwd)"
 inner_runner_parents_default="$(for f in */package.json; do echo "${f%/*}"; done)"
 inner_runner_parents="${inner_runner_parents:-$inner_runner_parents_default}" # or "subdir1 subdir2/path app/vue/base/web" for multiple
 # todo: get inner_runner_parents from .env or similar to avoid changing this file
 
-script_dir () { (a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}; echo "$a"); }
+# script_dir () { (a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}; echo "$a"); }
 
 all_hooks="applypatch-msg commit-msg prepare-commit-msg push-to-checkout sendemail-validate update"
 all_hooks="$all_hooks pre-applypatch pre-auto-gc pre-commit pre-push pre-rebase pre-receive"
@@ -19,7 +20,6 @@ if [ "$1" = "install" ]; then
 	use_noop=""; if [ "$1" = "-noop" ]; then use_noop="1"; shift; fi
 	enabled_hooks="$*"; if [ "$1" = "all" ]; then enabled_hooks="$all_hooks"; fi
 
-	project="$(script_dir)"
 	git_dir="$project/.git"
 	if [ -f "$git_dir" ]; then
 		git_dir="$(cat .git | grep 'gitdir:' | head -n 1 | tr -d '\n')"
@@ -40,7 +40,7 @@ if [ "$1" = "install" ]; then
 			else
 				cat <<-EOF > $hook_file
 				#!/usr/bin/env sh
-				./git-hook-runner.sh $hook_name \$*
+				\$lpdocs/app/repo/git-hook-runner.sh $hook_name \$*
 				EOF
 			fi
 			chmod u+x $hook_file
