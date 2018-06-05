@@ -1,0 +1,101 @@
+# design/sketch/plugins/create
+' LeonardPauli/docs
+	Created by Leonard Pauli, 27 may 2018
+
+prerequisites:
+	- npm install -g skpm // install "sketch plugin manager"
+		// https://github.com/skpm/skpm
+	- defaults write ~/Library/Preferences/com.bohemiancoding.sketch3.plist "Plugin Editor" "/Users/leonardpauli/bin/subl"
+		// https://developer.sketchapp.com/guides/preferences/
+	see "https://developer.sketchapp.com/reference/api/
+	see "http://sketchplugins.com/"
+
+TODO: see "https://github.com/skpm/with-webview"
+	https://github.com/skpm/sketch-module-web-view
+
+TODO: see "https://github.com/turbobabr/Sketch-Plugins-Cookbook"
+// TODO: see "https://github.com/turbobabr/sketch-wanderer"
+
+
+manual reload of long-running scripts:
+	- disable script caching:
+		defaults write ~/Library/Preferences/com.bohemiancoding.sketch3.plist AlwaysReloadScript -bool YES
+	- add tear down hook
+		const ver = 1
+		coscript.setShouldKeepAround(true)
+		console.log('STARTED: '+ver)
+		// (do long-running things ...)
+		const tearDown = ()=> {
+			// browserWindow.close()
+			coscript.setShouldKeepAround(false); // allow session tear down
+			throw(null) // force tear down start
+		}
+		setTimeout(tearDown, 5000) // alt in menu/keyboard/window close trigger
+	- install script by link
+		- npm run build
+		- ln -s "$(pwd)/$plugin.sketchplugin" ~/Library/Application\ Support/com.bohemiancoding.sketch3/Plugins/$plugin.sketchplugin
+		- start sketch // restart not necessary if already started
+	- iterate
+		- edit source (eg. change "ver" in demo above)
+		- npm run build
+		- start script from sketch (through shortcut or sketch runner, eg "cmd-', enter" after first time)
+			// if getting previous ver, it hadn't finished tear down, or AlwaysReloadScript flag not set
+		- trigger tearDown // eg. await timeout, before running again
+		
+	' TODO: auto-trigger on `npm run start --run` or `npm run start --run some-action-defined-in-manifest`
+		- plugin source code change detected (not webview, that's for webpack to take care of)
+		- send some command either to sketch or directly to the plugin to trigger the plugin's tearDown
+		- re-build
+		- trigger the plugin start comment in sketch (if provided with `--run`)
+
+
+
+working with webview:
+	defaults write com.bohemiancoding.sketch3 WebKitDeveloperExtras -bool true
+
+
+
+create:
+	- saved_p="$(pwd)"; name="my-plugin"
+	- cd $lpdocs/files
+	- skpm create --template skpm/with-prettier --name "My Plugin" $name && cd $_
+	- github.create repo && git remote add origin $repo && git push -u origin master
+	- cd .. && rm -rf $name && cd "$saved_p" && git submodule add $repo $name && cd $name
+	- vi package.json: // required for publish later on
+		"repository" : {
+			"type": "git",
+			"url": "git+https://github.com/ORG/NAME.git"
+		}
+
+dev:
+	prerequisites:
+		- npm install -g prettier && sublime-text.package-control.install JsPrettier
+		- npm i
+	- setup:
+		- npm run (start if auto-run or watch (if manually trigger, eg from menubar))
+		- open Sketch, open document
+	- dev:
+		- do menubar.Plugins.my-plugin."My Command"
+		- subl . && edit src/my-command.js
+			// console.log(context.document.pages()[0].layers()[0].treeAsDictionary())
+		- repeat
+	debugging:
+		- use console.log
+		- skpm log -f -n 10
+
+publish:
+	// - npm run build // necessary?
+	- skpm publish (<new-version>, major, minor, patch, premajor, preminor, prepatch, or prerelease)
+
+
+' refs:
+	- https://developer.sketchapp.com/guides/first-plugin/
+		// they've made it great! just read it
+	- https://github.com/skpm/skpm
+		// woah, neat!
+	- https://docs.npmjs.com/misc/semver
+		- https://github.com/dbrock/semver-howto, https://semver.org/
+	other plugins for source inspection:
+		- https://github.com/aclarkk/sketch-plugins
+	shell scripts from plugin:
+		- http://sketchplugins.com/d/727-sketch-shell-terminal

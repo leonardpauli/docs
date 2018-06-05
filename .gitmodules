@@ -1,6 +1,7 @@
 [submodule "terminal/ssl/ssl-manager/acme.sh"]
 	path = os/network/ssl/ssl-manager/acme.sh
 	url = git@github.com:Neilpang/acme.sh.git
+	shallow = true
 [submodule "app/vue/base"]
 	path = app/vue/base
 	url = git@github.com:LeonardPauli/lp-vue-base.git
@@ -16,9 +17,28 @@
 [submodule "design/sketch/plugins/sketch-dev-tools"]
 	path = design/sketch/plugins/sketch-dev-tools
 	url = git@github.com:skpm/sketch-dev-tools.git
+	shallow = true
 [submodule "app/node/streams/modules/split"]
 	path = app/node/streams/modules/split
 	url = git@github.com:dominictarr/split.git
+	shallow = true
 [submodule "app/node/streams/stream-handbook"]
 	path = app/node/streams/stream-handbook
 	url = git@github.com:substack/stream-handbook.git
+	shallow = true
+[submodule "design/sketch/plugins/skpm"]
+	path = design/sketch/plugins/skpm
+	url = git@github.com:skpm/skpm.git
+	shallow = true
+[submodule "app/js/module/string-from-object"]
+	path = app/js/module/string-from-object
+	url = git@github.com:leonardpauli/string-from-object.git
+[submodule "design/sketch/plugins/cocoascript-class"]
+	path = design/sketch/plugins/dependencies/cocoascript-class
+	url = git@github.com:leonardpauli/cocoascript-class.git
+[submodule "design/sketch/plugins/sketch-module-web-view"]
+	path = design/sketch/plugins/dependencies/sketch-module-web-view
+	url = git@github.com:leonardpauli/sketch-module-web-view.git
+[submodule "design/sketch/plugins/layer-renamer"]
+	path = design/sketch/plugins/layer-renamer
+	url = git@github.com:leonardpauli/layer-renamer.git
