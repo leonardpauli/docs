@@ -60,8 +60,7 @@ npm: // v6
 			- npm bump (package.json)? git tag?
 		- ensure you're logged in correctly to npm: npm whoami, or npm login ...
 		- inspect included files:
-			- echo 'true' | package-json-set-val private - // make npm publish fail
-			- npm publish --tag beta --access public // should fail, but still list included files
+			//- npm publish --tag beta --access public // should fail, but still list included files
 				// TODO: better: use npm run-script build / npm build . ? (used by npm publish)
 			- to change: alt:
 				- using blacklist:

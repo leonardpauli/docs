@@ -26,5 +26,18 @@ tooling:
 		- alt: mocka, etc
 
 
+locations:
+	nodejs; see ../node
+	browsers; see debugging.dev-tools.console
+	osx // JavaScriptCore
+		// see https://stackoverflow.com/questions/6830192/how-to-run-javascript-using-jsc-on-os-x
+		// http://www.phpied.com/javascript-shell-scripting/
+		ln -s /System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc /usr/local/bin
+		echo 'const a = 1+2; debug(a); arguments' | jsc -- some flags
+		jsc demo.js
+		jsc: Object.keys(this)
+
+
+
 ' to read:
 	https://jgthms.com/javascript-in-14-minutes/

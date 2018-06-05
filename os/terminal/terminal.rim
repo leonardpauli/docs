@@ -6,6 +6,7 @@
 
 // TODO
 // https://www.tldp.org/LDP/abs/html/fto.html
+// see http://www.grymoire.com/Unix/Sh.html
 
 customize:
 	- install ohmyzsh // framework for managing zsh configuration
@@ -120,6 +121,26 @@ files:
 		cleanup: trap "rm -rf $MYTMPDIR" EXIT
 			// makes sure it's cleaned up upon (unexpected + normal) exit
 
+	permissions:
+		// see http://www.grymoire.com/Unix/Permissions.html
+		chmod 755 myfile // 7 = 111 = rwx, 5 = 101 (binary) = r-x, ...
+		chmod u=rwx,g=rx,o=rx myfile // User = Read Write eXecute, Group = ..., Other = ...
+		// ls -l myfile | awk '{print $1}' // -rwxr-xr-x
+		on directories:
+			execute allows "searching" for files inside
+			write allows deleting + renaming files
+
+	directory:
+		just a file containing a list of contents as filenames with inodes
+
+	inode // see http://www.grymoire.com/Unix/Inodes.html
+		file containing:
+			- address to where the file data is stored on disk
+			- size
+			- permissions
+			- nr of hard links // gets deleted if hard linkes goes to 0?
+			- created/updated dates, etc
+
 	links:
 		// permissions are stored in inode, not file, so chmod link might affect the target inode, but not the link itself
 		// see https://linuxgazette.net/105/pitcher.html
@@ -145,6 +166,7 @@ text processing:
 		cat file | grep -E "search phrase"
 		grep -o // only show output
 	- sed
+		// see http://www.grymoire.com/Unix/sed.html
 		echo "hej world" | sed "s/hej/hello/g"
 		echo "ca.b" | sed -E "s/a\.b|^c/x/g"
 			"-E": extended regex
@@ -155,6 +177,14 @@ text processing:
 			// "\t" doesn't always work is sed
 			// alt. (ctrl-v, tab), to insert tab char directly
 			// https://stackoverflow.com/questions/2610115/why-is-sed-not-recognizing-t-as-a-tab
+	- awk
+		// see http://www.grymoire.com/Unix/Awk.html
+		- ls -l | awk '\
+			BEGIN { print "File\tOwner" } \
+						{ print $9, "\t", $3}	\
+			END 	{ print " - DONE -" } \
+			'
+		- ls -l | awk '{print $9}'
 	- pbcopy // copy to clipboard
 		echo "..." | pbcopy
 

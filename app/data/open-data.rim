@@ -12,3 +12,6 @@ code:
 
 other:
 	- "https://aws.amazon.com/public-datasets/"
+
+' to see:
+	http://comunica.linkeddatafragments.org/ - "A Web framework to query Linked Data interfaces"

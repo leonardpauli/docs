@@ -1,0 +1,13 @@
+# app/compiler
+' LeonardPauli/docs
+	Created by Leonard Pauli, 2 jun 2018
+
+' links:
+	Programming Is Magic (aka Reinventing the Parser Generator)
+		// David Beazley, PyCon USA 2018
+		// modernization of the PLY project that abandons its past and freely abuses modern Python features including advanced metaclasses, guaranteed dictionary ordering, class decorators, type hints, and more
+		https://www.youtube.com/watch?v=PzjoNnnSae8
+		https://www.youtube.com/watch?v=zJ9z6Ge-vXs
+	Kenneth Reitz - pipenv
+	Russell Keith-Magee - Building a cross-platform native app with BeeWare - PyCon 2018
+		// https://www.youtube.com/watch?v=qaPzlIJ57dk
