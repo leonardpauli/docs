@@ -1,0 +1,77 @@
+# example output from arduino ide compilation + upload
+
+Sketch uses 1,066 bytes (3%) of program storage space. Maximum is 30,720 bytes.
+Global variables use 9 bytes (0%) of dynamic memory, leaving 2,039 bytes for local variables. Maximum is 2,048 bytes.
+/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avrdude -C/Applications/Arduino.app/Contents/Java/hardware/tools/avr/etc/avrdude.conf -v -patmega328p -carduino -P/dev/cu.wchusbserial1420 -b57600 -D -Uflash:w:/var/folders/80/zb0lbp690wq1wv3n541p4qn40000gn/T/buildd5ae82e677127ac286f51de66781d807.tmp/Blink.ino.hex:i 
+
+avrdude: Version 6.0.1, compiled on Apr 14 2015 at 16:30:25
+				 Copyright (c) 2000-2005 Brian Dean, http://www.bdmicro.com/
+				 Copyright (c) 2007-2009 Joerg Wunsch
+
+				 System wide configuration file is "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/etc/avrdude.conf"
+				 User configuration file is "/Users/leonardpauli/.avrduderc"
+				 User configuration file does not exist or is not a regular file, skipping
+
+				 Using Port                    : /dev/cu.wchusbserial1420
+				 Using Programmer              : arduino
+				 Overriding Baud Rate          : 57600
+				 AVR Part                      : ATmega328P
+				 Chip Erase delay              : 9000 us
+				 PAGEL                         : PD7
+				 BS2                           : PC2
+				 RESET disposition             : dedicated
+				 RETRY pulse                   : SCK
+				 serial program mode           : yes
+				 parallel program mode         : yes
+				 Timeout                       : 200
+				 StabDelay                     : 100
+				 CmdexeDelay                   : 25
+				 SyncLoops                     : 32
+				 ByteDelay                     : 0
+				 PollIndex                     : 3
+				 PollValue                     : 0x53
+				 Memory Detail                 :
+
+																	Block Poll               Page                       Polled
+					 Memory Type Mode Delay Size  Indx Paged  Size   Size #Pages MinW  MaxW   ReadBack
+					 ----------- ---- ----- ----- ---- ------ ------ ---- ------ ----- ----- ---------
+					 eeprom        65    20     4    0 no       1024    4      0  3600  3600 0xff 0xff
+					 flash         65     6   128    0 yes     32768  128    256  4500  4500 0xff 0xff
+					 lfuse          0     0     0    0 no          1    0      0  4500  4500 0x00 0x00
+					 hfuse          0     0     0    0 no          1    0      0  4500  4500 0x00 0x00
+					 efuse          0     0     0    0 no          1    0      0  4500  4500 0x00 0x00
+					 lock           0     0     0    0 no          1    0      0  4500  4500 0x00 0x00
+					 calibration    0     0     0    0 no          1    0      0     0     0 0x00 0x00
+					 signature      0     0     0    0 no          3    0      0     0     0 0x00 0x00
+
+				 Programmer Type : Arduino
+				 Description     : Arduino
+				 Hardware Version: 2
+				 Firmware Version: 1.16
+				 Vtarget         : 0.0 V
+				 Varef           : 0.0 V
+				 Oscillator      : Off
+				 SCK period      : 0.1 us
+
+avrdude: AVR device initialized and ready to accept instructions
+
+Reading | ################################################## | 100% 0.03s
+
+avrdude: Device signature = 0x1e950f
+avrdude: reading input file "/var/folders/80/zb0lbp690wq1wv3n541p4qn40000gn/T/buildd5ae82e677127ac286f51de66781d807.tmp/Blink.ino.hex"
+avrdude: writing flash (1066 bytes):
+
+Writing | ################################################## | 100% 0.72s
+
+avrdude: 1066 bytes of flash written
+avrdude: verifying flash memory against /var/folders/80/zb0lbp690wq1wv3n541p4qn40000gn/T/buildd5ae82e677127ac286f51de66781d807.tmp/Blink.ino.hex:
+avrdude: load data flash data from input file /var/folders/80/zb0lbp690wq1wv3n541p4qn40000gn/T/buildd5ae82e677127ac286f51de66781d807.tmp/Blink.ino.hex:
+avrdude: input file /var/folders/80/zb0lbp690wq1wv3n541p4qn40000gn/T/buildd5ae82e677127ac286f51de66781d807.tmp/Blink.ino.hex contains 1066 bytes
+avrdude: reading on-chip flash data:
+
+Reading | ################################################## | 100% 0.64s
+
+avrdude: verifying ...
+avrdude: 1066 bytes of flash verified
+
+avrdude done.  Thank you.

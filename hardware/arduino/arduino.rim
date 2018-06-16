@@ -1,0 +1,116 @@
+# arduino
+' LeonardPauli/docs
+	created by Leonard Pauli, 16 jun 2018
+
+// - an open source microcontroller
+// 	popular for fast prototyping + getting started
+
+
+arduino.cc
+	- boards // created in Italy + known as "originals"
+		// higher quality + higher price (supports further arduino development)
+		- usb to serial com chip // builtin "FTDI" chip
+			// higher licence cost, but driver preinstalled on osx etc
+	- IDE // built with java
+		install: download from arduino.cc + click to install
+		getting started:
+			- connect board
+			- from menu bar, select:
+				- ../examples/0/blink
+				- ../board/<your board>
+				- ../port/<your tty>
+				// possibly also architecture?
+				- ../upload
+			- expect console to write some info + loading ~2s
+				- followed by the board's led at pin 13 to start blinking
+			- go through the other examples + arduino.cc/reference
+
+ebay / allibaba
+	- boards // known as "arduino compatible"
+		// sometimes lower quality, many different variants or same original board
+		- usb to serial com chip: alts:
+			- builtin "FTDI" variant
+			- builtin "chinese" variant
+				requires driver installation:
+					see "https://kig.re/2014/12/31/how-to-use-arduino-nano-mini-pro-with-CH340G-on-mac-osx-yosemite.html"
+					see "https://github.com/adrianmihalko/ch340g-ch34g-ch34x-mac-os-x-driver"
+					- should exist signed driver now, not requiring SIP (osx security) disabling
+					- download, unzip, open to install (requires password), restart
+					- connect board through usb
+					- ls /dev/tty*, look for wchusbserial, that's the device to use
+			- not builtin: see "using external programmer"
+			- attiny
+				// see http://www.instructables.com/id/AVR-Programming-with-Arduino-AVRdude-and-AVR-gcc/
+		- possible to get eg. arduino nano compatible for $2-$5
+			- attached "cheap" cable might not send data reliably, try different if issues
+
+using external programmer:
+	programmer: alts:
+		- hijacking of existing board programmer
+		- external
+	// TODO
+
+using compiler with terminal // eg. without Arduino IDE
+	- get configs: alts:
+		- using Arduino IDE
+			- upload sample program, see getting started
+			- copy console output to external text editor and identify configs
+		// TODO: alt without arduino IDE / notes on how to config
+	- create ./run, chmod u+x ./run // change config values according to your setup
+		#!/usr/bin/env sh
+		name="${1:-led}"
+		port="/dev/cu.wchusbserial1420"
+
+		arduinoavrdir="/Applications/Arduino.app/Contents/Java/hardware/tools/avr"
+		avrdudeconf="$arduinoavrdir/etc/avrdude.conf"
+		avrbindir="$arduinoavrdir/bin"
+		export PATH="$PATH:$avrbindir" # make binaries accessible
+		mmcu="atmega328p"
+		baudrate="57600"
+		clockrate="16000000UL" # 16 MHz, used for delay etc
+
+		avr-gcc -Os -DF_CPU=$clockrate -mmcu=$mmcu -c -o $name.o $name.c
+		avr-gcc -mmcu=$mmcu $name.o -o $name
+		avr-objcopy -O ihex -R .eeprom $name $name.hex
+		avrdude -C$avrdudeconf -v -p$mmcu -carduino -P$port -b$baudrate -D -Uflash:w:$name.hex:i
+	- create led.c
+		#include <avr/io.h>
+		#include <util/delay.h>
+		 
+		#define BLINK_DELAY_MS 1000
+		 
+		int main (void) {
+			DDRB |= _BV(DDB5); /* set pin 5 of PORTB for output*/
+			while(1) {
+				PORTB |= _BV(PORTB5); /* set pin 5 high to turn led on */
+				_delay_ms(BLINK_DELAY_MS);
+				PORTB &= ~_BV(PORTB5); /* set pin 5 low to turn led off */
+				_delay_ms(BLINK_DELAY_MS);
+			}
+		}
+	compile + upload: ./run led
+	writing in c:
+		reference:
+			timing:
+				// see https://www.nongnu.org/avr-libc/user-manual/group__util__delay.html
+				constant delay:
+					#define CONSTANT_KNOWN_AT_COMPILETIME 100
+					_delay_us(CONSTANT_KNOWN_AT_COMPILETIME) // or get no precision in timing
+					_delay_ms(CONSTANT_KNOWN_AT_COMPILETIME)
+				dynamic delay:
+					see <util/delay_basic.h> instead
+
+
+' links:
+	avr:
+		https://github.com/osx-cross/homebrew-avr
+		https://arduino.stackexchange.com/questions/18963/how-to-program-avr-in-mac-os-x
+		https://books.google.se/books?id=LDUXAgAAQBAJ&pg=PA49&lpg=PA49&dq=arduino+c+mac&source=bl&ots=JdxZ7eciHf&sig=JTz2PBDwit_1X_bRupkvVukLSe8&hl=en&sa=X&ved=0ahUKEwjKopqL6NbbAhUhJ5oKHY2TBM8Q6AEIgAEwCA#v=onepage&q=arduino%20c%20mac&f=false
+		.
+		http://todbot.com/blog/2006/12/06/arduino-serial-c-code-to-talk-to-arduino/
+		https://chrisheydrick.com/2012/06/12/how-to-read-serial-data-from-an-arduino-in-linux-with-c-part-1/
+		https://balau82.wordpress.com/2011/03/29/programming-arduino-uno-in-pure-c/
+		.
+		http://forum.arduino.cc/index.php?topic=45821.0
+	editors:
+		https://www.stuffandymakes.com/blog/2014/04/05/embedxcode-a-better-way-to-develop-for-arduino-on-the-mac-using-xcode
