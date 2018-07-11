@@ -114,3 +114,9 @@ osx.personal setup:
 		random text generator:
 			osx: little ipsum
 			npm: faker
+
+
+create custom:
+	// see https://github.com/sos-os/kernel
+	// see bitwise series
+

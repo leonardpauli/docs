@@ -130,5 +130,6 @@ local: verdaccio
 						// or external: true, name: verdaccio (version: '3.6')?
 
 
-
-
+utils:
+	- automatic dependency upgrade + check
+		- see "https://greenkeeper.io/"

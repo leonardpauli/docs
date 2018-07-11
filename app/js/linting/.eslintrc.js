@@ -136,6 +136,7 @@ module.exports = {
 			CallExpression: {arguments: 1},
 			ArrayExpression: 1,
 			ObjectExpression: 1,
+			ignoredNodes: ['ConditionalExpression'], // see ./ternary-expression-formatting-study.js
 		}],
 		
 		'init-declarations': off, // want: discourage use of let, but in some situations,
@@ -308,12 +309,13 @@ module.exports = {
 		'one-var': off, // maybe, but not in tiny block
 		'one-var-declaration-per-line': ERROR,
 		'operator-assignment': ERROR,
-		'operator-linebreak': [warn, 'after', {
+		'operator-linebreak': [warn, 'before', {
 			overrides: {
-				'||': 'before',
-				'&&': 'before',
-				':': 'ignore',
-				'?': 'before',
+				'=': 'after',
+				// '||': 'before',
+				// '&&': 'before',
+				// ':': 'before',
+				// '?': 'before',
 			},
 		}],
 		'padded-blocks': off, // 'never', yes, but not if tiny block or first line is comment

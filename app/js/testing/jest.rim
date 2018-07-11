@@ -10,9 +10,9 @@ install:
 		- babel (optional)
 
 	// (app/node/linting includes necessary eslint fixes)
+	- echo '{ "verbose": true }' | package-json-set-val jest -
 	- npm i -D jest babel-jest babel-core@7.0.0-bridge.0
 	// - mkdir tests
-	- echo '{ "verbose": true }' | package-json-set-val jest -
 	- package-json-script-add '"test": "jest"'
 	- package-json-script-add '"test:watch": "jest --changedFilesWithAncestor --watch"'
 	- package-json-script-add '"test:coverage": "jest --coverage"'

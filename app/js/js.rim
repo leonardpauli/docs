@@ -10,6 +10,7 @@ tooling:
 	package manager:
 		- npm (alt. yarn)
 		- alt: bower, etc
+		// see http://kitze.github.io/gtb/ for simple getting started
 	linting
 		- eslint
 		- prettier?
