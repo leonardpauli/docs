@@ -1,0 +1,31 @@
+{
+	"name": "@leonardpauli/babel-preset",
+	"version": "0.1.0",
+	"description": "Personal babel preset",
+	"main": "index.js",
+	"scripts": {
+		"test:watch": "jest --changedFilesWithAncestor --watch",
+		"test": "jest"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com:LeonardPauli/docs.git"
+	},
+	"keywords": [
+		"babel-preset"
+	],
+	"author": "Leonard Pauli (https://leonardpauli.com)",
+	"private": false,
+	"license": "ISC",
+	"devDependencies": {
+		"@babel/cli": "^7.0.0-beta.52",
+		"@babel/core": "^7.0.0-beta.52",
+		"@babel/preset-env": "^7.0.0-beta.52",
+		"@babel/preset-stage-2": "^7.0.0-beta.52",
+		"babel-preset-minify": "^0.3.0",
+		"jest": "^22.4.3"
+	},
+	"jest": {
+		"verbose": true
+	}
+}
