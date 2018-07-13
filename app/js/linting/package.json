@@ -1,6 +1,6 @@
 {
 	"name": "@leonardpauli/eslint-config",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"description": "Personal JS style",
 	"main": "index.js",
 	"scripts": {
