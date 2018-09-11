@@ -1,0 +1,28 @@
+# app/ideas
+' LeonardPauli/docs
+	created by Leonard Pauli, sep 2018
+
+
+apple-watch.mini-apps:
+	' in one git repo
+		+ open source (though AGPL licensed + name disclamer + CLA, or just copyright until that)
+	- unit circle - on watch and phone/tablet
+		+ practice mode
+	- circular periodic table - on watch and phone/tablet
+		- using orbitals spritekit vis
+		- + memos with atoms periodic table cards
+			- smart / adaptive
+		- + large complication with element info
+	- pdf slicer + viewer
+	- simple audio rec
+	- simple speedreader
+	- derivate practice
+	- watchmath the game - make work + release
+	- flashcards for watch
+	- multiple timers
+		+ complications
+	- routine track
+		- combine schedule + routine schedule on phone/web (see todo-day-sept18)
+		- tap watch complication when switching task
+			+ ability to choose skip task + insert different (using text input, dictation/quick predef choices)
+			- time tracking
