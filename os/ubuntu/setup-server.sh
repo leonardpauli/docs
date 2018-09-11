@@ -36,7 +36,7 @@ if [ ! "$onInstance" = "y" ]; then
   # TODO: use digitalocean api to create droplet?
 
   p '- droplet.create'; p +1
-  p '- ubuntu 17'
+  p '- ubuntu 18+'
   p '- enable ipv6'
   p '- add your ssh key: Create new? (Y/n)'; read sshKeyNeeded
   if [ ! "$sshKeyNeeded" = "n" ]; then
@@ -133,9 +133,9 @@ systemctl reload sshd
 p '# - firewall setup? # https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04'
 
 p '- docker."install docker" ↩︎'; read tmp; p +1
-p '- uninstall possibly old versions' \
-&& sudo apt-get remove docker docker-engine docker.io \
-&& p '- update the apt package index' \
+p '- uninstall possibly old versions'
+sudo apt-get remove docker docker-engine docker.io
+p '- update the apt package index' \
 && sudo apt-get update \
 && sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg2 \
 && p '- add GPG key for official Docker repo' \
@@ -152,17 +152,18 @@ p '- uninstall possibly old versions' \
 && p '- prioritize newly added repo' && apt-cache policy docker-ce \
 && p '- install docker' && sudo apt-get install -y docker-ce \
 && p '- check status, systemctl used also for auto start on boot' && sudo systemctl status docker \
-&& p '- add user to docker group' && sudo usermod -aG docker $USER \
+&& p '- add user to docker group' && sudo usermod -aG docker $instanceUser \
 && p '// done; test by writing "docker" on next login'
 # && p '- relogin to apply' && su - ${USER} // not from script
 p -1
 
 p '- docker."install docker-compose" ↩︎'; read tmp; p +1
-sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose \
+sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose \
 && sudo chmod +x /usr/local/bin/docker-compose \
 && docker-compose -v # test
 p -1
-
+# curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+# chmod +x /usr/local/bin/docker-compose
 
 # p '- docker."install docker-machine"'
 
