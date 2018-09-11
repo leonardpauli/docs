@@ -7,7 +7,37 @@
 
 
 ' TODO:
-	see /"https://www.digitalocean.com/community/tutorials/how-to-use-ssh-keys-with-putty-on-digitalocean-droplets-windows-users"
+	windows flow:
+		// see "https://www.digitalocean.com/community/tutorials/how-to-create-ssh-keys-with-putty-to-connect-to-a-vps"
+		prerequisites:
+			- download and install putty
+				https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+				// look for .msi fuke in Packages files secation under "Windows Installer"
+		generate:
+			- open gen // windows key + search for putty gen
+			- menu -> key -> "ed25519"
+			- press generate + move mouse for randomness // RSA should be selected
+				// it should start with "ssh-ed25519", alt "ssh-rsa", not "---- BEGIN SSH2 PUBLIC KEY"...
+			- save public key as "id_rsa.pub" // press "Save public key"
+				- alt copy the text in the text box "ssh-ed25519 AAAAC3Nz... comment"
+			- save private key as "id_rsa" // press "Save private key", without extention
+			- open "id_rsa.pub" with code editor and copy contents ...
+		ssh use:
+			- open putty // not gen
+			- enter ip of server
+			- enter ssh port // default 22
+			- sidebar.connection.ssh.auth.private key file: select your pk
+			- sidebar.session.saved sessions: enter some name + press save
+			- press connect
+				- if asking about authenticity, say yes if you are on a private network and trust your isp...
+					- or better yet, can see that the fingerprint is matching
+					- otherwise some risk of MiM attack
+			for DO:
+				login as: root
+				// 
+			next time: 
+			// https://www.digitalocean.com/docs/droplets/how-to/connect-with-ssh/putty/
+
 
 
 - generate public/private ssh key pair
