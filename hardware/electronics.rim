@@ -1,0 +1,105 @@
+# hardware/electronics.rim
+' LeonardPauli/docs
+	created by Leonard Pauli, sep 2018
+
+' TODO:
+	- both english + swedish words
+
+
+terms
+	- current				I = x [A, ampere] // ström
+	- voltage 			U = x [V, volt] = RI // spänning
+	- power 				P = x [W, watt] = UI // effekt
+	- resistance 		R = x [Ω, Ohm] // resistance
+	- conductivity 	C = x [S, Sivert = 1/Ohm], RC = 1 // konduktans
+	- impedance 		Z = a+jb [Ω, Ohm] // complex version of resistance
+		// (eg. for AC circuits; includes phase/imaginary part)
+	- admittance // complex version of conductivity
+	- charge // laddning // TODO
+	- inductance 		L = ... // TODO
+	- potential // see voltage // TODO: difference? directional?
+
+
+components
+	- active: - power source:
+		ideal: or:
+			- true:
+			- else:
+		dependent: or:
+			- true:
+			- else:
+		kind: or:
+			- current
+			- voltage
+			value is Enum:
+				- Alternating{alias AC}
+					value is Number.Complex
+				- Direct{alias DC}
+					value is Number.Decimal
+					direction: value > 0
+	- passive:
+		- resistor
+		- capacitor // TODO
+		- inductor // TODO
+		- opamp? // TODO
+	- meters
+		ideal is Boolean
+		kind: or:
+			- current
+				connection: series
+				- resistor{series}.value: infinite if ideal else "be aware"
+			- voltage
+				connection: parallel
+				- resistor{parallel}.value: infinite if ideal else "be aware"
+					// if access to many resistor{value: high}, resistance can be figured out
+			- resistance
+				connection: parallel
+
+
+circuits:
+	edges is many Edge is Component
+	nodes is many Node
+	patterns:
+		- open
+			resistance: infinite
+		- closed
+			resistance: 0
+		- parallel // TODO: inline notation? (A // B) or (A || B) or..?
+			conductivity: c.tot: sum c // c.1 + c.2 +...
+		- series // TODO: inline notation? (A B)
+			resistance: r.tot: sum r // r.1 + r.2 +...
+			- voltage divider // 1-[v]-[r.1]-2-[r.2]-1, potential at 
+	notation:
+		- passive
+			// current flows like [v]+ -> +[r]- -> -[v]
+			// voltage drop over passive components is positive
+			// usually more passive components -> nice to have more positive values
+		- active // opposite from passive
+			// current flows like [v]+ <- +[r]- <- -[v]
+			// voltage drop over passive components is negative // lots of minus signs!
+
+theory
+	- kirchhoff's circuit laws
+		- KVl // voltage law
+			sum (loop.edges.directed).voltage is 0
+		- KCl // circuit law 
+			sum (node.edges.directed).current is 0
+	- nodal-analysis // nodanalys // using KCl
+	- maskanalys // using KVl
+	- superposition // circuit can be divided to one layer per power source, then summed, for analysis
+		be: layers |> nodal-analysis | sum{each edge}
+		layers is many Circut: circuit.components(is PowerSource{not dependent}) |> (:source) Circuit
+			...: circuit
+			components(is PowerSource, not source) |> replace: or .kind:
+				// replace with its internal impedance
+				- current: open-circuit
+				- voltage: short-circuit
+	- circuit equivalents // used to reduce / black-box parts of a circuit
+		// for linear circuits // TODO: why active etc?
+		- Norton equivalent // a-[current-source || resistor]-b // TODO
+		- Thevenin equivalent // a-[voltage-source]-[resistor]-b // TODO
+			if PowerSource{beroende} isn't in circuit.components
+				v.th: v.oc
+				r.th: r.oc when circuit.components(PowerSource) is "nollställd"
+			oc: "open circuit"
+			th: "thevenin equivalent"
