@@ -42,3 +42,6 @@
 [submodule "design/sketch/plugins/layer-renamer"]
 	path = design/sketch/plugins/layer-renamer
 	url = git@github.com:leonardpauli/layer-renamer.git
+[submodule "app/js/module/utils"]
+	path = app/js/module/utils
+	url = git@github.com:leonardpauli/js-utils.git
