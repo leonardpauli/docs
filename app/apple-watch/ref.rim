@@ -1,0 +1,68 @@
+# app/apple-watch/ref
+' LeonardPauli/docs
+	created by Leonard Pauli, 4 sep 2018
+
+' TODO
+	- make cheat sheet
+	- make example project(s) showcasing all abilites
+	- see app/ideas.apple-watch
+
+abilities
+	- data
+		- sync data live
+		- sync files
+		- internet access
+		- image processing
+	- ui
+		- table
+		- group layout
+			- layout (centering, constraints, nesting groups, etc)
+			- simple animations
+			- image
+				- using animated stack
+			- label
+			- button
+			- picker
+				- custom using image stack
+			- slider
+			- switch
+		- sprite kit
+		- scene kit
+		- map
+		- video modal
+		- audio modal
+	- navigation
+		- scrolls if overflow
+		- hierarchical // push/pop
+		- pages
+			- continuous, limited, non-looping
+				- though, go to (eg. first) button at end possible))
+			- possible to change count programmatically?
+			- possible to use with hierarchical?
+		- modal
+		- force press meny
+	- input
+		- crown + touch interaction
+			- with spritekit
+		- audio rec
+		- text
+			- dictation (if online)
+			- quick options list
+		- touch
+			- tap
+			- longpress
+			- swipe
+			- pan
+		- accelerometer
+		- heartrate
+		next version:
+			- gps
+			- internet (3G)
+	- effects
+		- sound + vibration
+	- notifications
+		- local, schedule + remove
+			- from watch
+			- from phone
+		// - remote
+
