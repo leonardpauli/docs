@@ -2,12 +2,22 @@
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 19 mar 2018
 
+- see "https://github.com/pybee/paying-the-piper"
+
 ' TODO
 	- https://www.quora.com/What-is-the-best-free-for-non-commercial-use-license-to-use-for-an-open-source-project
 		esp. Garet Claborn's answer
 	- https://wonderunit.com/thoughts-on-free-and-open-source/
 	- https://cla-assistant.io/
 	- https://github.com/tvvocold/FOSS-for-Dev
+	- https://github.com/pybee/paying-the-piper/issues/61
+	to read:
+	- http://blog.milkingthegnu.org/2008/05/exisiting-dual.html
+	- https://blog.p2pfoundation.net/can-make-lot-money-open-source/2016/12/08
+	- https://medium.com/deconet/how-to-get-paid-for-open-source-6e13bb238a7f
+	- http://www.mikeperham.com/2015/11/23/how-to-charge-for-your-open-source/
+	- https://fair.io/
+
 
 spelling: "LICENSE" // https://github.com/dominictarr/split/pull/24
 

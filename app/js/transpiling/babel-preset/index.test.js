@@ -32,6 +32,18 @@ describe('simple', ()=> {
 		expect(res).not.toMatch('require(".")')
 	})
 
+	it('spread / destructuring', ()=> {
+		const org = 'var a = {...b, d, ...c}'
+		const res = transform(org)
+		expect(res).toMatch('_objectSpread')
+	})
+	it('spread / destructuring 2', ()=> {
+		const org = 'var {a, b: {c}, ...r} = b'
+		const res = transform(org)
+		expect(res).toMatch('c = _b.b.c')
+		expect(res).toMatch('r = _objectWithoutProperties')
+	})
+
 	it('minify', ()=> {
 		const org = 'const keep = x=> x*2'
 		const res = transform(org, {minify: true})

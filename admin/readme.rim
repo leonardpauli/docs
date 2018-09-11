@@ -7,6 +7,9 @@
 components
 	- title
 		- badges
+			- see "http://shields.io/"; eg. md:
+				[![npm version](https://img.shields.io/npm/v/@leonardpauli/utils.svg)](https://www.npmjs.com/package/@leonardpauli/utils)
+				[![licence](https://img.shields.io/npm/l/@leonardpauli/utils.svg)](https://github.com/leonardpauli/js-utils/blob/master/LICENSE)
 		- short description
 		- overview
 
@@ -22,5 +25,5 @@ components
 	- sponsors / donating?
 	- about
 		- copyright?
-		- licence
+		- license
 			- commersial / custom option?

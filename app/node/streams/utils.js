@@ -43,7 +43,7 @@ const linesToTsvObjects = ({header = null} = {})=>
 		: header.reduce((obj, key, i)=> (obj[key] = s[i] || null, obj), {})
 	))
 
-const streamToTsvObjects = (stream)=> stream
+const streamToTsvObjects = stream=> stream
 	.pipe(toLines())
 	.pipe(linesToTsvObjects())
 

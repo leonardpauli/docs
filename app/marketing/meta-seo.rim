@@ -22,6 +22,7 @@ search engines relies more on actual content than tags
 	- topic relevance score, subject matter authority score
 		- might be lower with SPA's? // (someone got 10% drop in traffic)
 
+- add sitemap.xml + robots.txt?
 - canonical tags
 - meta robots tags
 - avoid keywords tag
