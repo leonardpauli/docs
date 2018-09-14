@@ -2,21 +2,59 @@
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 14 sept 2018
 	based on https://docs.oracle.com/javase/tutorial
+	based on http://tutorials.jenkov.com/java/enums.html
 
 
 enum:
 	example:
-		enum ChessPlayer { WHITE, BLACK }
-		ChessPlayer.WHITE
-		ChessPlayer.WHITE.name() == "WHITE"
-	example.extended:
-		public enum Modes {
-			mode1 ("a"),
-			mode2 ("b"),
-			mode3 ("c");
+		enum Level { LOW, MEDIUM, HIGH, SUPER_EXTREME } // has to be all caps + _
+		Level l = Level.MEDIUM
+		p.name() == "MEDIUM"
+		p.toString() == "MEDIUM"
+		for (Level l : Level.values()) { ... }
+		Level.valueOf("HIGH") == Level.HIGH
 
-			private final String name;
-			private Modes(String name) { this.name = name; }
-			public String toString() { return name; }
+	example.fields:
+		public enum Modes {
+			mode1 ("a", 3),
+			mode2 ("b", 7),
+			mode3 ("c", 2);
+
+			private final String title;
+			private final int nr;
+
+			private Modes(String title, int nr) {
+				this.title = title;
+				this.nr = nr;
+			}
+
+			public int getNr() { return nr; }
+			public String toString() { return title; }
 		}
 		Modes.mode1.toString() == "a"
+
+	example.method.abstract:
+		public enum Level {
+			LOW{ @Override public int getY(int x) { return x + 2; } },
+			MEDIUM{ @Override public int getY(int x) { return x * 2; } },
+			HIGH { @Override public int getY(int x) { return x * x * 3; } };
+
+			public abstract int getY(int x);
+		}
+	example.interface.implement:
+		interface Fn { int getY(int x); }
+		public enum Level implements Fn {
+			LOW{ public int getY(int x) { return x + 2; } },
+			MEDIUM{ public int getY(int x) { return x * 2; } },
+			HIGH { public int getY(int x) { return x * x * 3; } };
+		}
+
+	utilities:
+		set:
+			EnumSet<Level> enumSet = EnumSet.of(Level.HIGH, Level.MEDIUM); // instead of normal set, optimised for enums
+		map:
+			EnumMap<Level, String> enumMap = new EnumMap<Level, String>(Level.class);
+			enumMap.put(Level.HIGH  , "high metadata");
+			enumMap.put(Level.MEDIUM, "Medium metadata");
+			String levelValue = enumMap.get(Level.HIGH);
+
