@@ -1,0 +1,44 @@
+# app/java/test
+' LeonardPauli/docs
+	Created by Leonard Pauli, 14 sept 2018
+	based on https://docs.oracle.com/javase/tutorial
+
+// see app/js/test
+
+
+- manual testing
+- code reviews
+- automatic testing
+	types:
+		- unit tests
+			a -> (b, c -> d)
+			(d, b): simple unit testable, no dependencies
+			c: unit test includes one dependency, a little bit larger surface area
+			a: many dependencies, more of an integration test
+
+			- expected true cases
+			- expected false cases
+			- edge cases
+			- extreme cases
+		- end-to-end, e2e, test
+			like an automated userflow
+			to find missing unit tests
+		- regression tests
+			added when a bug was fixed, to ensure it won't appear again
+	- fuzz tests / random tests
+		guided by code coverage and static analysis + type analysis
+		generate by "evolution"
+			take existing tests and "breed" them / mutate them to combine new ones
+		finds bugs in "dark corners"
+
+- formal proof
+	eg. for (int a, int b)=> a+b
+		see descreet mathematics
+		prove commutability
+		prove relation between groups
+			eg. add -> mul
+		unit, eg 0
+		etc
+
+code coverage // ability to see what code paths has been tested
+	// see https://www.jetbrains.com/help/idea/viewing-code-coverage-results.html

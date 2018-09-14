@@ -1,0 +1,22 @@
+# app/java/enum
+' LeonardPauli/docs
+	Created by Leonard Pauli, 14 sept 2018
+	based on https://docs.oracle.com/javase/tutorial
+
+
+enum:
+	example:
+		enum ChessPlayer { WHITE, BLACK }
+		ChessPlayer.WHITE
+		ChessPlayer.WHITE.name() == "WHITE"
+	example.extended:
+		public enum Modes {
+			mode1 ("a"),
+			mode2 ("b"),
+			mode3 ("c");
+
+			private final String name;
+			private Modes(String name) { this.name = name; }
+			public String toString() { return name; }
+		}
+		Modes.mode1.toString() == "a"

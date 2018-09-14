@@ -1,0 +1,49 @@
+# app/java/interface
+' LeonardPauli/docs
+	Created by Leonard Pauli, 14 sept 2018
+	based on https://docs.oracle.com/javase/tutorial
+
+
+interface:
+	example:
+		public interface GroupedInterface extends Interface1, Interface2, Interface3 {
+			int A = 5;
+			
+			void doSomething(int i, double x);
+			int doSomethingElse(String s);
+			
+			default boolean didItWork(int i, double x, String s) { return ...; }
+
+			static int formatA(int a) { return ... };
+			default int getSome(int a) { return formatA(a); }
+		}
+		public interface Relatable {
+			int isLargerThan(Relatable other); // interface as type
+		}
+	"public" is Boolean: interface usable by class defined in any package
+		else: only accessible to class defined in the same package (as the interface)
+		// for public, any changes will be breaking for classes using it (except for default method + constant additions)
+		// 	consider specifying all from start or creating new interface extending previous one
+	"extends" is many Interface or Empty: extend other interfaces
+		// class can subclass/extend one other class
+	"body":
+		- methods // implicitly public
+			- abstract // followed by semicolon, no braces (ie, no implementation)
+			- default // defined with the "default modifier" (?)
+				// has default implementation defined in interface, optional to override in implementing class
+			- static // defined with the "static" keyword
+				// accessed from the interface
+		- fields; constant declarations // implicitly: public, static, and final // ie. cannot be private
+
+	usage.class:
+		public class MyClass implements GroupedInterface {			
+			public void doSomething(int i, double x) { ... } // required to add "public"
+			public int doSomethingElse(String s) { return ...; } // required to implement all
+			// didItWork not required to be implemented, because the interface defines a default variant
+		}
+	usage.casting.down: // if Object implements Relatable, cast object to Relatable so it can be accepted as Relatable
+		public Object findLargest(Object object1, Object object2) {
+   		Relatable obj1 = (Relatable)object1;
+   		Relatable obj2 = (Relatable)object2;
+   		return ... (obj1).isLargerThan(obj2) ...;
+		}

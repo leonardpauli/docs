@@ -1,0 +1,29 @@
+# app/java/exception
+' LeonardPauli/docs
+	Created by Leonard Pauli, 14 sept 2018
+	based on https://docs.oracle.com/javase/tutorial
+
+
+exceptions:
+	example:
+		// based on https://www.protechtraining.com/content/java_fundamentals_tutorial-exceptions
+		public class InsufficientBalanceException extends Exception {
+			private final double available;
+			private final double required;
+
+			public InsufficientBalanceException(double available, double required) {
+				super("Available $"+available+" but required $"+required);
+				this.available = available; this.required = required;
+			}
+
+			public double getAvailable() { return available; }
+			public double getRequired() { return required; }
+		}
+	usage:
+		void doSomething() throws InsufficientBalanceException {
+			if (1==2) throw new InsufficientBalanceException(1, 2);
+		}
+		void proxy() throws InsufficientBalanceException { doSomething(); }
+		void nice() {
+			try { proxy(); } catch (InsufficientBalanceException e) { ... }
+		}
