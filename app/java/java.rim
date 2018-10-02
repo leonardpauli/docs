@@ -1,0 +1,12 @@
+# app/java
+' LeonardPauli/docs
+	Created by Leonard Pauli, 18 sept 2018
+
+editors:
+	- intelliJ // https://www.jetbrains.com/idea/
+
+update to java 10 development kit:
+	download + install // see "http://www.oracle.com/technetwork/java/javase/downloads/jdk10-downloads-4416644.html
+	confirm: java -version
+	get JAVA_HOME: vi ~/.zshrc:
+		export JAVA_HOME="$(${"$(readlink "$(which java)")"%/*}/java_home)"

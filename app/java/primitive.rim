@@ -10,6 +10,16 @@ arrays:
 		xs.length == size
 		xs[0] = 5;
 		xs[0] == 5;
+		directly initialized:
+			int[] xs = { 5, 3, 4 };
+		manuall size change by copy:
+			int maxSize = ...;
+			X[] xs = new X[maxSize];
+			...
+			int actualOrIncreasedSize = ...;
+			X[] ret = Arrays.copyOf(xs, actualOrIncreasedSize);
+			lower level:
+				System.arrayCopy(sourceXs, sourceStartIdx, targetXs, targetStartIdx, countToCopy);
 	dynamic size:
 		import java.util.List;
 		import java.util.ArrayList;
@@ -20,9 +30,19 @@ arrays:
 		xs.size() // length
 		for (MyType x : xs) { ...x... }
 		xs.addAll(xs2)
-
+		filter:
+			List<String> list = new ArrayList<>(Arrays.asList("ab", "bc", "cd", "de"));
+			list.removeIf(s -> !s.contains("c"));
 
 strings:
-	StringBuilder sb = new StringBuilder("");
-	sb.append("...");
-	sb.toString();
+	manual:
+		String s = "hello";
+		int l = s.length(); l == 5
+	looping over chars:
+		for (char ch : str.toCharArray()) {}
+		using lambda:
+			str.chars().forEachOrdered(i -> ...);
+	dynamic size:
+		StringBuilder sb = new StringBuilder("");
+		sb.append("...");
+		sb.toString();

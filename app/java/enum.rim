@@ -7,12 +7,14 @@
 
 enum:
 	example:
-		enum Level { LOW, MEDIUM, HIGH, SUPER_EXTREME } // has to be all caps + _
+		enum Level { LOW, MEDIUM, HIGH, SUPER_EXTREME } // convention: all caps + _
 		Level l = Level.MEDIUM
 		p.name() == "MEDIUM"
 		p.toString() == "MEDIUM"
 		for (Level l : Level.values()) { ... }
 		Level.valueOf("HIGH") == Level.HIGH
+		Level.values().length == 4
+		Level.HIGH.ordinal() == 2
 
 	example.fields:
 		public enum Modes {
@@ -40,6 +42,20 @@ enum:
 			HIGH { @Override public int getY(int x) { return x * x * 3; } };
 
 			public abstract int getY(int x);
+		}
+	example.method.abstract+field:
+		public enum Level {
+			LOW(1){ @Override public int getY(int x) { return x + 2; } },
+			Level(int nr) { ... }
+			public abstract int getY(int x);
+		}
+	example.field.static.custom:
+		public enum Level {
+			LOW, MEDIUM;
+			private Level next;
+			static {
+				LOW.next = MEDIUM;
+			}
 		}
 	example.interface.implement:
 		interface Fn { int getY(int x); }

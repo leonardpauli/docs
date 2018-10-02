@@ -48,8 +48,14 @@ class:
 		}
 	body:
 		- method: ...
-		- field
-			- final // prevents subclass override
+		- field // [access_modifier] [static] [final] type name [= initial value] ;
+			- access modifiers:
+				private: from same class
+				package: from same package (default/implicit)
+				protected: from same package + subclasses outside package
+				public: from any class
+			- static: class field instead of instance field
+			- final: only settable once // like const
 	inheritance:
 		- in overriding method, ability to invoke super.method...(...)
 		- in overriding constructor, ability to invoke super(...)
@@ -62,14 +68,43 @@ class:
 
 	master base-class Object:
 		// see https://docs.oracle.com/javase/tutorial/java/IandI/objectclass.html
+		// - public int hashCode()
+			// implement if equals implemented;
+			// a.equals(b) (implies one way)=> a.hashCode() == b.hashCode()
 		- public boolean equals(Object obj);
+			example: // https://www.mkyong.com/java/java-how-to-overrides-equals-and-hashcode/
+				import java.util.Objects;
+
+				public class User {
+					private String name;
+					private int age;
+					private String passport;
+				
+					@Override public boolean equals(Object o) {
+						if (o == this) return true;
+						if (!(o instanceof User)) return false;
+						User user = (User) o;
+						// return user.age == age user.name.equals(name) && user.passport.equals(passport);
+						return age == user.age &&
+							Objects.equals(name, user.name) &&
+							Objects.equals(passport, user.passport);
+					}
+
+					@Override public int hashCode() {
+						// int r = 17;
+						// r = 31*r + name.hashCode();
+						// r = 31*r + age;
+						// r = 31*r + passport.hashCode();
+						// return r;
+						return Objects.hash(name, age, passport);
+					}
+				}
 		- public String toString();
 		- public final Class getClass(); // not overridable
 			// eg. obj.getClass().getSimpleName()
 		- public void finalize() throws Throwable; // override to provide cleanup, eg. file descriptor closing
 			// possibly called by GC, but close/clean yourself when possible
 		// - protected Object clone() throws CloneNotSupportedException
-		// - public int hashCode()
 		- ...
 	good practice:
 		few fields, many methods using those fields
