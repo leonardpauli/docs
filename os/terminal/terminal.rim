@@ -160,6 +160,9 @@ files:
 			ln -s originals alias-directory
 			ln ../path/to/source-file/relative/to/target target 
 				// files only, could manually mkdir + ln the contents though			
+			get target:
+				readlink aliased-file
+					// eg. readlink "$(which java)"
 		stat -x myfile && ls -lah myfile // check rights etc, and if it's a link, its destination
 
 text processing:
