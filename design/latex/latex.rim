@@ -1,0 +1,10 @@
+# design/latex
+' LeonardPauli/docs
+	Created by Leonard Pauli, 18 sep 2018
+
+// "document preparation system for high-quality typesetting"
+
+' notes
+	max install:
+		https://www.latex-project.org/get/
+		/usr/texbin -> /Library/TeX/texbin -> /Library/TeX/Distributions/.DefaultTeX/Contents/Programs/texbin
