@@ -45,3 +45,6 @@
 [submodule "app/js/module/utils"]
 	path = app/js/module/utils
 	url = git@github.com:leonardpauli/js-utils.git
+[submodule "app/vue/store"]
+	path = app/vue/store
+	url = git@github.com:leonardpauli/lp-vue-store.git
