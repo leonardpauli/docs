@@ -1,9 +1,12 @@
 {
+  "enabled": true,
+  "autoFixOnSave": true,
   "extends": [
     "tslint-microsoft-contrib",
     "tslint-config-prettier"
   ],
   "rules": {
+    "indent": [true, "tabs", 2],
     "mocha-no-side-effect-code": false,
     "missing-jsdoc": false,
     "no-relative-imports": false,

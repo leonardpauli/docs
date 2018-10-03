@@ -7,6 +7,8 @@
 
 - npm install -g prisma
 - bootstrap:
+	alt:
+		// TODO: see https://github.com/graphql-boilerplates/typescript-graphql-server
 	- mkdir example
 	- cd example
 	- prisma init
@@ -33,6 +35,7 @@
 
 
 typescript.nodejs.project.create:
+	// see https://basarat.gitbooks.io/typescript/
 	direct:
 		// http://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html
 		- npm install -g typescript
