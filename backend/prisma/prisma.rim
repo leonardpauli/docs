@@ -1,0 +1,75 @@
+# backend/prisma
+' LeonardPauli/docs
+	Created by Leonard Pauli, 3 oct 2018
+
+// open-source GraphQL ORM-like layer (for server)
+// see https://www.prisma.io/
+
+- npm install -g prisma
+- bootstrap:
+	- mkdir example
+	- cd example
+	- prisma init
+		options:
+			- use new local docker
+			- use postgress
+			- use typescript
+		generated:
+			- prisma.yml // "Prisma service definition"
+			- datamodel.prisma // "GraphQL SDL-based datamodel (foundation for database)"
+			- docker-compose.yml // "Docker configuration file"
+	- start: docker-compose up -d
+	- deploy: prisma deploy
+		' will deploy to the just started docker container
+			- setting up tables
+			- generating a typescript file for interacting
+	- test: prisma playground
+		// might have to comment out the generator part in prisma.yml (bug?)
+	- setup api
+		- do typescript.nodejs.project.create
+
+
+	// learn more: see http://bit.ly/prisma-server-overview
+
+
+typescript.nodejs.project.create:
+	direct:
+		// http://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html
+		- npm install -g typescript
+		- vi hi.ts
+		- tsc hi.ts
+		- cat hi.js
+	simple:
+		// https://basarat.gitbooks.io/typescript/docs/quick/nodejs.html
+		- npm init -y
+		- npm install typescript --save-dev
+		- npm install @types/node --save-dev
+	boilerplate:
+		// see https://github.com/jsynowiec/node-typescript-boilerplate
+
+
+other:
+	editor: VSCode: "https://code.visualstudio.com/docs/?dv=osx
+		' fast editing: https://code.visualstudio.com/docs/editor/codebasics
+	communication: Discord: "https://discordapp.com" (mobile + desktop + web)
+	deploy.preview.locally: "https://github.com/zeit/serve
+		- npm i -g serve
+		- cd dist && serve
+	deploy: now: "https://zeit.co/download", "https://zeit.co/now#get-started"
+		// for vue: https://cli.vuejs.org/guide/deployment.html#now
+		static:
+			- vi now.json:
+				{
+					"name": "lp-vue-store-example",
+					"type": "static",
+					"static": {
+						"rewrites": [{"source": "**", "destination": "/index.html"}]
+					},
+					"alias": "lp-vue-store-example",
+				}
+			- vi package.json
+				"deploy": "cp now.json dist/ && cd dist && now --public && now alias",
+				// every deploy will be online "for ever" at a unique hash
+				// use alias to have one url point to eg. the latest deploy
+				// see now ls, now rm, now alias --help
+			- npm run build && npm run deploy && open https://lp-vue-store-example.now.sh/

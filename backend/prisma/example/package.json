@@ -1,0 +1,35 @@
+{
+  "name": "prisma-test",
+  "version": "0.1.0",
+  "description": "prisma-test",
+  "engines": {
+    "node": ">= 10.6.0"
+  },
+  "devDependencies": {
+    "@types/jest": "~23.3.2",
+    "@types/node": "~8.10.30",
+    "jest": "~23.6.0",
+    "prettier": "1.14.3",
+    "rimraf": "~2.6.2",
+    "ts-jest": "~23.10.2",
+    "tslint": "~5.11.0",
+    "tslint-config-prettier": "1.15.0",
+    "tslint-microsoft-contrib": "~5.2.1",
+    "tsutils": "~3.0.0",
+    "typescript": "~3.1.0"
+  },
+  "scripts": {
+    "clean": "rimraf coverage build tmp",
+    "build": "tsc -p tsconfig.release.json",
+    "build:watch": "tsc -w -p tsconfig.release.json",
+    "lint": "tslint -t stylish --project \"tsconfig.json\"",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "tslib": "~1.9.3",
+    "graphql": "^0.13.2",
+    "prisma-client-lib": "^1.17.1"
+  }
+}
