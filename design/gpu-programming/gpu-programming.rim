@@ -1,0 +1,84 @@
+# design/gpu-programming
+' LeonardPauli/docs
+	Created by Leonard Pauli, 5 oct 2018
+
+' see
+	shdr.bkcore.com
+	shadertoy.com
+
+
+shader:
+	- file settings:
+		precision highp float;
+	- 
+		attribute // input
+		uniform // same for all
+			// eg. uniform float time;
+			// eg. uniform vec2 resolution
+		varying // interpolate
+			// eg. varying vec3 fNormal;
+			// eg. varying vec3 fPosition;
+	- type
+		float
+			// eg 1.0 (not just 1, would be an int)
+		vec3
+		mat3
+		mat4
+	kind:
+		- vertex shader:		
+			- main
+				void main() {
+					fNormal = normalize(normalMatrix * normal);
+					vec4 pos = modelViewMatri
+					vec p = projectionMatrix ....
+					// p.y = sin(time*30.0 * p.x)
+					gl_Position = p
+				}
+		- fragment shader:
+			- main
+				void main() {
+					vec3 lightDir = vec3(1.0, 1.0, 1.0);
+					float brightness = dot(fNormal, lightDir) // difference in vector angle (?), dot product
+					float brightnessWithGlobalLight = 0.5 + 0.5 * brightness;
+					vec3 color = vec3(1.0, 0.0, 0.0) // red
+					vec3 colorShaded = color * brightnessWithGlobalLight;
+					float alpha = 1.0;
+					gl_FragColor = vec4(colorShaded, alpha);
+				}
+			- mandelbrot fractal
+				void main() {
+					vec3 color;
+					vec2 c = fPosition.xy; // vec2(0.0, 0.0)
+					vec2 p = vec2(0.0, 0.0);
+					for (int i=0; i<1000; i++) {
+						p = vec2(p.x*p.x - p.y*p.y, 2.0*p.x*p.y) // p^2 + c
+					}
+					...
+					gl_FragColor = vec4(color, 1.0)
+				}
+	logic:
+		if branching, it will (at least older ones) execute both, then use the value of one "branch" depending on the conditional
+			because it is multi...
+
+definitions:
+	normal: vector vertical from surface
+	reflection:
+		angle out is angle in symetrical around normal
+
+ray tracing:
+	"the raytracing equation"
+	instead of simulating photons from light sources to camera (most photons don't hit the camera -> much unnecessary calculations)
+		-> simulate reverse (photons from camera to light sources)
+	instead of polygons, graphs are simpler as definition of surfaces (?)
+	things:
+		- diffuse surface: add random to reflection angle
+			- increases noise in result
+		- mirror/reflecton: prev.light + energy-left*light
+
+hw:
+	c++, spheres + infinite planes, reflections, linear algebra, shadows, limit bounces count
+	show cool image
+
+
+gpgpu: // general programming gpu
+	latency, gissning ~1ms for initiating
