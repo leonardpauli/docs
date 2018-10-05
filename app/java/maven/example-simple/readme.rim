@@ -1,0 +1,31 @@
+# app/java/maven/example-simple
+' LeonardPauli/docs
+	Created by Leonard Pauli, 18 sept 2018
+
+prerequisites:
+	- JDK 10
+	- maven
+
+build-steps:
+	- mvn install
+	- mvn package
+	- java -jar target/*.jar
+	// - mvn test // included in mvn package
+
+definitions:
+	jar: "Java ARchive" // zip'ed folder of .class files (and possibly .java source files) + resources
+	.java file // java source code
+	.class file // compiled .java file containing bytecode executable by JVM
+	JVM: "Java Virtual Machine"
+	JDK: "Java Development Kit"
+
+structure:
+	pom.xml // containing maven project config (plugins, dependencies, JDK version, artifacts, etc)
+	src
+		main
+			META-INF/MANIFEST.MF
+				Manifest-Version: 1.0
+				Main-Class: com.myorg.mypackage.Main // specifies entrypoint class for jar (will invoke its "public static void main")
+			java/com/myorg/mypackage/Main.java // use reverse domain notation for "package", inside java folder
+		test
+			java/com/myorg/mypackage/MainTest.java // convention <Class>Test.java, folder structure should mirror main/java
