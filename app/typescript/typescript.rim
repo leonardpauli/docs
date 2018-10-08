@@ -1,0 +1,169 @@
+# app/typescript
+' LeonardPauli/docs
+	Created by Leonard Pauli, 8 oct 2018
+
+// language based on javascriped, but with types etc
+// really good tooling (eg. great autocompletion, static analysis, etc)
+
+prerequisites:
+	- see js
+	- see tools/editors.VSCode
+
+typescript.nodejs.project.create:
+	// see https://basarat.gitbooks.io/typescript/
+	direct:
+		// http://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html
+		- npm install -g typescript
+		- vi hi.ts
+		- tsc hi.ts
+		- cat hi.js
+	simple:
+		// https://basarat.gitbooks.io/typescript/docs/quick/nodejs.html
+		- npm init -y
+		- npm install typescript --save-dev
+		- npm install @types/node --save-dev
+	boilerplate:
+		// see https://github.com/jsynowiec/node-typescript-boilerplate
+
+
+syntax: // prerequisites: js syntax
+	- basic
+		// see https://learnxinyminutes.com/docs/typescript/
+		- basic
+			const a: string = 'Hi'
+			function (a: number, b: any): void {}
+			(a: number): number=> a*2
+
+		- simple enum example // look around in this file for advanced patterns
+			enum Color {Red, Green, Blue}
+			const c: Color = Color.Green
+
+		- interface example
+			interface Book {
+				title: string
+				author?: string // optional
+				read(pages: number): void // function
+				readonly id: String
+				quotes: Array<String>
+				legalNotes: ReadonlyArray<String> // mutations (eg. push, a[0] = ..., etc) disallowed
+			}
+			const mybook: Book = {title: 'a', read(pages: number) {}, id: '5f', quotes: [], legalNotes: ['a']}
+
+		- tuple example (array literal, class, interface)
+			const simpleTuple: [number, number] = [5, 6] // only exactly two allowed
+			class Tuple<T> {constructor (public a: T, public b: T) {}}
+			interface Pair<T> {a: T; b: T} // generics, eg. taking type as an argument
+			const pairToTuple = <T>(pair: Pair<T>): Tuple<T>=> new Tuple(pair.a, pair.b)
+			const tuple = pairToTuple({a: 1, b: 2})
+		
+		- function interfaces/type aliases
+			interface AdderFunction<T> { (a: T, b: T): T } // note no name + only one interface field
+			type AdderFunction<T> = (a: T, b: T)=> T // function type/interface using type-aliases
+			const add: AdderFunction<number> = (a, b)=> a+b
+
+		- classes
+			class Point {
+				x: number
+				// public/private keyword will generate similar boilerplate as written for x
+				// = 0; default values
+				constructor (x: number, public y: number = 0) { this.x = x }
+				dist() {return Math.sqrt(this.x*this.x + this.y*this.y)}
+				static origin = new Point(0, 0)
+			}
+		- class extension
+			class Point3D extends Point {
+				constructor (x: number, y: number, public z: number) {super(x, y)} // super call mandatory
+				dist() {const d = super.dist(); return Math.sqrt(d*d + this.z*this.z)} // override
+			}
+
+		- modules
+			module Geometry { // inside a file (a file is wrapped in module?)
+				export class Square { // accessible through dot-notation Geometry.Square
+					constructor (public sideLength: number = 0) {}
+					area() {return Math.pow(this.sideLength, 2)}
+				}
+			}
+			const sq = new Geometry.Square(5)
+			sq.area()
+			import G = Geometry // local alias for module
+
+
+	// based on, see: https://www.typescriptlang.org/docs/handbook/advanced-types.html
+	- type-aliases:
+		type StringNumberOrBoolean = string | number | boolean
+		type MyPrimitive = StringNumberOrBoolean
+		type ManyMyPrimitive = Array<MyPrimitive>
+		type WithName = {name: string}
+		type WithValue<T> = {value: T}
+		type KeyValue<T> = WithName & WithValue<T> // {name: string, value: T}
+		type MyFn = (a: string)=> number
+		type Tree<T> = {value: T; a: Tree<T>, b: Tree<T>} // self-referencing
+		type LinkedList<T> = T & { next: LinkedList<T> }
+		type Person = {name: string}
+		type People = LinkedList<Person> // p.name, p.next.name, p.next.next.name
+	- enum vs string-literal-type
+		type StatesL = "default" | "idle" | "active"
+		enum StatesE { Default, Idle, Active } 
+		const fn = (l: StatesL, e: StatesE)=>
+			- l is a string, can be sent to client etc
+			- e is an enum, int under the hood?
+		- other option, union type with interfaces + string literal
+			interface Rectangle { name: "rectangle", otherValue: ... }
+			interface Circle { name: "circle", otherValue: ... }
+			type Shape = Rectangle | Circle
+			// though bc Shape is type
+	- alias vs interface:
+		- interface are named, shows up on hover, etc, aliases are transparent
+		- interfaces are (implementable (for classes), extendable (for other interfaces)), aliases are not
+		- therefore, use interfaces where possible
+	- branching
+		const a = (v: string | number): void=> typeof v === 'number'? 1*v: "1"+v
+	- casting / type assertion
+		const pet: Fish | Bird = getPet()
+		// pet.swim access not allowed, because could be bird
+		if ((<Fish>pet).swim) (<Fish>pet).swim() // check type before use
+		else (<Bird>pet).fly() // only branch left, so no additional check needed
+	- type guard/checker // used to narrow down type ranges
+		- primitive: typeof object === 'string'
+		- instanceof: object instanceof Object
+		- user defined // "pet is Fish" is the "predicate" ts uses
+			const isFish = (pet: Bird | Fish): pet is Fish=> (<Fish>pet).swim !== undefined
+			if (isFish(pet)) pet.swim() // no additional "casting" needed, type narrowed down
+	- undefined vs null // undefined: field can be not-set, null: field can be explicitly set to empty
+		type MyObj = {
+			stringForSure: string
+			stringOrNull: string | null
+			stringOrUndefined?: string
+			stringOrUndefined: string | undefined // same as above
+			stringOrNullOrUndefined?: string | null
+			stringOrNullOrUndefined: string | null | undefined // same as above
+		}
+		- remove (null, undefined) from a type
+			type MaybeString = string | null | undefined
+			type StringForSure = MaybeA! // == string
+	- keyof
+		const pluck = <T, K extends keyof T>(o: T, keys: K[]): T[K][]=> keys.map(n=> o[n])
+		interface Person { name: string; age: number }
+		const person: Person = { name: 'Jarid', age: 35 }
+		const strings: string[] = pluck(person, ['name'])
+		"For any type T, keyof T is the union of known, public property names of T"
+		"let personProps: keyof Person; // 'name' | 'age'"
+		const getProperty = <T, K extends keyof T>(o: T, key: K): T[K]=> o[key]
+	- for/in/variable fields
+		interface Map<T> {[key: string]: T}
+		type Keys = 'a' | 'b'
+		type Flags = {[K in Keys]: boolean}
+		- ts std lib
+			type Readonly<T> = {readonly [P in keyof T]: T[P]}
+			type Partial<T> = {[P in keyof T]?: T[P]}
+			type Pick<T, K extends keyof T> = {[P in K]: T[P]}
+			type Record<K extends string, T> = {[P in K]: T}
+	- conditional types
+		type A<T> = T extends U ? X : Y
+		- ts std lib: // from their docs
+			Exclude<T, U> – Exclude from T those types that are assignable to U.
+			Extract<T, U> – Extract from T those types that are assignable to U.
+			NonNullable<T> – Exclude null and undefined from T.
+			ReturnType<T> – Obtain the return type of a function type.
+			InstanceType<T> – Obtain the instance type of a constructor function type.
+	- "declare" keyword // for adding type information to untyped part?
