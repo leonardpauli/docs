@@ -15,3 +15,6 @@ editors:
 terminal:
 	iterm3
 	ohmyzsh
+
+communication:
+	- Discord: "https://discordapp.com" (mobile + desktop + web)

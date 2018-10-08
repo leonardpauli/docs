@@ -1,0 +1,79 @@
+# backend/graphql/query-language
+' LeonardPauli/docs
+	Created by Leonard Pauli, 8 oct 2018
+
+
+// see https://graphql.github.io/learn/queries/
+- comment
+	- # comment
+- types
+	- scalar:
+		- scalar Date // declare new
+		// implementation has to define how to serialize, deserialize, and validate new scalar types
+		built-in:
+			- String, ID (serializable as string)
+			- Number, Int, Float, Boolean
+	- enum: enum Color { RED, GREEN, BLUE }
+	- object:
+		- type Person {} // definition
+		- type Person {name: String} // fields
+		- type Person {friend: Person} // infinitely nested subgraphs
+		- type Person implements Actor {...} // see interface
+		fields:
+			- myfield: SomeType // eg. myfield: String, myfield: Person
+			- myfield: String! // required, eg. not null/undefined (though empty string is still a string)
+			- myfield: [String] // optional list of optional strings
+			- myfield: [String!]!
+			- myfield(someArgument: SomeType = "some default value"): SomeOtherType
+	- interface: like object but acting as a base for them // two different object types can implement same interface, see type-system.interface for more
+		interface Actor {name: String}, type Person implements Actor {} // Person now has name field
+	- union: union Fruit = Apple | Pear | Banana
+	- input: like object but for use in arguments
+		input MyRangeInput {start: Int, end: Int}
+		type SomeTypeType {myfield(within: MyRangeInput): [String!]!}
+	- root-query: type Query { people: [Person] } // the only access point for queries
+- operations:
+	- query
+		// for getting data, without side-effects if possible
+		// if multiple query fields, the operations run in parallel
+		uses "type Query {...}"
+	- mutation
+		' like query but where:
+			- fields can (should) have side effects, usually based on field arguments (passed to the resolver)
+			- if multiple mutation fields, the operations run in series (bc side-effects, parallel could have different outcomes)
+		uses "type Mutation {...}"
+		mutation CreateSomething($someOperationArgument) {someMutationField(someArg: $someOperationArgument, someOther: 4) {fieldToReturnAfterCreation}}
+	- subscription
+		// like query, but using websockets? or some other form of ~real time updating
+	syntax:
+		- query {...} // anonymous
+		- query Named {...} // named
+		- query Named($operationArgument: String) {...} // arguments
+		- query Named($operationArgument: String = "Anna") {...} // default value
+		query-body:
+			- myfield // get its value (if type is primitive)
+			- myfield(someArgument: "value") // pass arguments to myfield resolver
+			- myfield(a: "value", b: {c: 5}) // eg. multiple
+			- myfield(someOther: $operationArgument) // see operation syntax
+			- myAliasName: myfield // have it return under a different name, eg. to avoid collision if multiple use of same field but eg with different arguments
+			- myfield { mysubfield } // if myfield is non-primitive, subfields to return has to be specified
+			- myfield { mysubfield {mysubsubfield}, myotherfield } // (recursively)
+			meta-fields:
+				- __typename // useful eg. for union types, to know what type was returned
+				// see https://graphql.github.io/learn/introspection/
+					- __Schema, __Type, __TypeKind, __Field, __InputValue, __EnumValue, __Directive
+					- query {__schema {queryType {name}}, __type(name: "...") {name, kind, description, ofType {...}}}
+			fragments: // "variable for subquery", instead of copy paste
+				// cannot be recursive/self-nested (could lead to infinite recursion)
+				- myfield {...myMetaFields}
+				- myfield {name, ...myMetaFields} // include additional + reusable
+				- fragment myMetaFields on MyFieldType { id, createdAt }
+				inline: // required if on union type
+					// if field returns Fish, it will return name + swimDistance, if Bird; name + flyDistance
+					- query {field{ name, ... on Fish {swimDistance}, ... on Bird {flyDistance} }}
+			directives:
+				- myfield @include(if: $someCondition)
+				- myfield @skip(if: $someCondition)
+
+- top level:
+	schema { query Query, mutation: Mutation, ... }

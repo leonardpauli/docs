@@ -1,0 +1,36 @@
+# backend/deployment
+' LeonardPauli/docs
+	Created by Leonard Pauli, 8 oct 2018
+
+preview.locally: "https://github.com/zeit/serve
+	- npm i -g serve
+	- cd dist && serve
+
+using now.sh:
+	// see "https://zeit.co/download", "https://zeit.co/now#get-started"
+	// for vue: https://cli.vuejs.org/guide/deployment.html#now
+	// TODO: find open source equivalents
+	supports:
+		- Dockerfile
+		- nodejs server (package.json)
+		- CDN/static deployment
+	static html5 app:
+		- vi now.json:
+			{
+				"name": "example",
+				"type": "static",
+				"static": {
+					"rewrites": [{"source": "**", "destination": "/index.html"}]
+				},
+				"alias": "my-example-site",
+			}
+		- vi package.json
+			"deploy": "cp now.json dist/ && cd dist && now --public && now alias",
+			// every deploy will be online "for ever" at a unique hash
+			// use alias to have one url point to eg. the latest deploy
+			// see now ls, now rm, now alias --help
+			' TODO
+				- check that alias is actually using the latest!
+				- ability to re-alias to roll back
+				- delete old deployments
+		- npm run build && npm run deploy && open https://lp-vue-store-example.now.sh/

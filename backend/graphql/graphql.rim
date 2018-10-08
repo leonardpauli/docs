@@ -1,0 +1,49 @@
+# backend/graphql
+' LeonardPauli/docs
+	Created by Leonard Pauli, 8 oct 2018
+
+// "graph query language" - specification of a system for api's
+// used for api's (eg. REST alternative)
+
+see also:
+	- app/{js, typescript, nodejs}
+	- backend/prisma
+
+definitions:
+	graph: see theory/math/graph
+	QL: "Query Language"
+	SDL: "Schema Definition Language" // eg. graphql sdl
+
+see query-language
+see apollo-server.basic-usage
+
+playground: // web-based tool to interact with a graphql api
+	// see https://github.com/prisma/graphql-playground
+	// based on: graphiql
+	shortcuts:
+		- query.prettify: shift-ctrl-p
+		- query.run: ctrl-enter
+		- auto-complete: ctrl-space
+
+authorisation:
+	idea/flow:
+		- in server, add create account/credentials mutation
+		- somewhere, use create credentials mutation
+			// usually from client, but in case of eg. exclusive beta, might be serverside only
+			// 	(if so, add guard in create credentials mutation)
+		- in client, login by making login mutation(?)
+		- in server.graphql.login.resolver: add custom logic to validate credentials + set response.cookie with token (eg. JWT)
+		- in client, be receiving response, cookie with token (eg. JWT being sent in http header with every GraphQL request) will be set
+		- in server, add middleware parsing+validating the token and populating request context with currentUser
+		- in server.graphql.resolver with auth: guard using custom logic using resolver arguments + currentUser, return early with error value if not authorized
+		- in client. handle errors
+		- in client, add logout functionality clearing the cookie (optionally call logout mutation, possibly invalidating the cookie + logging)
+
+' TODO:
+	- test using playground
+	- setup simple client using apollo-client
+	- acomodate for vue-apollo (apollo-client) in lp-vue-store // should not be a dependency, but easy to attach
+		- will handle caching (?) + auto update vue store objects with neat syntax for new Vue({apollo:{...}}) key (just pass it through?)
+		- make example project using it
+		// see https://akryum.github.io/vue-apollo/guide/installation.html#vue-cli-plugin
+		// see https://akryum.github.io/vue-apollo/guide/apollo/#special-options

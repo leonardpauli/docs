@@ -1,0 +1,29 @@
+# theory/math/graph
+' LeonardPauli/docs
+	Created by Leonard Pauli, 8 oct 2018
+
+// graph-theory: study about graphs (mathematical structures)
+// - "used to model pairwise relations between objects"
+
+' see:
+	- https://en.wikipedia.org/wiki/Graph_theory
+	- https://en.wikipedia.org/wiki/Glossary_of_graph_theory_terms
+
+Graph:
+	nodes is many: Node
+		alias: Vertex, Point
+		edges is many Edge
+		degree: edges.count
+	edges is many: Edge{directed: self.directed} with (Node a, Node b)
+		alias: Arc, Line
+		directed is Boolean
+		loop: a is b
+
+	directed is Boolean
+	
+	SubGraph is Graph with (edges in super.edges, nodes in super.nodes)
+	loops: edges(is loop)
+	circuits is many SubGraph
+	...
+
+	// TODO: path, stig, euler...
