@@ -1,0 +1,17 @@
+# app/tools
+' LeonardPauli/docs
+	Created by Leonard Pauli, 8 oct 2018
+
+editors:
+	- vim: see os/terminal/vim
+		available through terminal, usually preinstalled in linux+osx
+		great when on other + remote systems
+	- sublime text
+		fast, great for general text processing
+	- VSCode: "https://code.visualstudio.com/docs/?dv=osx"
+		' fast editing: https://code.visualstudio.com/docs/editor/codebasics
+		great for typescript
+
+terminal:
+	iterm3
+	ohmyzsh
