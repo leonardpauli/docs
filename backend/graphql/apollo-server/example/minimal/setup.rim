@@ -1,0 +1,12 @@
+# backend/graphql/apollo-server/example/minimal/setup
+' LeonardPauli/docs
+	Created by Leonard Pauli, 9 oct 2018
+
+setup:
+	// https://www.apollographql.com/docs/apollo-server/getting-started.html
+	- init npm project: mkdir server && cd $_ && npm init -y
+	- npm i apollo-server graphql // graphql is peer-dependenc of apollo-server
+	- vi index.js
+	- node index.js
+	- open provided link // should open a graphql playground
+		- in query, write: "query {books {title}}" // ctrl-enter to run

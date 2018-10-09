@@ -2,8 +2,10 @@
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 8 oct 2018
 
-// "graph query language" - specification of a system for api's
+// "graph query language" - specification of a system for api's / "data-layer?"
 // used for api's (eg. REST alternative)
+// https://facebook.github.io/graphql/
+// https://github.com/facebook/graphql
 
 see also:
 	- app/{js, typescript, nodejs}
@@ -13,9 +15,24 @@ definitions:
 	graph: see theory/math/graph
 	QL: "Query Language"
 	SDL: "Schema Definition Language" // eg. graphql sdl
+	directive: "@mydirective(someargument: somevalue, ...)" // see syntax
 
 see query-language
 see apollo-server.basic-usage
+
+cli: npm i -g graphql-cli -> graphql/gql
+	// https://github.com/graphql-cli/graphql-cli
+	// get-schema, diff & playground
+	// https://oss.prisma.io/content/GraphQL-CLI/01-Overview.html
+
+' TODO:
+	graphql-faker // generate fake data through directives
+		- npm i -g graphql-faker
+		- graphql-faker --open
+	graphql-cli-load // import data from (json, csv)
+	graphql-cli-voyager // view schema as visual uml-diagram-graph in browser // not great interface but does something
+	public apis:
+		- starwars api: https://swapi.co/
 
 playground: // web-based tool to interact with a graphql api
 	// see https://github.com/prisma/graphql-playground
@@ -39,6 +56,18 @@ authorisation:
 		- in client. handle errors
 		- in client, add logout functionality clearing the cookie (optionally call logout mutation, possibly invalidating the cookie + logging)
 
+pagination:
+	// see https://graphql.github.io/learn/pagination/
+	alts: direction, limit, and: or:
+		- offset // if entries gets added between requests, offset will be wrong
+		- lastEntryId // if lastEntry gets deleted, or updated (if updatedAt ordering is used), it might cause issues
+		- cursor // cursor can be a combination of dates, lastEntryId, (+ offset, etc, if wanted), and by making it opaque, it becomes its own normalized field
+	using cursor:
+		- independent from entry -> create wrapper
+			type PageInfo = { cursor: Cursor, exists: Boolean }
+			type PaginationList<T> = { edges: Edge<T>[], nodes: T[], next: PageInfo, prev: PageInfo } // node is a helper to unwrap all the nodes from the edges
+			type Edge<T> = { node: T, cursor: Cursor }
+
 ' TODO:
 	- test using playground
 	- setup simple client using apollo-client
@@ -47,3 +76,12 @@ authorisation:
 		- make example project using it
 		// see https://akryum.github.io/vue-apollo/guide/installation.html#vue-cli-plugin
 		// see https://akryum.github.io/vue-apollo/guide/apollo/#special-options
+
+
+' TODO:
+	// - apollo-server.example.minimal
+	- apollo-server.example.custom-directive
+	- apollo-server.example.auth-using-jwt
+	- prisma.example.minimal
+	- prisma.example.using-apollo-server+db-query-schema-stitching
+	- prisma.example.starting-point // using apollo-server, auth-using-jwt, db-query-schema-stitching, project setup, etc
