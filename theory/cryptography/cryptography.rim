@@ -1,0 +1,85 @@
+# theory/cryptography
+' LeonardPauli/docs
+	Created by Leonard Pauli, 9 oct 2018
+
+' see:
+	- terminal/pgp-workflows
+	- os/network/ssl
+
+dictionary:
+	RSA: "Rivest–Shamir–Adleman" // "public-key cryptosystems"
+	CA: "Certificate Authority"
+	MITM: "Man in the Middle"
+	HMAC: "hash-based message authentication code"
+	cipher: ~data resulting from some encryption
+
+communication.properties:
+	- privacy
+	- authenticity
+
+- asymmetric
+	algorithms:
+		- RSA -> (e: encrypt, d: decrypt)
+			e x: x^e mod m
+			d x: x^d mod m
+			d e x = x	// x = x^(d*e) mod m
+			- prime-numbers "too simple", needs > 700 digits for some security
+		- using elliptic curves // more "complex" than just prime-numbers, otherwise similar to RSA
+		// TODO: DSA?
+	use-cases:
+		- encryption: e{public}, d{private}
+		- signing: e{private}, d{public}
+		- key-exchange
+			DH -> ECDHE
+		practical:
+			client -> server -> client
+				- speed
+				- perfect forward secrecy
+				- revocation
+				- replay attacks + package dropping
+				- CA vulnerability
+				- server-client not checked?
+			RSA too slow -> key exchange with signing then (encryption.symmetric (for privacy) + signing (for authenticity))
+- symmetric // ~10^3 times faster than asymetric
+	- encryption
+		reversible
+		algorithms: AES // AES-128, AES-256
+			fixed block size, eg. 16byte for AES-128
+			transformation on block using some input, eg. block index, key, previous block (encrypted or not), initial random vector
+		E{k} data: data | modify{using-key: k}
+		- "cipher mode" ?
+			- ECB: attackable, same key for each segment/block
+			- CBC: non-parallelable, xor data with previous-cifered-value{initially: IV (Initiation Vector, random)} for each segment
+			- CTR: parallelable, xor data with (IV + segment index) for each segment
+			- GCM?
+	- signing
+		AEAD?
+	- hashing (cryptographic, non-cryptographic hashing exists for other use-cases)
+		should be non-reversible
+		should look random
+		- MD5: vulnerability: brute-force? -> avoid?
+		- SHA-256
+			vulnerability: length-extension attack // somewhat solvable by repeating twice: sha256(sha256(x))
+		use-cases:
+			- pasword hashing
+				should be slow to mitigate brute-force on cracked password-hash-db
+					variable workload as computers gets faster -> vulnerability: special build circuits; RAM is more expencive -> variable workload + memory usage
+	- random-generation?
+		more "real" -> slow, eg u/random
+		using AES encryption on 
+
+https:
+	TLS_ECDHE_RSA_WITH_AES_128_GCM
+	TLS (typ SSL) "Transport Layer Security"
+	using elliptic curve diffie-hellman key-exchange
+	AES_128: used algorithm
+	GCM: used cipher mode
+
+
+' TODO:
+	merkel trees?
+
+
+' references:
+	- indata18++ (KTH) lecture
+	- internet, etc
