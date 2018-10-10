@@ -1,0 +1,85 @@
+# backend/auth/jwt
+' LeonardPauli/docs
+	Created by Leonard Pauli, 10 oct 2018
+
+// "json web token"
+// - base64 encoded json object containing meta info + payload (possibly encrypted)
+// 		with protocol to encode/decode + sign/verify it
+// - use-case: ability to have client send currentUserId and trust it, thus avoiding db lookup for each request
+
+' see
+	https://github.com/auth0/node-jsonwebtoken
+	https://medium.com/@siddharthac6/json-web-token-jwt-the-right-way-of-implementing-with-node-js-65b8915d550e
+	https://jwt.io/introduction/
+	https://github.com/koajs/jwt
+
+definitions:
+	LUT: "look-up table" // eg. simple key-value storage
+
+flow:
+	- generate (public, private).key
+	- service.auth // using private.key
+		payload
+			| field:
+				- sensitive: encrypt{using public.key} // known only to selected services
+				- meh but time-sensitive: encrypt{using phrase + simple algo} // known to more services, eg. id's
+				- non-sensitive: keep-as-is
+			| jwt.sign{using private.key} // + set expiry date + algo + purpose
+			| jwt.encode // json -> base64
+			| token -> client.store
+	- package.auth-verify // using public.key
+		client.store -> token
+			| jwt.decode // base64 -> json
+			| jwt.verify{using public.key} // + check expiry date + algo + purpose
+			| field:
+				- decrypt if needed and service has access (keys)
+			| -> (partial) payload
+
+
+refresh-token-flow:
+	token:
+		safety-measures:
+			- long-term: short lifespan to minimize risk if compromised
+			- short-term: in-memory LUT of compromised tokens to guard against
+				- keep tiny (performance impact * each req)
+					eg. if grows, decrease token{new}.lifespan
+				- replicated on each instance
+			- short-short-term: none // collateral damage?
+				// between compromise and registered in LUT
+	refresh-token:
+		safety-measures:
+			- long-term: db-lookup
+			- short-term: only usable once
+			- short-short-term: none
+				' between compromise and original main token expiry
+						two sessions might be active (original + compromised)
+				-> keep track of access locations (IP, device, time, + token id)
+					+ notify sessions with different token id in UI with ability to take quick action (eg. add to LUT)
+	- login
+		- validate
+		- generate tokens
+			- token{lifespan: short{eg. 1d}}
+			- refresh-token{lifespan: long{eg. 6m}}
+		- send to client.store
+			alts: // TODO
+				- localstorage
+					- accessible by libs etc?
+				- cookie
+					- accessible by browser(stored as plain text on computer?) + server(header)
+		- client sends requests
+		- if token.expired, server.respond with error.token.expired
+			| client.middleware.refresh-token
+				requests.auth.token.refresh(refresh-token) | or:
+					server: -> refresh-token
+						| validate | db.lookup | fail if not exists else:
+							db.remove(refresh-token) | login{using refresh-token}
+								// return new (token, refresh-token)
+					- fail: redirect to login page
+					- ok: store token, retry request
+						do fail if error.token.expired again
+
+
+nodejs:
+	- see example/setup
+
+// TODO: encrypt .env.json.prod file (containing jwt-auth.private.key) with process.env.ENV_KEY provided one way to server?

@@ -1,0 +1,50 @@
+# backend/auth/bcrypt
+' LeonardPauli/docs
+	Created by Leonard Pauli, 10 oct 2018
+
+// "password hashing function based on the blowfish cipher"
+
+' see
+	https://en.wikipedia.org/wiki/Bcrypt
+	https://medium.com/@danboterhoven/why-you-should-use-bcrypt-to-hash-passwords-af330100b861
+	https://auth0.com/blog/hashing-in-action-understanding-bcrypt/
+
+when computers gets faster, brute-forcing becomes easier
+	-> change bcrypt.rounds alongside moorse-law
+		- hash.duration(high-end laptop 2018): 2^(rounds-10) * 64ms
+			// ie. ~16 hashes/s for 10 rounds // 1/(2^(10-10) * 64/1000) ≈ 16
+
+flow:
+	- on user.signup with (id, password.plain-text)
+		salt: bcrypt.salt.generate{rounds: 10}
+		hash: (password.plain-text, salt) | bcrypt.hash
+		db.user.store (id, hash)
+	- on user.login with (id, password.plain-text)
+		hash: db.user.get with id | .hash
+		matches: bcrypt.compare(password.plain-text, hash)
+		return ok if matches else fail
+
+nodejs.usage
+	- npm i bcrypt // might be issues if pre-built library not found and compiling necessary, see node-gyp
+	- cp ./hashPassword.js ... // see file, just a wrapper
+	- vi index.js
+		import {hashPassword, validatePassword} from './hashPassword'
+		const db = {users: {}}
+		const main = async ()=> {
+			await signup({id: 1, passwordPlainText: 'secret', name: 'Anna'})
+			test('Anna', (await login({id: 1, passwordPlainText: 'secret'}).name))
+			...
+		}
+		const login = async ({id, passwordPlainText})=> {
+			const user = db.users[id]
+			if (!user) return null
+			if (!await validatePassword(passwordPlainText, {againsHash: user.password})) return false
+			return user
+		}
+		const signup = async ({id, passwordPlainText, ...rest})=> {
+			const existingUser = await login(id, passwordPlainText)
+			if (existingUser !== null) return existingUser
+			db.users[id] = {...rest, id, password: await hashPassword(passwordPlainText)}
+		}
+		const test = (actual, expected)=> console.log(actual, expected)
+		main().catch(console.error)

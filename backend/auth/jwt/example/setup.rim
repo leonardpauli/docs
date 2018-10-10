@@ -1,0 +1,12 @@
+# backend/auth/jwt/example
+' LeonardPauli/docs
+	Created by Leonard Pauli, 10 oct 2018
+
+setup:
+	- mkdir example && cd $_ && npm init -y
+	- npm i jsonwebtoken
+	- mkdir keys && ssh-keygen -b 2048 -t rsa -f keys/jwt-auth // skip password
+		jwt-auth.pub // can be publicly shared, eg. to other services for them to verify the tokens
+		jwt-auth // private key and should be accessible only for service.token-generation
+	- vi index.js
+	- node index.js
