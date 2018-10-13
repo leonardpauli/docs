@@ -11,7 +11,7 @@
 
 when computers gets faster, brute-forcing becomes easier
 	-> change bcrypt.rounds alongside moorse-law
-		- hash.duration(high-end laptop 2018): 2^(rounds-10) * 64ms
+		- hash.duration(high-end laptop ~2018): 2^(rounds-10) * 64ms
 			// ie. ~16 hashes/s for 10 rounds // 1/(2^(10-10) * 64/1000) ≈ 16
 
 flow:
@@ -24,27 +24,27 @@ flow:
 		matches: bcrypt.compare(password.plain-text, hash)
 		return ok if matches else fail
 
-nodejs.usage
-	- npm i bcrypt // might be issues if pre-built library not found and compiling necessary, see node-gyp
-	- cp ./hashPassword.js ... // see file, just a wrapper
-	- vi index.js
-		import {hashPassword, validatePassword} from './hashPassword'
-		const db = {users: {}}
-		const main = async ()=> {
-			await signup({id: 1, passwordPlainText: 'secret', name: 'Anna'})
-			test('Anna', (await login({id: 1, passwordPlainText: 'secret'}).name))
-			...
-		}
-		const login = async ({id, passwordPlainText})=> {
-			const user = db.users[id]
-			if (!user) return null
-			if (!await validatePassword(passwordPlainText, {againsHash: user.password})) return false
-			return user
-		}
-		const signup = async ({id, passwordPlainText, ...rest})=> {
-			const existingUser = await login(id, passwordPlainText)
-			if (existingUser !== null) return existingUser
-			db.users[id] = {...rest, id, password: await hashPassword(passwordPlainText)}
-		}
-		const test = (actual, expected)=> console.log(actual, expected)
-		main().catch(console.error)
+
+nodejs.usage // see ./example
+	- npm i bcrypt // see bcrypt if issues
+		if pre-built library not available:
+			might be that npm uses older version
+				- npm info bcrypt
+				- npm i bcrypt@3.0.1 // use latest
+				// possible also try installing bcrypts dependencies independently first with latest version
+			will try to compile locally // might be trouble-some
+				requirements: node-gyp
+					node-gyp: "Node.js native addon build tool"
+						npm i -g node-gyp
+	- vi hashPassword.js // see file, just a wrapper
+	- vi api.js // example usage of wrapper for login/signup
+	- npm i -D jest
+	- vi index.test.js // example usage of api
+	- npm run test
+
+	durations:
+		genSalt: ~5ms
+			// $2b$10$aiGiwRB1nz0NtxlTrH.GKu
+		hash{rounds 10}: ~64ms (high-end laptop ~2018)
+			// $2b$10$4hp01RizLtDArFMRul2zyepbEeNseparCDxktDO4wQsoViE5Wkw2G
+		compare: ~same as hash
