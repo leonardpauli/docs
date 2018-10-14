@@ -83,3 +83,4 @@ nodejs:
 	- see example/setup
 
 // TODO: encrypt .env.json.prod file (containing jwt-auth.private.key) with process.env.ENV_KEY provided one way to server?
+// TODO: error handling: https://github.com/auth0/node-jsonwebtoken#errors--codes

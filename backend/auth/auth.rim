@@ -1,0 +1,58 @@
+# backend/auth
+' LeonardPauli/docs
+	Created by Leonard Pauli, 13 oct 2018
+
+see:
+	- bcrypt // password hashing
+	- jwt // client token containing signed + encrypted data (eg. user id + roles) from server
+	- account-service
+
+definitions:
+	ACL: "Access Control List" // eg. for roles and permissions
+
+
+api.auth // TODO + see account-service
+	' idea: own thing with extra security focus that handles everthing token/account related
+		flow: client
+			-> api.auth{replicated/sharded account+roles db's, key.private}
+				.(signup, login, token.refresh, token.invalidate, logout)
+			-> token{encoded account{user, roles}}
+			-> api.other -> service.other{key.public}
+				- token.validate{key.public}: or:
+					- fail: -> client: or:
+						- token.refresh | api.auth | redo request
+						- login popup
+						- error message
+					- ok: -> continue
+				- token | action.authorised | or:
+					- ok: -> continue -> response -> client
+					- fail: error -> client
+	auth-service cluster/replicated pods/instances behind loadbalancer
+	auth-service: // TODO
+		- own db(s)
+		- has private.key
+	other services:
+		- has public.key to validate req.token{jwt?} (includes user id + auth info such as roles etc)
+			- if invalid or refresh needed, returns that to client that makes new request to api.auth ()
+
+
+pluggable external authenticators:
+	alt:
+		- passport.js
+			dictionary:
+				strategy: "external authenticator implementation"
+			not generall, built for route-based auth with express.js
+				ability to reuse all its strategies
+			strategy:
+				- local
+				- productivity: google
+				- social: facebook, twitter, google, etc
+				- general: openid, oauth, etc
+				- 
+				- etc
+			to review:
+				- ability to use jwt?
+					and not store sessions server-side?
+				- ability to use with koa?
+				- up to date? // external providers deprecate their api's all the time...
+
