@@ -1,0 +1,11 @@
+# app/web/performance
+' LeonardPauli/docs
+	Created by Leonard Pauli, 15 oct 2018
+
+// TODO
+
+- bundle.size.analyse:
+	- "https://bundlephobia.com"
+		// eg. https://bundlephobia.com/result?p=graphql@14.0.2
+ 	- vue: try building using vue-cli-ui
+- see app/tools/chrome.extensions.performance
