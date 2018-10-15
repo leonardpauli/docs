@@ -1,0 +1,46 @@
+# backend/auth/example/simple/idea
+' LeonardPauli/docs
+	Created by Leonard Pauli, 14 oct 2018
+
+// simple
+
+stack:
+	backend:
+		- koa
+		- jwt
+		- bcrypt
+		- grapgql (apollo-server)
+		- prisma
+	frontend:
+		- vue simple
+		- grapgql (apollo-server)
+	endpoints:
+		- login, signup, me, notes, logout
+
+
+User @auth(role: ADMIN)
+	id: UUID @unique @pk
+	email: String! @validate(type: email)
+	hash: String!
+	emailVerified: Boolean! @default(false)
+	roles: [Role!]!
+
+enum Role {
+	ADMIN,
+}
+
+Note @auth(role: LOGGEDIN)
+	author: User! @relation
+	text: String!
+
+' Post @auth(or: [isOwner, isPublic])
+	author: User! @relation @public
+	text: String! @public
+	secretNote: String @auth(isOwner)
+	public: Boolean! @default(false)
+
+- token valid for 7d
+- no refresh token: re-login required
+- no change email, no change password for now
+- create admin user on startup, print credentials to log
+- @auth directive with ADMIN + LOGGEDIN roles, default is private
