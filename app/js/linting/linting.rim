@@ -4,6 +4,15 @@
 
 // see https://eslint.org/docs/user-guide/configuring
 
+' TODO: create sh script to lint fix any file using custom default config
+	- npm i -g @leonardpauli/eslint-config onchange ...
+	- lint/lintw [glob]
+		- if glob:
+			- run custom lint on glob
+			- eslint ... (use config) --fix ... (glob)
+		- run `npm run lint`/`npm run lint:watch` if available
+		- else show help
+
 prerequisites:
 	- lint_config_name='@leonardpauli/eslint-config'
 

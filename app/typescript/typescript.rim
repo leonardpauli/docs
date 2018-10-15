@@ -25,6 +25,22 @@ typescript.nodejs.project.create:
 	boilerplate:
 		// see https://github.com/jsynowiec/node-typescript-boilerplate
 
+ts-node:
+	// https://github.com/TypeStrong/ts-node
+	// for development only (slower, etc), for production, compile to js first and use node directly
+	in project: npm i -D ts-node typescript
+	globally (for cli usage outside projects): npm i -g ts-node typescript
+	- ts-node script.ts // execute file (tsc | node)
+	- ts-node // repl
+	- ts-node -e 'console.log("Hello, world!")' // execute code from arg
+	- ts-node -p '"Hello, world!"' // execute code from arg + print result
+	- echo "console.log('Hello, world!')" | ts-node // execute code from pipe
+
+editor.support
+	editors: VSCode supports by default if project.setup done
+	project.setup:
+		- copy ./example/tsconfig.json to project root
+
 
 syntax: // prerequisites: js syntax
 	- basic
