@@ -1,0 +1,12 @@
+# backend/server/koa/examples/using-typescript
+' LeonardPauli/docs
+	Created by Leonard Pauli, 15 oct 2018
+
+setup:
+	- mkdir server && cd $_ && npm init -y
+	- cp .../tsconfig.json ./ // eg. to activate editor typescript support
+	- npm i koa
+	- vi index.ts // instantiate Koa server + add middlewares + start listening
+	- vi middlewares-utility.ts
+	- vi middlewares-custom.ts
+	- ts-node index.ts

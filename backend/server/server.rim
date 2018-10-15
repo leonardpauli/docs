@@ -1,0 +1,9 @@
+# backend/server
+' LeonardPauli/docs
+	Created by Leonard Pauli, 15 oct 2018
+
+nodejs:
+	alt:
+		- native http/https module
+		- express // "outdates" in favour of koa
+		- koa

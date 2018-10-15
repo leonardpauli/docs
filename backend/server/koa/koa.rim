@@ -1,0 +1,21 @@
+# backend/server/koa
+' LeonardPauli/docs
+	Created by Leonard Pauli, 15 oct 2018
+
+// web server framework for nodejs
+// - simplified concept; only one pipeline of "middlewares", async fn taking ctx, done
+// see https://koajs.com/
+// see https://github.com/koajs/koa/blob/master/docs/api/context.md
+
+setup.minimal:
+	- npm i koa
+	- vi index.js
+		const Koa = require('koa')
+		const app = new Koa()
+		const config = {port: 3000}
+		const mainRoute = async ctx=> ctx.body = 'Hello World'
+		app.use(mainRoute)
+		app.listen(config.port)
+	- node index.js
+
+ts.example: see ./examples/using-typescript
