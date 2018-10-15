@@ -1,0 +1,37 @@
+# app/api/apollo-client
+' LeonardPauli/docs
+	Created by Leonard Pauli, 15 oct 2018
+
+// library for consuming graphql api
+// - js
+
+see:
+	- backend/graphql/apollo-server
+
+// TODO
+
+see backend/auth/example/simple/setup
+
+
+' apollo-boost // pre-configured apollo-client
+	// TODO: issues installing, better just use manual directly (~30 lines extra)
+	// see https://www.apollographql.com/docs/react/essentials/get-started.html#apollo-boost
+	packages:
+		- apollo-client
+		- apollo-cache-inmemory
+			alt: apollo-cache-persist
+			specify id resolvers for requests:
+				// https://www.apollographql.com/docs/react/features/performance.html#cache-redirects
+		- apollo-link-http
+		- apollo-link-error
+			onError (graphql.error or network.error): console.error
+		- apollo-link-state
+	config:
+		onError // eg. to show snackbar
+
+dev-tools:
+	- see app/tools/chrome.extensions
+
+' TODO:
+	apollo-codegen
+		// https://www.apollographql.com/docs/react/features/developer-tooling.html#codegen

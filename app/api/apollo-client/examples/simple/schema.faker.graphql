@@ -1,0 +1,1 @@
+type Query { message: String @fake(type: words) }

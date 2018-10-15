@@ -1,0 +1,25 @@
+# app/api/apollo-client/example/simple/setup
+' LeonardPauli/docs
+	Created by Leonard Pauli, 14 oct 2018
+
+// simple
+
+see:
+	- backend.graphql.{graphql-faker}
+	- app.api.apollo-client
+	- app.vue.{cli}
+
+setup:
+	- mkdir web && cd $_ && npm init -y
+	- npm i vue
+	- npm i vue-apollo graphql apollo-client apollo-link apollo-link-http apollo-cache-inmemory graphql-tag
+	- mkdir src && cd $_
+	- vi main.js		
+	- vi App.vue
+	- vi apollo-client.js
+	- vi config.js
+	- cd ..
+	test:
+		- echo 'type Query { message: String @fake(type: words) }' > schema.faker.graphql
+		- graphql-faker -p 4000
+		- vue serve src/main.js
