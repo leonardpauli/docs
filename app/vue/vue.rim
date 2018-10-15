@@ -6,9 +6,26 @@
 
 prerequisites:
 	- see app.spa.get dev-dependencies.fundamental
-	- get boilerplate-cli // (ie. vue-cli), get up and running quickly with necessary code* 
-		- `npm i -g @vue/cli` // https://github.com/vuejs/vue-cli
 
+definitions:
+	cli: "Command Line Interface"
+
+cli:
+	// https://github.com/vuejs/vue-cli
+	install: npm i -g @vue/cli
+	serve:
+		prerequisite:
+			- npm i -g @vue/cli-service-global
+		- uses global dependencies
+		- single vue file
+			- echo '<template><h1>Hello</h1></template>' > App.vue
+			- vue serve App.vue
+		- auto-detect: vue serve
+			entrypoint: main.js, index.js, App.vue, app.vue or the one specified (eg. vue serve myentrypoint.js/.vue)
+			optionally in same dir:
+				- index.html
+				- package.json with installed local deps
+				- config files for babel, postcss and eslint (etc?)
 
 generate boilerplate project
 	- `vue create -m npm my-app`, follow instructions // vue create -m npm base
@@ -36,7 +53,7 @@ get started:
 	- npm run build // create a package ready for production in /dist, just upload it to a server
 
 
-cli utils:
+utils:
 	vue_file_html_to_pug:
 		// for once through UI, see "http://html2jade.org/"
 		- npm i -g html2pug
