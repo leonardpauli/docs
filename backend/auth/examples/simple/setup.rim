@@ -1,0 +1,19 @@
+# backend/auth/example/simple/setup
+' LeonardPauli/docs
+	Created by Leonard Pauli, 14 oct 2018
+
+// simple
+
+see:
+	- backend.server.koa
+	- backend.auth.{jwt, bcrypt}
+	- backend.graphql.{it, prisma, apollo-server}
+	- app.api.apollo-client
+	- app.vue.{cli}
+
+backend:
+	- mkdir api && cd $_ && npm init -y
+	- ...
+frontend:
+	- cp app/api/apollo-client/example/simple
+	- ...
