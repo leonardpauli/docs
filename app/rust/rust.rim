@@ -9,12 +9,25 @@ install:
 	- curl https://sh.rustup.rs -sSf | sh
 		cargo.bin.dir.add: cargo, rustc, rustup, ... 
 	- cat $HOME/.cargo/env >> ~/.zshrc
-	test: cargo -h
+	update: rustup update // do after installation
+	test: rustc --version, cargo -h
 	uninstall: rustup self uninstall
 
 cargo // Rust's package manager
 	bin
 		dir: $HOME/.cargo/bin
+
+rustup // https://github.com/rust-lang-nursery/rustup.rs/blob/master/README.md
+
+
+editor-support:
+	// see https://areweideyet.com/#sublime
+	vscode:
+		- https://github.com/rust-lang-nursery/rls-vscode
+	' TODO: sublime-text:
+		- https://github.com/rust-lang/rust-enhanced
+		- https://packagecontrol.io/packages/RustAutoComplete
+			https://github.com/racer-rust/racer
 
 
 syntax

@@ -2,15 +2,25 @@ extern crate image;
 
 use image::{ImageBuffer, Rgb};
 
-const WIDTH: u32 = 10;
-const HEIGHT: u32 = 10;
-
 fn main() {
     println!("Hello, world!");
 
-    let mut img = ImageBuffer::<Rgb<u32>>::new(WIDTH, HEIGHT);
+    let sizes: Vec<u32> = vec![16, 32, 48, 128];
 
-    img.get_pixel_mut(5, 5).data = [255, 255, 255];
 
-    img.save("img.png").unwrap();
+    sizes.clone().into_iter().for_each(|x| {
+        let img = make_image(x);
+        img.save(format!("out/icon{}.png", x)).unwrap();
+    });
+    
+}
+
+fn make_image(size: u32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let mut img = ImageBuffer::<Rgb<u8>, Vec<u8>>::new(size, size);
+    for x in 5..size-5 {
+        for y in 5..10 {
+            img.get_pixel_mut(x, y).data = [255, 255, 255];
+        }
+    }
+    img
 }
