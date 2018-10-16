@@ -1,0 +1,6 @@
+[package]
+name = "lib-test"
+version = "0.1.0"
+authors = ["Leonard Pauli <leonardpauli@me.com>"]
+
+[dependencies]

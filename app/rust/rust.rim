@@ -1,0 +1,39 @@
+# app/rust
+' LeonardPauli/docs
+	Created by Leonard Pauli, 16 oct 2018
+
+// programming language
+// see https://www.rust-lang.org
+
+install:
+	- curl https://sh.rustup.rs -sSf | sh
+		cargo.bin.dir.add: cargo, rustc, rustup, ... 
+	- cat $HOME/.cargo/env >> ~/.zshrc
+	test: cargo -h
+	uninstall: rustup self uninstall
+
+cargo // Rust's package manager
+	bin
+		dir: $HOME/.cargo/bin
+
+
+syntax
+	examples:
+		// https://en.wikipedia.org/wiki/Rust_(programming_language)
+		- hello world: fn main() { println!("Hello World"); }
+		- factorial:
+			- recursive:
+				fn factorial(i: u64) -> u64 {
+					match i {
+						0 => 1,
+						n => n * factorial(n-1)
+					}
+				}
+			- iterative:
+				fn factorial(i: u64) -> u64 {
+					let mut acc = 1;
+					for num in 2..=i { acc *= num; }
+					acc
+				}
+			- using iterators:
+				fn factorial(i: u64) -> u64 { (1..=i).product() }
