@@ -1,0 +1,26 @@
+# app/web/browser/chrome/extension
+' LeonardPauli/docs
+	Created by Leonard Pauli, 16 oct 2018
+
+// - about extensions for web.browser.chrome 
+// https://developer.chrome.com/extensions/getstarted
+
+
+extension:
+	components:
+		- background scripts
+		- content scripts
+		- options page
+		- UI elements
+		- various logic files
+		created using: HTML, CSS, JavaScript
+		manifest // binding together
+
+extension.management.page
+	- open chrome://extensions
+	- toggle "developer mode" true
+	load.unpacked: click "load unpacked", select directory
+	extension.reload
+
+example:
+	see example.background-changer

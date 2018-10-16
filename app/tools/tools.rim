@@ -19,22 +19,4 @@ terminal:
 communication:
 	- Discord: "https://discordapp.com" (mobile + desktop + web)
 
-
-chrome.extensions:
-	performance:
-		- lighthouse // https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk
-	data:
-		- json-formatter // https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa
-	frameworks:
-		- vue-dev-tools
-			- vuex-dev-tools
-		- react-dev-tools
-			- redux-dev-tools
-		- apollo-dev-tools
-			// https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm
-			// https://www.apollographql.com/docs/react/features/developer-tooling.html#devtools
-	distractions:
-		- adblock-plus
-		- News Feed Eradicator for Facebook
-	utils:
-		- video speed controller
+see web.browser.chrome.{it, extension.list}

@@ -1,0 +1,99 @@
+# app/web/browser/chrome/extension/example/background-changer/setup
+' LeonardPauli/docs
+	Created by Leonard Pauli, 16 oct 2018
+
+// based on https://developer.chrome.com/extensions/getstarted
+
+setup:
+	- mkdir background-changer && cd $_
+	- vi manifest.json
+		{
+			"name": "Background Changer",
+			"version": "0.1.0",
+			"description": "Changes the background of current page",
+			"manifest_version": 2
+		}
+	- do extension.management.page.load.unpacked
+	- add background script
+		- vi manifest.json: // insert
+			"background": {
+				"scripts": ["background.js"],
+				"persistent": false
+			},
+		- vi background.js
+			const onInstalled = ()=> console.log('installed')
+			chrome.runtime.onInstalled.addListener(onInstalled)
+
+	- use persistent storage
+		- add permission
+			- vi manifest.json // insert
+				"permissions": ["storage"],
+		- use
+			- vi background.js // mod
+				const onInstalled = ()=> chrome.storage.sync.set({
+					color: 'hsl(134, 55%, 48%)',
+				}, ()=> {
+					console.log('store updated, installed')
+				})
+
+	- do extension.management.page.extension.reload
+		- "inspect views"."background page" link will become available
+			- click it to view install log
+
+	- add user-interface/popup
+		- vi popup.html
+			<!DOCTYPE html>
+			<html><head><style>
+				button { height: 30px; width: 30px; outline: none; }
+			</style></head><body>
+				<button id="changeColor"></button>
+			</body></html>
+		- vi manifest.json // insert
+			"page_action": {
+				"default_popup": "popup.html",
+			},
+
+	- add icons
+		- mkdir images && touch icon{16,32,48,128}.png
+		- vi manifest // insert
+			"icons": {"16": "images/icon16.png", ...},
+		- vi manifest, insert under page_action
+			"default_icon": {"16": "images/icon16.png", ...}
+
+	- enable user-interface/popup:
+		- manifest.permission.add "declarativeContent"
+		- script.background.on install.add:
+			const pageRules = [{
+				conditions: [new chrome.declarativeContent.PageStateMatcher({
+					pageUrl: {hostEquals: 'developer.chrome.com'},
+				})],
+				actions: [new chrome.declarativeContent.ShowPageAction()]
+			}]
+			chrome.declarativeContent.onPageChanged.removeRules(undefined, ()=>
+				chrome.declarativeContent.onPageChanged.addRules(pageRules))
+
+	- add user-interface/popup script:
+		- vi popup.html // insert
+			<script src="popup.js"></script>
+		- vi popup.js
+			let changeColor = document.getElementById('changeColor')
+			chrome.storage.sync.get('color', data=> {
+				changeColor.style.backgroundColor = data.color
+				changeColor.setAttribute('value', data.color)
+			})
+	- add interaction with page
+		- management.permission.add: activeTab
+		- vi popup.js
+			changeColor.onclick = el=> {
+				let color = el.target.value
+				chrome.tabs.query({active: true, currentWindow: true}, tabs=> {
+					chrome.tabs.executeScript(tabs[0].id, {
+						code: 'document.body.style.backgroundColor = "'+color+'";'
+					})
+				})
+			}
+			
+	- try it
+		- reload extension
+		- open http://developer.chrome.com
+		- click the extension's icon in top right corner
