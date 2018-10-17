@@ -1,0 +1,12 @@
+# mostly for editing syntax highlighting support?
+projects:
+  api:
+    schemaPath: src/schema.graphql
+    extensions:
+      endpoints:
+        default: ${env:API_ENDPOINT}
+
+  database:
+    schemaPath: src/generated/prisma/prisma.graphql
+    extensions:
+      prisma: prisma.yml

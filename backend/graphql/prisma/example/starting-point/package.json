@@ -27,6 +27,7 @@
   },
   "license": "ISC",
   "dependencies": {
+    "apollo-server": "^2.1.0",
     "graphql": "^0.13.2",
     "graphql-tools": "^4.0.0",
     "prisma-client-lib": "^1.17.1"

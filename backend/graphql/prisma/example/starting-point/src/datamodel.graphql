@@ -1,0 +1,18 @@
+type User @model {
+  id: ID! @unique
+  name: String!
+  posts: [Post!]!
+}
+
+type Post @model {
+  id: ID! @unique
+  title: String! @auth(some: "arg")
+  content: String!
+  published: Boolean! @default(value: "false")
+  author: User!
+  age: Int!
+}
+
+type Anna {
+  id: String
+}

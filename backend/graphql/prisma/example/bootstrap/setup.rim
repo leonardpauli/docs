@@ -1,21 +1,12 @@
-# backend/prisma
+# backend/graphql/prisma/example/bootstrap/setup
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 3 oct 2018
 
-// open-source GraphQL ORM-like layer (for server)
-// see https://www.prisma.io/
-
 prerequisites:
-	- see app/typescript
-	- see backend/graphql
-	- see backend/graphql
+	- see prisma.cli
 
-
-- npm install -g prisma
-- bootstrap:
-	alt: // TODO: see https://github.com/graphql-boilerplates/typescript-graphql-server
-	- mkdir example
-	- cd example
+setup:
+	- mkdir bootstrap && cd $_
 	- prisma init
 		options:
 			- use new local docker
@@ -35,9 +26,3 @@ prerequisites:
 	- setup api
 		- do typescript.nodejs.project.create
 	// learn more: see http://bit.ly/prisma-server-overview
-
-' TODO: // see example
-	- use apollo-server, see backend.graphql.apollo-server.basic-usage
-	- auth using jwt + ensure for routes, see backend.graphql.auth
-	- simple migrations
-	- simple remote docker deploy
