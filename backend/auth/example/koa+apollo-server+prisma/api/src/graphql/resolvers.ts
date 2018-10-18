@@ -1,6 +1,9 @@
 import { prisma } from './prisma-generated'
 
+
 const ctxFree = ()=> ({})
+
+// type Resolver = parent, args, context, info
 
 const resolvers = {
 	Query: {
@@ -16,7 +19,7 @@ const resolvers = {
 	UserModule: {
 		list: ()=> prisma.users(),
 		// me: User! @auth(requireRole: USER)
-		me: ()=> {},
+		me: (_, __, ctx)=> ctx.token.user(),
 	},
 	NoteModule: {
 		list: ()=> prisma.notes(),
@@ -31,9 +34,11 @@ const resolvers = {
 	// MiscModuleMutation: {},
 	AccountModuleMutation: {
 		// login(input: AccountLoginInputEmail): AccountToken
-		login: ()=> {},
+		login: async (_, {input: {email: {email, password: pass}}}, ctx)=> ({token: await ctx.token.login({email, pass})}),
 		// signup(input: AccountSignupInput): Void
-		signup: ()=> {},
+		signup: async (_, { input: {credential: {email: { email, password: pass }}}, name }, ctx) => {
+			await ctx.token.signup({ email, pass, name })
+		},
 		// logout: Void @auth(requireRole: USER)
 		logout: ()=> {},
 		// changePassword(input: AccountChangePasswordInput): Void @auth(requireRole: USER)

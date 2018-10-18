@@ -1,4 +1,4 @@
-import { ApolloServer, gql } from 'apollo-server-koa'
+import { ApolloServer, gql } from "apollo-server-koa";
 import { importSchema } from 'graphql-import'
 import directives from './directive'
 import resolvers from './resolvers'
@@ -9,6 +9,7 @@ const server = new ApolloServer({
 	typeDefs: publicApiInterface,
 	resolvers,
 	schemaDirectives: directives,
+	context: ({ctx}) => ({ctx, token: ctx.token}),
 });
 
 export default server
