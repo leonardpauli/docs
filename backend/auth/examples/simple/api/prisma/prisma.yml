@@ -1,0 +1,16 @@
+datamodel: ../src/graphql/datamodel/index.graphql
+endpoint: http://localhost:4467
+# secret: mysecret
+
+# seed:
+#   import: seed.graphql
+
+hooks:
+  post-deploy:
+    - graphql get-schema --project db
+    - graphql codegen
+
+# TODO: duplicate of graphql codegen?
+generate:
+  - generator: typescript-client
+    output: ../src/graphql/prisma-generated

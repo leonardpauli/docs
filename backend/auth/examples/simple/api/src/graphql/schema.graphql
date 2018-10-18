@@ -1,0 +1,7 @@
+# import * from './datamodel/index.graphql'
+# import * from './directive/index.graphql'
+
+type Query {
+	greeting: String!
+	users: [User!]!
+}

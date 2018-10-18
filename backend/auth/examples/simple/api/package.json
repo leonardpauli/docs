@@ -1,0 +1,28 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "description": "",
+  "main": "src/index.ts",
+  "scripts": {
+    "prisma:up": "(cd prisma && docker-compose up -d)",
+    "prisma:down": "(cd prisma && docker-compose down)",
+    "prisma:deploy": "(cd prisma && prisma deploy)",
+    "prisma:playground": "(graphql playground -p db)",
+    "dev:start": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server-koa": "^2.1.0",
+    "graphql": "^14.0.2",
+    "graphql-import": "^0.7.1",
+    "koa": "^2.5.3",
+    "prisma-binding": "^2.1.6",
+    "prisma-client-lib": "^1.18.1"
+  },
+  "devDependencies": {
+    "typescript": "^3.1.2"
+  }
+}

@@ -1,0 +1,4 @@
+directive @unique on FIELD_DEFINITION
+directive @default(value: String) on FIELD_DEFINITION
+
+scalar DateTime

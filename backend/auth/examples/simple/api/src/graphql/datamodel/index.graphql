@@ -1,0 +1,24 @@
+# import * from '../directive/index.graphql'
+
+type User {
+	id: ID! @unique
+	createdAt: DateTime!
+	email: String! @unique @validate(type: "email")
+	hash: String! @private
+	emailVerified: Boolean! @default(value: "false")
+	roles: [Role!]!
+}
+
+enum Role {
+	ADMIN,
+	USER
+}
+
+type Note {
+	id: ID! @unique
+	createdAt: DateTime!
+	updatedAt: DateTime!
+	published: Boolean! @default(value: "false")
+	author: User!
+	text: String!
+}

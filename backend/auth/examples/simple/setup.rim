@@ -13,7 +13,36 @@ see:
 
 backend:
 	- mkdir api && cd $_ && npm init -y
-	- ...
+	- use backend.server."koa".example.using-typescript.setup
+	- use backend.graphql."apollo-server".example.custom-server-koa.setup
+	- use backend.graphql."prisma".example.bootstrap.setup
+		- mkdir prisma && cd $_ && prisma init
+		- vi prisma.yml // change
+			output: ../src/prisma-generated
+		- vi ../.graphqlconfig.yml
+		- up, down, deploy, playground |> package-json-script-add "prisma:\(it)"
+	- vi prisma/datamodel.prisma
+	// TODO: check https://www.prisma.io/docs/data-model-and-migrations/data-model-knul/
+		// for proper .graphqlconfig.yml etc setup + multi-file schema + import in app schema
+	- test: npm run prisma:up && npm run prisma:deploy && npm run prisma:playground
+	- npm i graphql-import
+	- vi src/schema.graphql
+	- add resolvers:
+		- login
+		- signup
+		- me
+		- notes
+		- logout
+	- add validate directive
+	- add auth directive
+	- test
+
 frontend:
 	- cp app/api/apollo-client/example/simple
-	- ...
+	- create middleware storing jwt token
+	- create login form
+	- create me component
+	- create logout action
+	- create signup form
+	- create notes component
+	- test
