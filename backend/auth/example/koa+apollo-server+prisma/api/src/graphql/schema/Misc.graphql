@@ -1,0 +1,7 @@
+# import * from '../directive/index.graphql'
+
+type MiscModule {
+	greeting: String!
+}
+
+# type MiscModuleMutation {}

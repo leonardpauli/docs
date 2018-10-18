@@ -1,0 +1,12 @@
+# import Note from '../datamodel/index.graphql'
+# import * from '../directive/index.graphql'
+
+type NoteModule {
+	list: [Note!]!
+}
+
+type NoteModuleMutation {
+	add(text: String!, publish: Boolean! = false): Void @auth(requireRole: USER)
+	publish(id: ID!, enable: Boolean! = true): Void @auth(requireRole: USER)
+	remove(id: ID!): Void @auth(requireRole: USER)
+}

@@ -1,0 +1,36 @@
+# import User from '../datamodel/index.graphql'
+# import * from '../directive/index.graphql'
+
+# type AccountModule {}
+
+type AccountModuleMutation {
+	login(input: AccountLoginInputEmail): AccountToken
+	signup(input: AccountSignupInput): Void
+	logout: Void @auth(requireRole: USER)
+	changePassword(input: AccountChangePasswordInput): Void @auth(requireRole: USER)
+}
+
+
+type AccountToken {
+	jwtToken: String!
+}
+
+
+input AccountLoginInputEmail {
+	email: String!
+	password: String!
+}
+
+input AccountLoginInput {
+	email: AccountLoginInputEmail!
+}
+
+input AccountSignupInput {
+	credentials: AccountLoginInput!
+	name: String
+}
+
+input AccountChangePasswordInput {
+	passwordCurrent: String!
+	passwordNew: String!
+}

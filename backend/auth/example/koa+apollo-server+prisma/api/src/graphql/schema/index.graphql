@@ -1,0 +1,21 @@
+# import * from '../datamodel/index.graphql'
+# import * from '../directive/index.graphql'
+# import * from './Account.graphql'
+# import * from './User.graphql'
+# import * from './Note.graphql'
+# import * from './misc.graphql'
+
+
+type Query {
+	Misc: MiscModule!
+	# Account: AccountModule!
+	User: UserModule!
+	Note: NoteModule!
+}
+
+type Mutation {
+	# Misc: MiscModuleMutation!
+	Account: AccountModuleMutation!
+	User: UserModuleMutation!
+	Note: NoteModuleMutation!
+}

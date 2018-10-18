@@ -1,0 +1,12 @@
+# import User from '../datamodel/index.graphql'
+# import * from '../directive/index.graphql'
+
+type UserModule {
+	list: [User!]! @auth(requireRole: ADMIN)
+	
+	me: User! @auth(requireRole: USER)
+}
+
+type UserModuleMutation {
+	nameChange(value: String): Void @auth(requireRole: USER)
+}

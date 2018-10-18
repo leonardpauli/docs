@@ -1,5 +1,8 @@
 # import * from './prisma-mock.graphql'
+# import Role from '../datamodel/index.graphql'
 
-directive @auth(value: String) on FIELD_DEFINITION
+directive @auth(requireRole: Role) on FIELD_DEFINITION
 directive @private on FIELD_DEFINITION
 directive @validate(type: String) on FIELD_DEFINITION
+
+scalar Void

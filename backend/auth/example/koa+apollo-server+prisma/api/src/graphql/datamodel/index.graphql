@@ -7,6 +7,9 @@ type User {
 	hash: String! @private
 	emailVerified: Boolean! @default(value: "false")
 	roles: [Role!]!
+
+	name: String! @default(value: "Nameless")
+	notes: [Note!]!
 }
 
 enum Role {
