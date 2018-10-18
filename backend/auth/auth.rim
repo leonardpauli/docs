@@ -10,6 +10,9 @@ see:
 definitions:
 	ACL: "Access Control List" // eg. for roles and permissions
 
+example:
+	- see example/koa+apollo-server+prisma
+
 
 api.auth // TODO + see account-service
 	' idea: own thing with extra security focus that handles everthing token/account related
