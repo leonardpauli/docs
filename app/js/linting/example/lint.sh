@@ -10,10 +10,11 @@
 script_dir () { (a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}; echo "$a"); }
 
 npm_bin_path="$(script_dir)"/node_modules/.bin
+eslint_config_file="$(script_dir)"/.eslintrc
 
 if [ "$1" = "-w" ]; then
-	"$npm_bin_path"/onchange -v "${2-'./**/*.js'}" -d 200 -w -- "$npm_bin_path"/eslint --fix {{changed}}
+	"$npm_bin_path"/onchange -v "${2-'./**/*.js'}" -d 200 -w -- "$npm_bin_path"/eslint -c "$eslint_config_file" --fix {{changed}}
 	exit
 fi
 
-"$npm_bin_path"/eslint --fix $*
+"$npm_bin_path"/eslint -c "$eslint_config_file" --fix $*
