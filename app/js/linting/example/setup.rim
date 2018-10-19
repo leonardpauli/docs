@@ -1,0 +1,20 @@
+# app/node/linting/example
+' LeonardPauli/docs
+	Created by Leonard Pauli, 20 oct 2018
+
+setup:
+	- mkdir example && cd $_ && npm init -y
+	- npm i -D onchange
+	- lint_glob='src/**/*.js'
+	- package-json-script-add '"eslint": "eslint"'
+	- package-json-script-add '"lint:watch": "onchange '"'$lint_glob'"' -d 200 -w -- npm run --silent eslint {{changed}}"'
+	- npm i -D eslint babel-eslint
+	- package-json-script-add '"lint": "eslint --fix '"$lint_glob"'"'
+	- lint_config_name='@leonardpauli/eslint-config'
+	- npm i -D $lint_config_name eslint-plugin-vue eslint-plugin-jest
+	- echo '{ "extends": "'"$lint_config_name"'" }' > .eslintrc
+	- mkdir src
+	test:
+		- echo 'var a =33;' > src/index.js
+		- npm run lint:watch
+		- cat src/*.js
