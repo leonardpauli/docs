@@ -1,0 +1,40 @@
+# design/gpu-programming/webgl
+' LeonardPauli/docs
+	Created by Leonard Pauli, 31 jul 2018
+
+// TODO: mkdir webgl && gsa git@github.com:greggman/webgl-fundamentals.git
+
+' links
+	https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Animating_textures_in_WebGL
+	https://webglfundamentals.org/webgl/lessons/webgl-2d-matrices.html
+	http://mathworld.wolfram.com/Matrix.html
+	https://webglfundamentals.org/webgl/lessons/webgl-2d-matrices.html
+	https://en.wikipedia.org/wiki/Matrix_(mathematics)
+	https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext
+	https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext
+	https://dev.opera.com/articles/introduction-to-webgl-part-1/
+	https://webglfundamentals.org/
+	http://duriansoftware.com/joe/An-intro-to-modern-OpenGL.-Table-of-Contents.html
+	https://en.wikipedia.org/wiki/Texel_(graphics)
+	https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Data#Varyings
+	https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Data#Attributes
+	https://webglfundamentals.org/webgl/lessons/webgl-3d-perspective.html
+	https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Lighting_in_WebGL
+	https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
+	https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Data#Uniforms
+	https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindBuffer
+	https://www.google.se/search?q=glmatrix.js&oq=glmatrix.js&aqs=chrome..69i57j0l5.430j0j1&sourceid=chrome&ie=UTF-8
+	http://glmatrix.net/
+	https://github.com/toji/gl-matrix
+	https://webglfundamentals.org/webgl/lessons/webgl-shaders-and-glsl.html
+	https://webplatform.github.io/docs/tutorials/webgl_an_advanced_shader/
+	https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/gl_FragCoord.xhtml
+	https://www.opengl.org/discussion_boards/showthread.php/182833-pow%28x-2%29-different-then-x%2Ax
+	https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/max.xhtml
+	http://learningwebgl.com/blog/?p=239
+	http://joshuagrams.github.io/webgl-intro/global-variables.html
+	http://web.archive.org/web/20120314072005/http://www.nihilogic.dk/labs/webgl_cheat_sheet/WebGL_Cheat_Sheet.pdf
+	https://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf
+	http://www.hpmor.com/
+	https://www.google.se/search?q=the+surrender+experiment+michael+singer&oq=the+surrender+e&aqs=chrome.4.69i57j0l5.5527j0j1&sourceid=chrome&ie=UTF-8
+	https://www.google.se/search?q=indisk+mat+potatis+blomk%C3%A5l&oq=indisk+mat+po&aqs=chrome.2.69i57j0l5.55927j0j1&sourceid=chrome&ie=UTF-8

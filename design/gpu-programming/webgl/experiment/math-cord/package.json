@@ -1,0 +1,16 @@
+{
+  "name": "math-cord",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gl-matrix.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "gl-matrix": "^2.8.1",
+    "p5": "^0.7.2"
+  }
+}

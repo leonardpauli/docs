@@ -1,0 +1,30 @@
+/* @import url("https://webglfundamentals.org/webgl/resources/webgl-tutorials.css"); */
+body {
+  margin: 0;
+  background: #222;
+}
+canvas {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+}
+
+.toprow {
+	display: block;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 20px;
+}
+
+.toprow > * {
+	display: inline-block;
+	border: none;
+	color: white;
+	background: transparent;
+	height: 100%;
+}
+
+.image-dd {
+	width: 130px;
+}

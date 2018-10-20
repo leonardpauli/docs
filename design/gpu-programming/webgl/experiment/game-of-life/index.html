@@ -1,0 +1,108 @@
+<link rel="stylesheet" href="/style.css"/>
+
+<script id="2d-vertex-shader" type="x-shader/x-vertex">
+// vertex-shader
+
+precision mediump float;
+attribute vec2 a_position;
+attribute vec2 a_texCoord;
+uniform vec2 u_resolution;
+varying vec2 v_texCoord;
+
+void main() {
+	// convert the rectangle from pixels to 0.0 to 1.0
+	vec2 zeroToOne = a_position / u_resolution;
+
+	// convert from 0->1 to 0->2
+	vec2 zeroToTwo = zeroToOne * 2.0;
+
+	// convert from 0->2 to -1->+1 (clipspace)
+	vec2 clipSpace = zeroToTwo - 1.0;
+
+	gl_Position = vec4(clipSpace * vec2(1, 1), 0, 1);
+
+	// pass the texCoord to the fragment shader
+	// The GPU will interpolate this value between points.
+	v_texCoord = a_texCoord;
+}
+
+</script>
+<script id="2d-fragment-shader" type="x-shader/x-fragment">
+// fragment-shader
+
+precision mediump float;
+
+// our texture
+uniform sampler2D u_image;
+uniform vec2 u_resolution;
+uniform vec2 u_resolution_i;
+uniform float u_time;
+
+// the texCoords passed in from the vertex shader.
+varying vec2 v_texCoord;
+
+
+float modI(float a,float b) {
+    float m=a-floor((a+0.5)/b)*b;
+    return floor(m+0.5);
+}
+
+void main() {
+	vec2 c = v_texCoord;
+	float d = 1.0; //modI(u_time/1000.0,100.0);
+	vec2 s = vec2(d/u_resolution_i.x, d/u_resolution_i.y);
+
+	vec2 xy00 = texture2D(u_image, vec2(c.x - s.x, c.y - s.y)).xy;
+	vec2 xy01 = texture2D(u_image, vec2(c.x - s.x, c.y - 0.0)).xy;
+	vec2 xy02 = texture2D(u_image, vec2(c.x - s.x, c.y + s.y)).xy;
+	vec2 xy10 = texture2D(u_image, vec2(c.x - 0.0, c.y - s.y)).xy;
+	vec2 xy11 = texture2D(u_image, vec2(c.x - 0.0, c.y - 0.0)).xy;
+	vec2 xy12 = texture2D(u_image, vec2(c.x - 0.0, c.y + s.y)).xy;
+	vec2 xy20 = texture2D(u_image, vec2(c.x + s.x, c.y - s.y)).xy;
+	vec2 xy21 = texture2D(u_image, vec2(c.x + s.x, c.y - 0.0)).xy;
+	vec2 xy22 = texture2D(u_image, vec2(c.x + s.x, c.y + s.y)).xy;
+
+	float avgx = (xy00.x+xy01.x+xy02.x+xy10.x+xy11.x+xy12.x+xy20.x+xy21.x+xy22.x)/9.0;
+	float avgy = (xy00.y+xy01.y+xy02.y+xy10.y+xy11.y+xy12.y+xy20.y+xy21.y+xy22.y)/9.0;
+
+	
+	bool isX = avgx>avgy;
+
+	float v00 = (xy00.x>0.5 || xy00.y>0.5)?1.0:0.0;
+	float v01 = (xy01.x>0.5 || xy01.y>0.5)?1.0:0.0;
+	float v02 = (xy02.x>0.5 || xy02.y>0.5)?1.0:0.0;
+	float v10 = (xy10.x>0.5 || xy10.y>0.5)?1.0:0.0;
+	float v11 = (xy11.x>0.5 || xy11.y>0.5)?1.0:0.0;
+	float v12 = (xy12.x>0.5 || xy12.y>0.5)?1.0:0.0;
+	float v20 = (xy20.x>0.5 || xy20.y>0.5)?1.0:0.0;
+	float v21 = (xy21.x>0.5 || xy21.y>0.5)?1.0:0.0;
+	float v22 = (xy22.x>0.5 || xy22.y>0.5)?1.0:0.0;
+
+	bool isPopulated = v11>0.5;
+	float neighbors = v00+v01+v02+v10+v12+v20+v21+v22;
+
+	bool toBe = isPopulated? (neighbors>=2.0 && neighbors<4.0): neighbors==3.0;
+	
+	float ac = (toBe?1.0:0.0);
+	float bc = (isPopulated?1.0:0.0)*0.2;
+
+	gl_FragColor = vec4(isX?ac:bc,!isX?ac:bc,(neighbors>0.0?0.05:0.0)+(neighbors/8.0)*0.8, 1.0);
+}
+
+</script>
+<div class="toprow">
+	<select class="image-dd"></select>
+	<input type="range" class="speed" min="0" value="500" max="10000"/>
+	<input type="checkbox" class="ultrarapid"/>
+	<input type="file" class="upload"/>
+</div>
+
+<!--
+for most samples webgl-utils only provides shader compiling/linking and
+canvas resizing because why clutter the examples with code that's the same in every sample.
+See http://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html
+and http://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
+for webgl-utils, m3, m4, and webgl-lessons-ui.
+-->
+<script src="/external/webgl-utils.js"></script>
+<script src="/script.js"></script>
