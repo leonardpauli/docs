@@ -1,0 +1,160 @@
+<html>
+<head>
+<title>Write with correctness</title>
+<style>
+*{margin:0px;padding:0px}*:focus{outline:none;-webkit-apperance:none}
+
+a {
+	text-decoration: none;
+	color: #05a;
+}
+
+footer {
+	font-size: 12px;
+	display: block;
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	height: 50px;
+	text-align: center;
+	opacity: 0.9;
+}
+footer.faded {
+	opacity: 0;
+	transition: opacity 5s;
+}
+footer:hover {
+	opacity: 0.8;
+	transition: opacity 0.4s;
+}
+
+body {
+	padding-top:80px;
+	font-family:helvetica;
+}
+
+body.dark {
+	background:black; color:#ddd;
+}
+
+.tb {
+	width:95%;
+	max-width:700px;
+	text-align:left;
+	margin:0 auto;
+	margin-top:30px;
+	height:30px;
+	border:none;
+	display:block;
+	background:transparent;
+	color:#333;
+}
+
+.dark .tb {
+	color:#ddd;
+}
+
+</style>
+</head>
+<body>
+<footer>
+	<a href="/">Practice flow?</a> 
+	Created by <a href="https://leonardpauli.com">Leonard</a>, 2016-2018
+	<br/>Use up/down to adjust position |
+	<a href="javascript:toggleDark()">Toggle dark mode?</a>
+</footer>
+<script>
+
+// Created by Leonard Pauli. jan 2016
+
+const toggleDark = t=> document.body.classList.toggle('dark', t)
+
+const getTB = tagname=> {
+	const tb = document.createElement(tagname || 'div')
+	tb.classList.add('tb')
+	document.body.appendChild(tb)
+	return tb;
+}
+
+const nextLineTb = getTB()
+nextLineTb.style.textAlign = 'center'
+nextLineTb.style.background = 'none'
+const writtenTb = getTB('input')
+writtenTb.style.fontSize = '13px'
+const sourceTb = getTB('input')
+sourceTb.style.color = '#444'
+
+let sourceText = ''
+let lines = []
+let currLineIdx = 0
+const setSourceText = (t)=> {
+	let t2 = t.replace(/\u201c|\u201d/g, '"')
+		.replace(new RegExp('', 'g'), '\n-')
+		.replace(new RegExp('ⓒ ?', 'g'), '')
+		.replace(new RegExp('–', 'g'), '-')
+		.replace(/\n\n/g, '##n##')
+		.replace(/\n/g, '')
+		.replace(/##n##/g, '\n ')
+	sourceText = t2.replace(/[\n ]+/ig, ' ');
+	let last = 0
+	lines = sourceText.split(' ').reduce((p,v)=> {
+		if (p[last].length>80) p[++last] = v
+		else p[last] += ' '+v
+		return p }, [''])
+	lines[0] = lines[0].substr(1)
+	writtenTb.value = ''
+	currLineIdx = -1
+	getNextLine()
+}
+
+const getNextLine = ()=> {
+	currLineIdx++
+	if (currLineIdx>=lines.length) {
+		alert('Done!')
+		return
+	}
+	nextLineTb.innerText = lines[currLineIdx]
+	writtenTb.value = ''
+}
+
+document.body.onkeydown = (e)=> {
+	if (e.target == sourceTb) {
+		const wasEnter = e.which==13
+		if (wasEnter) {
+			e.preventDefault()
+			setSourceText(sourceTb.value);
+		}
+	} else if (e.target == writtenTb) {
+		const correct = lines[currLineIdx]==writtenTb.value
+		let wasSpace = e.which==32
+		if (correct && wasSpace) {
+			e.preventDefault()
+			getNextLine()
+			return
+		}
+		// Check logic
+		setTimeout(()=> {
+			const onTrack = lines[currLineIdx].indexOf(writtenTb.value)==0
+			writtenTb.style.color = onTrack?'#ddd':'#fbb'
+		},10)
+	} else {
+		const dir = (e.which == 38)? -10 : e.which == 40 ? 10 : 0
+		if (dir) {
+			document.body.style.paddingTop = parseInt(document.body.style.paddingTop)+dir+'px'
+		}
+	}
+}
+
+setTimeout(()=> {
+	nextLineTb.innerText = 'Ready? :)'
+	writtenTb.placeholder = '2. ...and then write it here, correctly'
+	sourceTb.placeholder = '1. Paste your practice text here and hit enter...'
+
+	document.body.style.paddingTop = '40px'
+	document.querySelector('footer').classList.add('faded')
+}, 100)
+
+</script>
+</body>
+</html>

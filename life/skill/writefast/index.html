@@ -1,0 +1,121 @@
+<html>
+<head>
+<title>Write with flow</title>
+<style>
+a {
+	text-decoration: none;
+	color: #05a;
+}
+
+footer {
+	font-size: 12px;
+	display: block;
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	height: 50px;
+	text-align: center;
+	opacity: 0.9;
+}
+footer.faded {
+	opacity: 0;
+	transition: opacity 5s;
+}
+footer:hover {
+	opacity: 0.8;
+	transition: opacity 0.4s;
+}
+
+body {
+	width: 1vw;
+	height: 1vh;
+}
+
+body.dark {
+	background:black; color:#ddd;
+}
+
+.container {
+	font-size:50px;
+	text-align:right;
+	top:70px;
+	width:10000%;
+	left:-9950%;
+	position:absolute;
+}
+</style>
+</head>
+<body>
+<div class="container"></div>
+<footer>
+	<a href="/correctness">Practice correctness?</a> 
+	Created by <a href="https://leonardpauli.com">Leonard</a>, 2016-2018
+	<br/>
+	<a href="javascript:toggleDark()">Toggle dark mode?</a>
+</footer>
+<script>
+
+// Created by Leonard Pauli. jan 2016
+
+const toggleDark = t=> document.body.classList.toggle('dark', t)
+
+const container = document.body.querySelector('.container')
+
+var els = []
+
+const addLetter = l=> {
+	const el = document.createElement('div')
+	
+	if (l==' ') el.innerHTML = '&nbsp;'
+	else el.innerText = l
+	
+	el.style.cssText = 'position:relative;display:inline-block;'
+	el.style.opacity = 1
+
+	container.appendChild(el)
+	els[els.length] = el
+}
+
+document.body.onkeydown = e=> {
+	if (e.key=="Enter" || (e.key=="Backspace" && (e.altKey || e.metaKey))) {
+		e.preventDefault()
+		els.forEach(el=> el.remove())
+		els = []
+		return
+	}
+	if (e.key=="Backspace") {
+		e.preventDefault()
+		if (els.length>0) els.pop().remove()
+		return
+	}
+	if (e.key.length>2 || e.metaKey) return
+	e.preventDefault()
+
+	addLetter(e.key)
+}
+
+const fps = 60, fadeTime = 0.5;
+if (window.t) clearTimeout(window.t)
+
+const fade = ()=> {
+	els.forEach((el,i)=> {
+		var opa = parseFloat(el.style.opacity) - fadeTime/fps
+		el.style.opacity = opa
+		if (opa < 0) {
+			el.remove()
+			els.splice(i,1)
+		}
+	})
+	window.t = setTimeout(fade, 1000/fps)
+}
+fade()
+
+setTimeout(()=> {
+	'Write something... :)'.split('').forEach((v, i)=> setTimeout(()=> addLetter(v), i*70+Math.random()*50))
+	document.querySelector('footer').classList.add('faded')
+}, 100)
+
+</script>
+</body>
+</html>
