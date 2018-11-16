@@ -48,3 +48,6 @@
 [submodule "app/vue/store"]
 	path = app/vue/store
 	url = git@github.com:leonardpauli/lp-vue-store.git
+[submodule "app/web/webassembly/wabt"]
+	path = app/web/webassembly/wabt
+	url = git@github.com:WebAssembly/wabt.git

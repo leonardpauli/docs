@@ -1,0 +1,30 @@
+# app/web/webassembly
+' LeonardPauli/docs
+	created by Leonard Pauli, 16 nov 2018
+
+// "binary instruction format for a stack-based virtual machine"
+// alias: wasm
+// see https://webassembly.org/
+
+
+wabt: "The WebAssembly Binary Toolkit" // https://github.com/WebAssembly/wabt
+	install:
+		alt: npm // https://www.npmjs.com/package/wabt
+		- cd ./wabt // git@github.com:WebAssembly/wabt.git
+		- git submodule update --init --recursive
+		- make
+		- echo 'export PATH="$PATH:$lpdocs/app/web/webassembly/wabt/bin"' >> ~/.zshrc
+	wat2wasm
+
+
+article: // https://blog.scottlogic.com/2018/04/26/webassembly-by-hand.html
+	WAT: "WebAssembly Textformat" // -> binary format -> js binary array -> browser.compile -> execute function
+		example: // wat2wasm helloWorld.wat && cat helloWorld.wasm
+			(module
+				(func (result i32)
+					(i32.const 42)
+				)
+				(export "helloWorld" (func 0))
+			)
+		editor:
+			- VSCode: highlightning // https://github.com/AlanCezarAraujo/vscode-webassembly-syntax-highlight

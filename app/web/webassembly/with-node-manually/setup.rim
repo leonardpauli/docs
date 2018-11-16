@@ -1,0 +1,11 @@
+# app/web/webassembly/with-node-manually
+' LeonardPauli/docs
+	created by Leonard Pauli, 16 nov 2018
+
+// based on https://blog.scottlogic.com/2018/04/26/webassembly-by-hand.html
+
+get-started:
+	- npm i
+	- edit main.wat
+	- node compile.js // -> main.wasm
+	- node main.js // runs main.wasm
