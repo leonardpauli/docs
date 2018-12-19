@@ -7,16 +7,65 @@ const lpdocs = '/Users/leonardpauli/projects/own/docs'
 const {
 	add,
 	range, last, first, sum,
-	untilAll, unpromisifyArr,
-	print, toInt, cw,
-	input,
+	delay, untilAll, unpromisifyArr,
+	print, toInt,
 } = require(lpdocs+'/app/node/other/utils')
-const rl = require('readline')
+const {prompterGet, cw} = require(lpdocs+'/app/node/other/prompter')
+
+const readline = require('readline')
 const fs = require('fs')
 
 
-const main = async ()=> {
 
+const main = async ()=> {
+	const output = process.stdout
+
+	const appendOptions = appendOptionsGet()
+	printStartupInfo({output, appendOptions})
+
+	// TODO: load lapses from appendTo file
+	// 	TODO: load only eg. last 3 lines from end of file
+
+	let i = 0
+	const startDate = new Date()
+	const lapses = []
+
+	const completer = line=> {
+		const prevLines = lapses.slice().reverse().map(({title})=> title)
+		const matched = prevLines.filter(c=> c.indexOf(line)==0)
+		return matched
+	}
+
+	const pr = prompterGet({
+		output,
+		completerDefault: completer,
+	})
+
+	let line = null
+	while (line = await pr.next({
+		question: ''+cw.cyan(i),
+	}), !pr.done) {
+		if (line=='exit') break
+
+		const lapse = lapseFromLine(line)
+		const commentStr = lapseCommentStrGet({lapse, startDate, lapses, i})
+		appendCommentStr({output, lapse, i, commentStr})
+		appendLapseToFile({appendOptions, lapse})
+
+		lapses.push(lapse)
+		i++
+	}
+
+	pr.close()
+	
+	if (appendOptions.stream) appendOptions.stream.end()
+	else printLapsesCsv({output, lapses})
+}
+
+
+// subroutines
+
+const appendOptionsGet = ()=> {
 	const appendPath = process.argv[2]
 	const append = {
 		enabled: !!appendPath,
@@ -24,52 +73,64 @@ const main = async ()=> {
 		stream: null,
 	}
 	if (append.enabled) append.stream = fs.createWriteStream(append.path, {flags: 'a'})
+	return append
+}
 
-	print(
-		cw(cw.c.c)('laptimer')+
-		cw(2)(' [append-to.tsv], exit to exit, other messages to title laps, enter to start')+
-		(append.enabled? cw(2)('\noptions: appending to '+cw(cw.c.y.d)(append.path)): '')
-	)
+const printStartupInfo = ({output, appendOptions})=> output.write(
+	cw.cyan('laptimer')
+	+cw.gray(` [${appendOptions.path || 'append-to.tsv'}], exit to exit, other messages to title laps, enter to start`)
+	+(appendOptions.enabled? cw.gray('\noptions: appending to '+cw.yellow.dark(appendOptions.path)): '')
+	+'\n')
 
-	let i = 0
-	let title = 'start'
-	let startDate = null
-	let lapses = []
+const lapseFromLine = line=> {
+	const date = new Date()
+	const title = line
+	const lapse = {date, title}
+	return lapse
+}
 
-	while ((title = await input(cw(cw.c.c.d)(i))) != 'exit') {
-		const date = new Date()
-		let comment = ''
-		if (!startDate)	{
-			startDate = date
-			comment = ' // '+startDate
-		}
+const lapseCommentStrGet = ({lapse, startDate, lapses, i})=> {
+	const msSinceStart = lapse.date - startDate
+	const msSinceLast = lapses.length? lapse.date - last(lapses).date: 0
+	const hh = doubleDigit(lapse.date.getHours())
+	const mm = doubleDigit(lapse.date.getMinutes())
+	const dur = durFormatted(msSinceLast)
+	const commentStr = `${hh}:${mm}, ${dur}`
+	return commentStr
+}
 
-		const msSinceStart = date-startDate
-		const msSinceLast = lapses.length? date-last(lapses).date: 0
-		lapses.push({date, msSinceStart, msSinceLast, title})
+const appendCommentStr = ({output, lapse, i, commentStr})=> {
+	const dx = (i+' : '+lapse.title).length-1
+	const dy = -1
+	readline.moveCursor(output, dx, dy)
+	output.write(cw.gray(` // ${commentStr}\n`))
+}
 
-		rl.moveCursor(process.stdout, (i+' : '+title).length-1, -1)
-		const doubleDigit = (n, s=n+'')=> s.length==1?'0'+s:s
-		const time = doubleDigit(date.getHours())+':'+doubleDigit(date.getMinutes())
-		process.stdout.write(cw(2)(` // ${time}, ${msSinceLast/1000}s${comment}\n`))
+const appendLapseToFile = ({appendOptions, lapse})=> {
+	if (!appendOptions.enabled) return
+	const line = objectToTSV(lapsPrepareForTSV(lapse))
+	appendOptions.stream.write(line+'\n')
+}
 
-		if (append.enabled) append.stream.write(
-			objectToTSV(lapsPrepareForTSV(last(lapses)))+'\n')
+const printLapsesCsv = ({output, lapses})=> output.write(
+	'\n----\n'
+	+listOfObjectsToTSV(lapses.map(lapsPrepareForTSV))+'\n')
 
-		i++
-	}
-	input.done()
-
-	if (append.stream) append.stream.end()
-	else print(
-		'\n----\n'+
-		listOfObjectsToTSV(lapses.map(lapsPrepareForTSV))
-	)
-
+const durFormatted = ms=> {
+	const sAll = Math.round(ms/1000)
+	const s = sAll%60
+	const m = Math.floor(sAll/60)
+	if (sAll < 10) return (ms/1000)+'s'
+	if (m < 1) return `${s}s`
+	if (m < 10) return `${m}m ${s}s`
+	return `${m}m`
 }
 
 
-// subs
+// helpers
+
+const doubleDigit = (n, s=n+'')=> s.length==1?'0'+s:s
+
 const lapsPrepareForTSV = ({date, title})=> ({date: date*1, title})
 
 // TODO: just removes tabs in cells, better way?
@@ -85,6 +146,8 @@ const listOfObjectsToTSV = xs=> {
 const objectToTSV = (x, keys=Object.keys(x))=>
 	keys.map(k=> x[k]).map(cleanedTabs).join('\t')
 const cleanedTabs = s=> (s+'').replace(/\t/ig, ' ')
+
+
 
 // start
 main().then().catch(console.error)
