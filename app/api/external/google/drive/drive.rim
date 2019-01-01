@@ -1,0 +1,43 @@
+# app/api/external/google/drive
+' LeonardPauli/docs
+	Created by Leonard Pauli, 21 oct 2018
+
+quick start:
+	// based on quick start: // https://developers.google.com/drive/api/v3/quickstart/js
+	- get api keys: "https://console.developers.google.com/flows/enableapi?apiid=drive&pli=1
+		- create app id
+			- choose project // existing or new project? // one for all or one for each? (like folders?)
+		- "go to credentials" // https://console.developers.google.com/apis/credentials
+			- credential.type
+			- credential.oauth.client-id
+				name: "lp-docs.drive.test-quick-start"
+				js-origins: "https://localhost:5000"
+				redirect-uris: "https://localhost:5000" // authorization.code will be appended to path
+			- credential.oauth.consent-screen.setup
+				email: User.current.email or google.Group(created by User.current).email
+				product.name: "Testing Quick Start (lp-docs.drive)"
+				more:
+					homepage.url
+					product.logo.url{square, size: 120px}
+					legal.privacy-policy // required for deploy
+					legal.terms-of-service // optional
+			- download client_id.json // see files/
+
+
+google.developers.console // https://console.developers.google.com/apis/dashboard
+	dashboard // view api usage stats
+
+
+client.lib.js:
+	get started: // https://developers.google.com/api-client-library/javascript/start/start-js
+	samples: // https://developers.google.com/api-client-library/javascript/samples/samples
+
+
+' links
+	https://github.com/gsuitedevs
+	https://developers.google.com/drive/api/v3/about-sdk
+	https://developers.google.com/drive/api/v3/quickstart/js
+	https://developers.google.com/api-client-library/javascript/start/start-js
+	https://developers.google.com/api-client-library/javascript/samples/samples
+	https://github.com/gsuitedevs
+	https://github.com/gsuitedevs/drive-utils
