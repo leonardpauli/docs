@@ -1,6 +1,7 @@
 # app/api/external/google/drive
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 21 oct 2018
+	continued 1 jan 2019
 
 quick start:
 	// based on quick start: // https://developers.google.com/drive/api/v3/quickstart/js
@@ -22,6 +23,20 @@ quick start:
 					legal.privacy-policy // required for deploy
 					legal.terms-of-service // optional
 			- download client_id.json // see files/
+		- create api key
+			- select the generated client_id
+			- click "create credentials" -> API key
+			- save in files/client_config.json
+				{"api":{"google":{"web":{"key": "..."}}}}
+			// restrict? not necessary if client_id restricted/only has client-ok api's enabled?
+	- test quickstart
+		- python3.5 -m http.server 5000
+		- open http://localhost:5000/example/quickstart.html
+
+
+goal:	list contents of folder, create folder, create folder alias, 
+
+
 
 
 google.developers.console // https://console.developers.google.com/apis/dashboard
