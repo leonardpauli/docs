@@ -28,6 +28,8 @@ editor-support:
 		- https://github.com/rust-lang/rust-enhanced
 		- https://packagecontrol.io/packages/RustAutoComplete
 			https://github.com/racer-rust/racer
+	' TODO: vim:
+		supertab, deoplete, "Rust support plugins", RLS
 
 
 syntax

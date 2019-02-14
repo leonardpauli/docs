@@ -19,5 +19,8 @@
     "eslint-plugin-jest": "^21.15.2",
     "eslint-plugin-vue": "^4.7.1",
     "onchange": "^3.3.0"
+  },
+  "dependencies": {
+    "eslint-plugin-typescript": "^0.14.0"
   }
 }

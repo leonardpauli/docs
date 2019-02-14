@@ -9,7 +9,7 @@ const onInstalled = ()=> {
 
 	const pageRules = [{
 		conditions: [new chrome.declarativeContent.PageStateMatcher({
-			pageUrl: {hostEquals: 'developer.chrome.com'},
+			pageUrl: {urlMatches: '.*'},
 		})],
 		actions: [new chrome.declarativeContent.ShowPageAction()]
 	}]
