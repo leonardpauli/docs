@@ -1,0 +1,9 @@
+# theory/math/graph/graphviz/example
+' created by Leonard Pauli, 5 nov 2018
+
+// see https://www.graphviz.org/
+
+run:
+	neato -Tps neato-graph.dot -o neato-graph.ps
+	dot -Tpng digraph.dot -o digraph.png
+
