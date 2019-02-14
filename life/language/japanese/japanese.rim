@@ -1,0 +1,64 @@
+# life/language/japanese
+' LeonardPauli/docs
+	Created by Leonard Pauli, 1 dec 2018
+
+// language
+
+writing:
+	character-set:
+		- hiragana // syllables + gramatical "atoms"?
+		- katakana // mirrors hiragana, mostly for foregin words? 
+		- kanji // pictograms for words/meanings (shared with chinese?)
+			// usually "technically" replacable by hiragana
+
+
+' resources:
+	duolingo.com
+		modules // 40st, ~5-10 "lessons" each, ~1h/module inc. some repetition
+			- Hiragana 1, Hiragana 2, Hiragana 3, Hiragana 4, Intro
+			- Intro 2, Greetings, Food 1, Time 1, Time 2
+			- Time 3, Home, Intro 3, Family, Restaurant
+			- Activity 1, Position, Hobby 1, Transport., Clothes
+			- Hobby 2, Weather, Food 2, Direct. 1, Dates
+			- Shopping 1, People, Activity 2, Nature, Classroom
+			- Feeling, Direct. 2, Objects, Shopping 2, Hobby 3
+			- Class. 2, Health, Vacation, Subculture, Olympics
+			' 40*7=280 ~> 300 lessons
+				level:
+					- Empty: gray
+					- 0: purple
+					- 1: blue
+					- 2: green
+					- 3: red
+					- 4: ??
+					- 5: gold
+				I try to make a "gradient", eg I've just started the third section (making it gray->purple->blue),
+					so I try to get the second section to green (lvl 2) while getting the first section to lvl3.
+				That way, I continually (every day or so),
+					learn some new things,
+					while practicing what I did some days ago a bit,
+					and the things I did many days ago a lot.
+				-> always progress forward (fun + a bit challenging)
+				-> better learning the things I have seen before
+				-> storing/retaining the things I've learnt in longterm memory
+	japanesepod101.com
+		youtube
+			introduction: https://www.youtube.com/watch?v=QuW0w3aAcr0
+			hiragana: https://www.youtube.com/watch?v=6p9Il_j0zjc
+			particles: https://www.youtube.com/watch?v=UaI7UpOl-Xk
+	youtube
+		tips for learning fast/efficiently: https://www.youtube.com/watch?v=_IOZbJ7PCPk
+			better (ted talk): https://www.youtube.com/watch?v=d0yGdNEWdn0 // How to learn any language in six months | Chris Lonsdale | TEDxLingnanUniversity
+	japanese-lesson.com
+		hiragana: http://japanese-lesson.com/characters/hiragana/index.html
+	guidetojapanese.org
+		hiragana stroke order: http://www.guidetojapanese.org/learn/grammar/hiragana
+	other:
+		https://ankiweb.net/shared/decks/japanese
+
+' places:
+	&ROLL CAFE // https://www.tofugu.com/travel/tokyo-coworking-space-&roll-cafe/?series=japan-coworking
+		2 CHOME−19−17 KITAZAWA, SETAGAYA, TOKYO 155-0031
+		https://androllshimokitaza.wixsite.com/androll
+	' resources
+		www.tofugu.com
