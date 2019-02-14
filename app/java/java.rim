@@ -10,3 +10,65 @@ update to java 10 development kit:
 	confirm: java -version
 	get JAVA_HOME: vi ~/.zshrc:
 		export JAVA_HOME="$(${"$(readlink "$(which java)")"%/*}/java_home)"
+
+build-system + package-manager:
+	maven:
+		alt: gradle
+		// https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html
+		install:
+			- download + install
+			- update local repository by creating example project:
+				- mkdir files
+				- mvn archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+					// will take some time to download to (user-specific) local repository
+					// will generate example structure, inc. pom.xml package declaration file
+				- see my-app/pom.xml
+					- add in <project> // template was old
+						<properties>
+							<maven.compiler.source>1.6</maven.compiler.source>
+							<maven.compiler.target>1.6</maven.compiler.target>
+						</properties>
+				- update junit dependency:
+					- vi pom.xml:
+						<groupId>org.junit.jupiter</groupId>
+						<artifactId>junit-jupiter-api</artifactId>
+						<version>5.1.0</version>
+						<scope>test</scope>
+					- vi src/**/AppTest.java:
+						package com.mycompany.app;
+						import org.junit.jupiter.api.Test;
+						import static org.junit.jupiter.api.Assertions.assertEquals;
+						public class AppTest {
+							@Test
+							public void testApp() {
+								assertEquals(2, 1+1);
+							}
+						}
+					- mvn install
+				- fix manifest // to define jar main class entrypoint
+					- vi pom.xml:
+						<build><plugins><plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-jar-plugin</artifactId>
+							<version>3.1.0</version>
+							<configuration><archive><manifest>
+								<addClasspath>true</addClasspath>
+								<classpathPrefix>lib/</classpathPrefix>
+								<mainClass>com.mycompany.app.App</mainClass>
+							</manifest></archive></configuration>
+						</plugin></plugins></build>
+					' - mkdir src/main/META-INF && cd $_ && vi MANIFEST.MF
+						Manifest-Version: 1.0
+						Main-Class: com.mycompany.app.Main
+					- use java version 10: // requires installing JDK 10 from oracle website
+						- vi pom.xml
+							<plugin>
+								<groupId>org.apache.maven.plugins</groupId>
+								<artifactId>maven-compiler-plugin</artifactId>
+								<version>3.8.0</version>
+								<configuration>
+									<release>10</release>
+								</configuration>
+							</plugin>
+				- build example project: mvn package
+				- run jar: java -jar target/example-1.0-SNAPSHOT.jar // should print "Hello World!"

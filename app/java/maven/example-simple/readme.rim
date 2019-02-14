@@ -29,3 +29,24 @@ structure:
 			java/com/myorg/mypackage/Main.java // use reverse domain notation for "package", inside java folder
 		test
 			java/com/myorg/mypackage/MainTest.java // convention <Class>Test.java, folder structure should mirror main/java
+	.gitignore // ignore target/ dir containing maven output
+
+
+test (using junit 5):
+	// for @Disable to work etc, extra maven plugin necessary, see ../example-junit5-improved.pom.xml
+	requirements:
+		- directory: src/test/java/{mirror class-to-be-tested-path}/{class-name}Test.java // has to end in Test.java
+		- package has to be same as class to test
+		- class name has to be same as filename
+		- class has to be public
+		- methods:
+			- has to be public
+			- has to start with "test", eg. "public void testSomething() {...}"
+	example:
+		package com.myorg.mypackage.mysub;
+		import org.junit.jupiter.api.Test;
+		import static org.junit.jupiter.api.Assertions.assertEquals;
+		public class MainTest {
+			@Test
+			public void testMain() { assertEquals(2, 1 + 1); }
+		}

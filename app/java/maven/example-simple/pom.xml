@@ -1,16 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<url>http://maven.apache.org</url>
+	
+	<name>mypackage</name>
 	<groupId>com.myorg.mypackage</groupId>
 	<artifactId>mypackage</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>mypackage</name>
-	<url>http://maven.apache.org</url>
+	
 	<properties>
 		<maven.compiler.source>1.10</maven.compiler.source>
 		<maven.compiler.target>1.10</maven.compiler.target>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -19,8 +22,10 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<plugins>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -35,6 +40,8 @@
 					</archive>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
+	
 </project>
