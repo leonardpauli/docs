@@ -1,16 +1,16 @@
 {
-  "name": "example",
+  "name": "minimal",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "init:keys": "(mkdir keys && cd $_ && echo 'skip password' && ssh-keygen -b 2048 -t rsa -f jwt-auth && openssl rsa -in jwt-auth -pubout -outform PEM -out jwt-auth.pub)",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "jsonwebtoken": "^8.3.0"
+    "apollo-server-koa": "^2.1.0",
+    "graphql": "^14.0.2"
   }
 }

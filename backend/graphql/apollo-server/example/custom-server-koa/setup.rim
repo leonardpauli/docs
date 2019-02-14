@@ -1,0 +1,14 @@
+# backend/graphql/apollo-server/example/custom-server-koa
+' LeonardPauli/docs
+	Created by Leonard Pauli, 9 oct 2018
+
+prerequisites:
+	- ../minimal
+	- typescript
+	- backend/server/koa/examples/using-typescript
+
+minimal:
+	- npm i graphql apollo-server-koa
+	- vi src/graphql-server.ts
+	- vi src/index.ts
+	- ts-node src/index.ts

@@ -1,0 +1,119 @@
+# source: http://localhost:4000/graphql
+# timestamp: Fri Oct 19 2018 11:58:24 GMT+0200 (Central European Summer Time)
+
+directive @unique on FIELD_DEFINITION
+
+directive @validate(type: String) on FIELD_DEFINITION
+
+directive @private on FIELD_DEFINITION
+
+directive @default(value: String) on FIELD_DEFINITION
+
+directive @auth(requireRole: Role) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int, scope: CacheControlScope) on FIELD_DEFINITION | OBJECT | INTERFACE
+
+input AccountChangePasswordInput {
+  passwordCurrent: String!
+  passwordNew: String!
+}
+
+input AccountLoginInput {
+  email: AccountLoginInputEmail!
+}
+
+input AccountLoginInputEmail {
+  email: String!
+  password: String!
+}
+
+type AccountModuleMutation {
+  login(input: AccountLoginInput): AccountToken
+  signup(input: AccountSignupInput): Void
+  logout: Void
+  changePassword(input: AccountChangePasswordInput): Void
+}
+
+input AccountSignupInput {
+  credential: AccountLoginInput!
+  name: String
+}
+
+type AccountToken {
+  token: String!
+}
+
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
+}
+
+scalar DateTime
+
+type MiscModule {
+  greeting: String!
+}
+
+type Mutation {
+  Account: AccountModuleMutation!
+  User: UserModuleMutation!
+  Note: NoteModuleMutation!
+}
+
+type Note {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  published: Boolean!
+  author: User!
+  text: String!
+}
+
+type NoteModule {
+  list: [Note!]!
+}
+
+type NoteModuleMutation {
+  add(text: String!, publish: Boolean! = false): Void
+  publish(id: ID!, enable: Boolean! = true): Void
+  remove(id: ID!): Void
+}
+
+type Query {
+  Misc: MiscModule!
+  User: UserModule!
+  Note: NoteModule!
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+"""
+The `Upload` scalar type represents a file upload promise that resolves an
+object containing `stream`, `filename`, `mimetype` and `encoding`.
+"""
+scalar Upload
+
+type User {
+  id: ID!
+  createdAt: DateTime!
+  email: String!
+  hash: String @deprecated(reason: "private")
+  emailVerified: Boolean!
+  roles: [Role!]!
+  name: String!
+  notes: [Note!]!
+}
+
+type UserModule {
+  list: [User!]!
+  me: User!
+}
+
+type UserModuleMutation {
+  nameChange(value: String): Void
+}
+
+scalar Void

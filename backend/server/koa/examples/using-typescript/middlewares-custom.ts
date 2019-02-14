@@ -1,4 +1,4 @@
-import {Middleware, errorHandlerGet} from './middlewares'
+import {Middleware, errorHandlerGet} from './middlewares-utility'
 
 export const indexRoute: Middleware = async ctx=> {
 	ctx.body = 'hello'

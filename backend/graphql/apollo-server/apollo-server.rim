@@ -7,6 +7,25 @@
 
 basic-usage: see example/minimal/setup
 
+example:
+	- minimal
+	- custom-directive // + using typescript simple
+		- minimal
+		- src // TODO
+	- koa+middleware // TODO
+		// TODO: add backend/nodejs/koajs // https://koajs.com/
+		http://www.passportjs.org/docs/
+		https://blog.pusher.com/handling-authentication-in-graphql-jwt/
+		https://github.com/koajs/jwt
+		https://github.com/f0rr0/koa-passport-jwt
+		https://mherman.org/blog/user-authentication-with-passport-and-koa/
+		https://www.prisma.io/blog/graphql-directive-permissions-authorization-made-easy-54c076b5368e/
+		https://medium.com/@lastmjs/advanced-graphql-directive-permissions-with-prisma-fdee6f846044
+	- auth // TODO
+		- jwt
+		- passport+jwt
+
+
 # TODO:
 - monitoring // see https://www.apollographql.com/docs/apollo-server/features/metrics.html
 - access-control
@@ -17,6 +36,18 @@ basic-usage: see example/minimal/setup
 - custom scalars // https://www.apollographql.com/docs/apollo-server/features/scalars-enums.html
 - custom directives // https://www.apollographql.com/docs/apollo-server/features/creating-directives.html
 	// https://blog.apollographql.com/reusable-graphql-schema-directives-131fb3a177d1
+	' see https://www.apollographql.com/docs/apollo-server/features/creating-directives.html
+		visitSchema(schema: GraphQLSchema)
+		visitScalar(scalar: GraphQLScalarType)
+		visitObject(object: GraphQLObjectType)
+		visitFieldDefinition(field: GraphQLField<any, any>)
+		visitArgumentDefinition(argument: GraphQLArgument)
+		visitInterface(iface: GraphQLInterfaceType)
+		visitUnion(union: GraphQLUnionType)
+		visitEnum(type: GraphQLEnumType)
+		visitEnumValue(value: GraphQLEnumValue)
+		visitInputObject(object: GraphQLInputObjectType)
+		visitInputFieldDefinition(field: GraphQLInputField)
 	built-in:
 		- @deprecated(reason: String)
 		- @skip(if: Boolean!)
@@ -26,27 +57,6 @@ basic-usage: see example/minimal/setup
 		- resolver generation: people: [Person] @rest(url: "/api/v1/people") // automatically fetch from rest endpoint
 		- add formatting options: today: Date! @date(defaultFormat: "mmmm d, yyyy")
 		- internationalization: greeting: String! @intl
-			// https://www.apollographql.com/docs/apollo-server/features/creating-directives.html#Marking-strings-for-internationalization
-			const { ApolloServer, gql, SchemaDirectiveVisitor } = require("apollo-server");
-			class IntlDirective extends SchemaDirectiveVisitor {
-				visitFieldDefinition(field, details) {
-					const { resolve = defaultFieldResolver } = field;
-					field.resolve = async function (...args) {
-						const context = args[2];
-						const defaultText = await resolve.apply(this, args);
-						// In this example, path would be ["Query", "greeting"]:
-						const path = [details.objectType.name, field.name];
-						return translate(defaultText, path, context.locale);
-					};
-				}
-			}
-			const server = new ApolloServer({
-				typeDefs: gql`
-					directive @intl on FIELD_DEFINITION
-					type Query { greeting: String @intl }`,
-				schemaDirectives: { intl: IntlDirective },
-			});
-			server.listen().then(({url})=> console.log(`server ready at ${url}`));
 		- authorization: @auth(requires: ADMIN)
 			directive @auth(requires: Role = ADMIN) on OBJECT | FIELD_DEFINITION
 			enum Role {ADMIN, REVIEWER, USER, UNKNOWN}

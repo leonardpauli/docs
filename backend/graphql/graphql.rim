@@ -79,9 +79,6 @@ pagination:
 
 
 ' TODO:
-	// - apollo-server.example.minimal
-	- apollo-server.example.custom-directive
-	- apollo-server.example.auth-using-jwt
 	- prisma.example.minimal
 	- prisma.example.using-apollo-server+db-query-schema-stitching
 	- prisma.example.starting-point // using apollo-server, auth-using-jwt, db-query-schema-stitching, project setup, etc

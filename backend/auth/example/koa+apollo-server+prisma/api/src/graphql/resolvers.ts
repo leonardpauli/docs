@@ -1,4 +1,4 @@
-import { prisma } from './prisma-generated'
+import { prisma } from './prisma/generated'
 
 
 const ctxFree = ()=> ({})

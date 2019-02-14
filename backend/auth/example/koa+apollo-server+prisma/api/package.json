@@ -9,6 +9,7 @@
     "prisma:down": "(cd prisma && docker-compose down)",
     "prisma:deploy": "(cd prisma && prisma deploy)",
     "graphql:playground": "graphql playground",
+    "graphql:generate-schema": "graphql get-schema --project api",
     "dev:start": "ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

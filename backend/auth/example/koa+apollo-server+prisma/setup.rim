@@ -11,31 +11,59 @@ see:
 	- app.api.apollo-client
 	- app.vue.{cli}
 
+start:
+	backend:
+		prerequisite:
+			- docker running
+			- npm + node{> v10}
+		- cd api && npm i
+		- npm run prisma:up
+		- npm run prisma:deploy
+		- npm run init:keys
+		- npm run dev:start
+		- npm run graphql:playground // TODO: add to devDependencies
+	frontend:
+		- cd web && npm i
+		- npm run dev:start
+
 backend:
 	- mkdir api && cd $_ && npm init -y
 	- use backend.server."koa".example.using-typescript.setup
 	- use backend.graphql."apollo-server".example.custom-server-koa.setup
 	- use backend.graphql."prisma".example.bootstrap.setup
 		- mkdir prisma && cd $_ && prisma init
-		- vi prisma.yml // change
-			output: ../src/prisma-generated
-		- vi ../.graphqlconfig.yml
 		- up, down, deploy, playground |> package-json-script-add "prisma:\(it)"
-	- vi prisma/datamodel.prisma
-	// TODO: check https://www.prisma.io/docs/data-model-and-migrations/data-model-knul/
-		// for proper .graphqlconfig.yml etc setup + multi-file schema + import in app schema
+		- change structure
+			- use .graphqlconfig.yml
+				- use codegen, db + app project
+			- use multi-file schema // using graphql-import
+				- npm i graphql-import
+	- fix mock-directives: vi src/graphql/directive/...
+	- fix datamodel: vi src/graphql/datamodel/...
 	- test: npm run prisma:up && npm run prisma:deploy && npm run prisma:playground
-	- npm i graphql-import
-	- vi src/schema.graphql
-	- add resolvers:
-		- login
-		- signup
-		- me
-		- notes
-		- logout
-	- add validate directive
-	- add auth directive
+	- fix @private directive
+
+	- fix schema: vi src/graphql/schema/...
+	- fix empty resolvers: vi src/graphql/resolvers.ts
+	- add api: vi src/api
+		- Account: use backend.auth."bcrypt".example
+			- npm i bcrypt
+		- Account: use backend.auth."jwt".example
+			- npm i jsonwebtoken
+			- package-json-script-add "init:keys"
+			- echo keys >> .gitignore
+	- fix context + middleware for token
+	// next up:
+	- fix typings
+	- connect resolvers to api
+
+	- fix auth directive
+	- fix validate directive
 	- test
+
+	- document koa + prisma + directives + graphql + apollo
+
+	// - fix model directive ? / passthrough resolver
 
 frontend:
 	- cp app/api/apollo-client/example/simple
@@ -46,3 +74,7 @@ frontend:
 	- create signup form
 	- create notes component
 	- test
+
+
+' TODO:
+	- check https://www.prisma.io/docs/data-model-and-migrations/data-model-knul/

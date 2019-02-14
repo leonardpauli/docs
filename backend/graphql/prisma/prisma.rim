@@ -6,6 +6,7 @@
 // see https://www.prisma.io/
 
 prerequisites:
+	- see os/container/docker
 	- see app/typescript
 	- see backend/graphql
 	- see backend/graphql

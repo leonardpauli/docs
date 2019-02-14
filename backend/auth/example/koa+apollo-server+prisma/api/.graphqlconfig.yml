@@ -1,15 +1,25 @@
 projects:
   api:
-    schemaPath: src/graphql/schema/index.graphql
+    schemaPath: src/graphql/schema/generated/index.graphql
     extensions:
       endpoints:
         default: http://localhost:4000/graphql
+      # codegen:
+      # - generator: graphql-binding # typegen
+      #   language: typescript
+      #   #input: "{binding,prisma}/*.ts"
+      #   # schemaPath
+      #   # schemaPath: src/graphql/schema/generated/binding.graphql
+      #   input: src/graphql/schema/generated/binding.ts
+      #   output:
+      #     # typings: typings.ts
+      #     binding: binding.ts
   db:
-    schemaPath: src/graphql/prisma-generated/prisma.graphql
+    schemaPath: src/graphql/prisma/generated/schema.graphql
     extensions:
       prisma: prisma/prisma.yml
       codegen:
       - generator: prisma-binding
         language: typescript
         output:
-          binding: src/graphql/prisma-generated/binding.ts
+          binding: src/graphql/prisma/generated/binding.ts

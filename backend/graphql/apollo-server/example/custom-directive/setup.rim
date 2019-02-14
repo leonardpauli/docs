@@ -1,0 +1,19 @@
+# backend/graphql/apollo-server/example/minimal/setup
+' LeonardPauli/docs
+	Created by Leonard Pauli, 9 oct 2018
+
+// see https://www.apollographql.com/docs/apollo-server/features/creating-directives.html#Marking-strings-for-internationalization
+
+prerequisites:
+	- ../minimal
+	- app/typescript.ts-node.globally (or run through VSCode built-in?)
+	- app/typescript.editor.support.project.setup
+
+minimal:
+	- ts-node minimal/index.ts
+
+index.setup: // TODO
+	- cd src
+	- vi directives/*
+	- vi index.ts
+	- ts-node index.js
