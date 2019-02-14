@@ -4,6 +4,10 @@
 
 // TODO: mkdir webgl && gsa git@github.com:greggman/webgl-fundamentals.git
 
+tools:
+	see stats/available memory etc for current browser // http://webglreport.com/?v=2
+
+
 ' links
 	https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Animating_textures_in_WebGL
 	https://webglfundamentals.org/webgl/lessons/webgl-2d-matrices.html
