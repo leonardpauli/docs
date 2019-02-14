@@ -30,14 +30,17 @@ ebay / allibaba
 		// sometimes lower quality, many different variants or same original board
 		- usb to serial com chip: alts:
 			- builtin "FTDI" variant
-			- builtin "chinese" variant
+			- builtin "chinese" variant // CH340/CH341
 				requires driver installation:
-					see "https://kig.re/2014/12/31/how-to-use-arduino-nano-mini-pro-with-CH340G-on-mac-osx-yosemite.html"
-					see "https://github.com/adrianmihalko/ch340g-ch34g-ch34x-mac-os-x-driver"
-					- should exist signed driver now, not requiring SIP (osx security) disabling
+					// see "https://kig.re/2014/12/31/how-to-use-arduino-nano-mini-pro-with-CH340G-on-mac-osx-yosemite.html"
+					// see "https://github.com/adrianmihalko/ch340g-ch34g-ch34x-mac-os-x-driver"
+					// - should exist signed driver now, not requiring SIP (osx security) disabling
+					see "http://www.wch.cn/download/CH341SER_MAC_ZIP.html"
 					- download, unzip, open to install (requires password), restart
 					- connect board through usb
 					- ls /dev/tty*, look for wchusbserial, that's the device to use
+						' note: if having both eg. /dev/cu.usbserial-1410, /dev/cu.wchusbserial1410, use "/dev/cu.wchusbserial1410"
+							// eg. for platformio.ini: upload_port = /dev/cu.wchusbserial1410
 			- not builtin: see "using external programmer"
 			- attiny
 				// see http://www.instructables.com/id/AVR-Programming-with-Arduino-AVRdude-and-AVR-gcc/
@@ -48,7 +51,9 @@ using external programmer:
 	programmer: alts:
 		- hijacking of existing board programmer
 		- external
+		- platformio // see files/platformio-test
 	// TODO
+
 
 using compiler with terminal // eg. without Arduino IDE
 	- get configs: alts:

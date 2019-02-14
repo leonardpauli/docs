@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+name="${1:-led}"
+port="cu.wchusbserial1420"
+
+export PATH="$PATH:/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin"
+
+avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -c -o $name.o $name.c
+avr-gcc -mmcu=atmega328p $name.o -o $name
+avr-objcopy -O ihex -R .eeprom $name $name.hex
+avrdude -C/Applications/Arduino.app/Contents/Java/hardware/tools/avr/etc/avrdude.conf -v -patmega328p -carduino -P/dev/$port -b57600 -D -Uflash:w:$name.hex:i
