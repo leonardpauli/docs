@@ -60,6 +60,17 @@ commands:
 	
 	docker pull some-remote-image // download image (including necessary intermediate layers)
 
+debugging process that has exited:
+	' TODO
+		- exited container -> repackage to new image
+			-> start new container based on the image, but with different command
+				ie. sh (opens shell into container; ability to view files, start processes, etc)
+		- alt: make sure to have logfiles in volume (before crash/exiting)
+		- alt: add eg. tail -f /dev/null as cmd before crash and restart container
+			- now it will pause and not exit, allowing, eg:
+				docker exec -it <container-id> sh
+				(to open interactive shell into "running" container)
+
 
 base images:
 	// always lock down with tags, or risk break in future
