@@ -104,6 +104,7 @@ image.sha: // ensure validity for production
 	# sha=$(docker inspect --format='{{index .RepoDigests 0}}' $image)
 	# imageWithSha=$(echo $sha | sed "s/.*@/$image@/")
 	# node:9.11-alpine@sha256:5149aec8f508d48998e6230cdc8e6832cba192088b442c8ef7e23df3c6892cd3
+	# node:10.15-alpine@sha256:0cbb2f7bbc8e7c3a519fa05263cea700324f627369bd44c0a42f8da275179e19
 	ARG imageWithSha
 	FROM imageWithSha ...
 

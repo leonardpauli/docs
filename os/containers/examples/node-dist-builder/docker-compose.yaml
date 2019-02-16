@@ -1,0 +1,9 @@
+version: '3.6'
+services:
+  build:
+    image: leonardpauli/node-dist-builder:build
+    build: .
+    volumes:
+      - /root/.npm
+      - /app/node_modules
+      - ./dist:/dist
