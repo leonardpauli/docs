@@ -4,3 +4,71 @@
 
 ' auth:
 	https://gist.github.com/amark/7dceae874a20878fdb9e2a8eed109bb5
+
+
+quick start: // as of 19 feb 2019
+	prerequisites:
+		- npm i -g @vue/cli
+	mkdir gunjs-vue-quick-start && cd $_
+	npm init -y
+	npm i gun
+	vi app.vue
+		<template><div>Hi: {{message}}</div></template><script>
+			import Gun from 'gun/gun'
+				// TODO: is it polluting global.Gun by just importing?
+				// gun/gun (vs just gun) is without some server-related adapters?
+			const gun = window.gun = new Gun()
+			export default {
+				data: ()=> ({
+					message: 'hello',
+				}),
+				mounted () {
+					...gunjs code...
+				}
+			}
+		</script>
+	vue serve app.vue
+	open in browser, open console, and interact
+		gun is Gun
+			with Options
+
+			Options is or: // see https://gun.eco/docs/API#gun
+				- Empty // -> local datastore w radisk (nodejs) or localStorage (browser)
+				- URL is String // local datastore + tries to sync with peer at URL
+				- many URL // see above but w multiple peers
+				- Object
+					peers is {many {URL as string: {}}}: {}
+					radisk is Boolean: true
+					localStorage is Boolean: true
+					uuid is (on: String) // default: 24 char alphanum soul generator
+					options.(module-name) // see third-party modules
+
+					' other:
+						file: 'file/path.json', // JSON persistance (non-performant, dev only)
+						s3: {key, secret, bucket} // see amazon s3
+
+			"_" is .Meta // see https://gun.eco/docs/Next-Steps#software-architects
+				opt // options configured at new Gun(...)?
+				graph is .Graph // where data is "stored"
+					many {Soul: Node}
+				' less used:
+					$, gun, root: self // diff?
+					ask, dup // ?
+					next, mum, now, once, stop, tag // ?
+					on // subscribe to updates?
+
+			HAM("Hypothetical Amnesia Machine").State("Convergence State")
+				is {many {key is String: HAM.State.Value}}
+				// used to resolve when syncing
+
+			Node:
+				"_" is .Meta
+					"#" is .Soul is String, id, unique
+					">" is HAM.State
+				many {key is String: .Value}
+				Value is or:
+					- null, Boolean, Number, String
+					- .Relation is {"#": Soul}
+
+		api // see 
+
