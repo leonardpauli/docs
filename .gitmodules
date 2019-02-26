@@ -51,3 +51,6 @@
 [submodule "app/web/webassembly/wabt"]
 	path = app/web/webassembly/wabt
 	url = git@github.com:WebAssembly/wabt.git
+[submodule "design/font/FiraCode"]
+	path = design/font/FiraCode
+	url = git@github.com:tonsky/FiraCode.git
