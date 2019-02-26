@@ -2,8 +2,8 @@
 ' LeonardPauli/docs
 	Created by Leonard Pauli, 16 may 2018
 
-' auth:
-	https://gist.github.com/amark/7dceae874a20878fdb9e2a8eed109bb5
+' sources:
+	- https://gun.eco/docs
 
 
 quick start: // as of 19 feb 2019
@@ -28,47 +28,252 @@ quick start: // as of 19 feb 2019
 			}
 		</script>
 	vue serve app.vue
-	open in browser, open console, and interact
-		gun is Gun
-			with Options
+	open in browser, open console, and interact // see api
 
-			Options is or: // see https://gun.eco/docs/API#gun
-				- Empty // -> local datastore w radisk (nodejs) or localStorage (browser)
-				- URL is String // local datastore + tries to sync with peer at URL
-				- many URL // see above but w multiple peers
-				- Object
-					peers is {many {URL as string: {}}}: {}
-					radisk is Boolean: true
-					localStorage is Boolean: true
-					uuid is (on: String) // default: 24 char alphanum soul generator
-					options.(module-name) // see third-party modules
 
-					' other:
-						file: 'file/path.json', // JSON persistance (non-performant, dev only)
-						s3: {key, secret, bucket} // see amazon s3
 
-			"_" is .Meta // see https://gun.eco/docs/Next-Steps#software-architects
-				opt // options configured at new Gun(...)?
-				graph is .Graph // where data is "stored"
-					many {Soul: Node}
-				' less used:
-					$, gun, root: self // diff?
-					ask, dup // ?
-					next, mum, now, once, stop, tag // ?
-					on // subscribe to updates?
+gun is Gun
+	with Options
 
-			HAM("Hypothetical Amnesia Machine").State("Convergence State")
-				is {many {key is String: HAM.State.Value}}
-				// used to resolve when syncing
+	Options is or: // see https://gun.eco/docs/API#gun
+		- Empty // -> local datastore w radisk (nodejs) or localStorage (browser)
+		- URL is String // local datastore + tries to sync with peer at URL
+		- many URL // see above but w multiple peers
+		- Object
+			peers is {many {URL as string: {}}}: {}
+			radisk is Boolean: true
+			localStorage is Boolean: true
+			uuid is (on: String) // default: 24 char alphanum soul generator
+			options.(module-name) // see third-party modules
 
-			Node:
-				"_" is .Meta
-					"#" is .Soul is String, id, unique
-					">" is HAM.State
-				many {key is String: .Value}
-				Value is or:
-					- null, Boolean, Number, String
-					- .Relation is {"#": Soul}
+			' other:
+				file: 'file/path.json', // JSON persistance (non-performant, dev only)
+				s3: {key, secret, bucket} // see amazon s3
 
-		api // see 
+	"_" is .Meta // see https://gun.eco/docs/Next-Steps#software-architects
+		opt // options configured at new Gun(...)?
+		graph is .Graph // where data is "stored"
+			many {Soul: Node}
+		' less used:
+			$, gun, root: self // diff?
+			ask, dup // ?
+			next, mum, now, once, stop, tag // ?
+			on // subscribe to updates?
 
+	HAM("Hypothetical Amnesia Machine").State("Convergence State")
+		is {many {key is String: HAM.State.Value}}
+		// used to resolve when syncing
+
+	Node:
+		"_" is .Meta
+			"#" is .Soul is String, id, unique
+			">" is HAM.State
+		Data is many {key is String: .Value}
+		is Data
+		Value is or:
+			- null, Boolean, Number, String
+			- .Relation is {"#": Soul} // can be circular (though 2 step op: need to create the node to get the Soul first)
+			// ie. NOT undefined, NaN, Infinity
+		Partial is {...many {key is String: .Value or .Partial}} // see api.put
+
+api // see https://gun.eco/docs/API
+	constructor: see gun
+	get // change current context path
+		// doesn't create nodes
+		// though node (and intermediate) will be created on eg. put
+		gun.get('a').get('b').get('c')
+			// gun._.graph.a == undefined
+		gun.get('a').get('b').get('c').put('hello')
+			// gun._.graph contains the flattened data
+			gun._.graph.a is Object
+			gun._.graph.a.b is Relation.Object // {#: 'j3f...'}
+			gun._.graph.a.b.c // undefined
+			gun._.graph.a.get // undefined
+			// use get to get the full-fledged node
+			gun.get('a') is Node
+			gun.get('a').get is fn
+			gun.get('a').get('b') is Node
+			gun.get('a').get('b').c // undefined
+			' to get data from Node
+				see api.(once, on, etc)
+				hacky: // for getting cached data
+					- manually traversing (cached) graph data
+						bSoul = gun._.graph.a.b['#']
+						bData = gun._.graph[bSoul]
+						bData.c // 'hello'
+					- get bSoul from node
+						bSoul == gun.get('a').get('b')._.link
+					- get bData from node
+						bData2 = gun.get('a').get('b')._.put
+						bData != bData2 // not same object...
+						JSON.stringify(bData) == JSON.stringify(bData2) // ...but same content
+
+			gun.get('a').get('b')
+
+	put // save data at current context path + sync to peers
+		gun.get('key').put(data, cb)
+		data is or:
+			- Node
+			- .Partial
+				' when used, data gets normalized
+					every sub-partial gets merged with corresponding node
+						if no existing node is found locally or among available peers
+							it will generate new Node with new Soul
+							potentially making two non-conflicting partial/value updates from
+							unconnected peers become conflicting (different Souls for node
+								containing non-conflicting values) en merging later on
+						solution: generate Soul deterministically using:
+							node = gun.get(generate_id(some_key_data))
+							parent.get('sub').put(node)
+							node.put({partial: 'update'}) // a
+							node.put({here: 32}) // b
+							// a + b will then merge smoothly
+					// also, seems like there is no built-in method to perform atomic updates
+
+			- .Value if not root level
+				// (eg. gun._.graph.im_at_root.not_me.neither_am_i)
+				// gun.get(key) // root-level node
+				// gun.get(key).get(...) // not root-level node
+				// gun.get(key).get(...).get(...) // not root-level node
+		cb: Empty or (ack=> {})
+			// fired for each peer (inc. local cache)
+			ack{err, ok} // "acknowledgement"
+				// persistance message from possible adapters
+				err is Empty if success
+
+
+		' note
+			r = gun.get('r') // root-level node
+			r.get('a').put('hello')
+				// gun._.graph.r.a == 'hello'
+			r.get('a').put({b: 'there'})
+				' see put.bug.chain
+					r.get('a').get('b').put('there')
+					...should be same, but broken atm
+				// replaces value at a
+				// gun._.graph.r.a == {b: bSoul}
+				// gun._.graph.(bSoul) == 'there'
+
+		' bug.chain:
+			**TL;DR: `.put` wrongly treats a String value in a .get chain as an Object, thus silently failing to save value.**
+
+			```
+			gun = new Gun()
+			gun.get('root').get('a').put('text')
+			gun.get('root').get('a').once(console.log) // "text" a // correct
+
+			gun.get('root').get('a').get('b').put('foo')
+			gun.get('root').get('a').once(console.log) // "text" a // still?
+			gun.get('root').get('a').get('b').once(console.log) // undefined b // whaa? not saved?? expected "foo" b
+
+			gun._.graph // well, it has created a node with {b: "foo"}, but root.a is still "text"
+
+			gun.get('root').get('a').put({b: 'bar'}) // putting without an "intermediate" chain
+			gun.get('root').get('a').once(console.log) // {b: "bar"} a // changed!
+			gun.get('root').get('a').get('b').once(console.log) // "bar" b // so this works!
+
+			gun._.graph // the previous faild-to-link {b: "foo"} is still there, together with the new successful {b: "bar"} (and {root: {a: {#: bSoul}}})
+			```
+
+			Two alternative solutions:
+			- quick: only allow object as value in .put
+			- better: make sure non-object values don't prevent intermediate chain nodes creation when using put
+
+			<h5>I looked through the code a bit, looks like it checks if there is a value at all instead of checking if the value is of object/partial or Node/gun type; (though was a bit hard with all the cryptic variable names, lack of comments and coherent formatting. That's another issue, though pretty sure it would allow more potential contributors / turn off less of them)</h5>
+
+
+	on
+		gun.get('foo').on(cb) // add change listener
+			cb: ((Node.Data, key)=> {})
+		gun.get('foo').on(cb, {change: true})
+			cb Node.Data{only changed fields}
+		gun.get('foo').off() // remove all listeners on foo
+
+		' "on" is called twice with:
+			gun.get('a').put({b: 'c'})
+			but once with:
+			gun.get('a').get('b').put('c')
+			// gah...
+
+	once // like on, but...
+		- cb is called sync if data is cached
+		- async if fetch necessary
+		- cb might be called once (or multiple?) times more if node is updated from within cb // GAH!!
+		// gun.get(key/soul).once((nodeData)=> {}, options)
+		options is {wait: 99ms} // debounce
+
+	set
+		gun.get('root').set(Node or Partial)
+			if Node already in set -> do nothing
+			else, add to unordered set by:
+				gun.get('root').get(node.soul).put(node) // TODO check
+
+	map // changes the context to contain multiple paths
+		// filters (value, key) pairs of node
+		// patterns, cb called...
+		xs.map().on(cb)
+			for each x initially, an x changes, an x is added
+		xs.map().once(cb)
+			for each x initially, an x is added
+		xs.once().map().on(cb)
+			for each x initially, an x changes
+		xs.once().map().once(cb)
+			for each x initially
+		xs.once().map(filter).once(cb)
+			for each x initially, where x matches filter
+			filter: (xData=> Boolean)
+
+	then // promisifies chain
+		' to enable: or:
+			- require('gun/lib/then.js')
+			- <script src="https://cdn.jsdelivr.net/npm/gun/lib/then.js"></script>
+		// eg. const nodeData = await gun.get(key/soul).once().then()
+
+	unset // see set
+		' to enable: or:
+			- require('gun/lib/unset.js')
+			- <script src="https://cdn.jsdelivr.net/npm/gun/lib/unset.js"></script>
+		// sets the value for the corresponding key to null
+
+	Gun.node.is(foo) is Boolean: foo is Gun.Node
+	Gun.node.soul(node) is Soul or Empty // node._.#
+
+sea // security, encryption, authentication/authorisation
+	see "https://gun.eco/docs/SEA"
+		<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+		<script>
+		// var Gun = require('gun'); // in NodeJS 
+		// require('gun/sea');
+		var SEA = Gun.SEA;
+		;(async () => {
+			var pair = await SEA.pair()
+			var enc = await SEA.encrypt('hello self', pair)
+			var data = await SEA.sign(enc, pair)
+			console.log(data)
+			var msg = await SEA.verify(data, pair.pub)
+			var dec = await SEA.decrypt(msg, pair)
+			var proof = await SEA.work(dec, pair)
+			var check = await SEA.work('hello self', pair)
+			console.log(dec)
+			console.log(proof === check)
+			// now let's share private data with someone:
+			var alice = await SEA.pair()
+			var bob = await SEA.pair()
+			var enc = await SEA.encrypt('shared data', await SEA.secret(bob.epub, alice))
+			await SEA.decrypt(enc, await SEA.secret(alice.epub, bob))
+			// `.secret` is Elliptic-curve Diffie–Hellman
+		})()
+		</script>
+
+
+faq
+	data
+		delete: just set value to null instead
+			// to ensure all peers understand that the value should be removed (vs just missing)
+				// otherwise it would just be autopopulated back from the other peers
+		arrays: see api.set
+
+
+' notes:
+	auth: https://gist.github.com/amark/7dceae874a20878fdb9e2a8eed109bb5
