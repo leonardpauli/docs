@@ -54,3 +54,6 @@
 [submodule "design/font/FiraCode"]
 	path = design/font/FiraCode
 	url = git@github.com:tonsky/FiraCode.git
+[submodule "app/vue/vue"]
+	path = app/vue/vue
+	url = git@github.com:vuejs/vue.git
