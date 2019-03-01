@@ -195,6 +195,69 @@ api // see https://gun.eco/docs/API
 			gun.get('a').get('b').put('c')
 			// gah...
 
+		' bug.on.multiple-listeners-remove
+			**TL;DR: no apparent way of removing .on() listener**
+
+			- .off() removes all listeners
+			- can't find any other way in docs (for .on())
+			- .get(()=> ...) is said to be "more low level", but has promising ev.off()
+			- to be able to add/remove multiple listeners on same node is a very common pattern (eg. username both in header and profile card)
+				- to use a custom cache with a single .on() works but seems like "duplicating the effort"
+				- would be great if .on() gave the ability to disable that specific listener
+				- eg. similar to `id = setTimeout(...); clearTimeout(id)`
+				- eg. `ctx = gun.get('a').on(...); ctx.off()`
+			- improper listener removal usually leads to "seemingly random" bugs
+
+			After digging in the code, .on() is more or less a wrapper for .get(), and passes along relevant args. See [line 46](https://github.com/amark/gun/blob/1fe9daafdeeb55dc41966595c4e848a928a0fa02/src/on.js#L46). It would be nice to have that in [the docs](https://gun.eco/docs/API#-a-name-on-a-gun-on-callback-option-) if it's the recommended way of removing specific listeners. Though having the ability to be calling .off() on the return value from .on() seems preferable in many ways (ability to remove listener before its first invocation, imho, "logical" syntax, etc).
+
+			This shouldn't require too much change (<10 lines?) if I saw correct (.on -> .get -> Gun.on that returns ev directly and has access to node, therefore adding ref to ev on node + make .off use node.ev.off() if ev exists, otherwise doing the usual).
+
+			Could make a PR if this behavior is the expected one.
+
+			```js
+			r = gun.get('root')
+			a = r.get('anna')
+			a.put({age: 5})
+
+			// listener 1, eg. in header component
+			l1handler = (value, key)=> console.log(`1: a.${key} is now ${value} (header)`)
+			l1 = a.map().on(l1handler)
+
+			// listener 2, eg. in profile card component
+			l2handler = (value, key)=> console.log(`2: a.${key} is now ${value} (profile)`)
+			l2base = a.map()
+			l2ev = null // awkward to get hold of
+			l2handlerWrapper = (value, key, _msg, ev)=> {l2ev = ev; l2handler(value, key)}
+			l2 = l2base.on(l2handlerWrapper)
+
+			console.log('updating...')
+			a.get('age').put(6)
+
+			// leaving profile page, profile card component is destroyed, listener 2 should be removed
+			console.log('removing listener 2')
+			// l2.off() // no relevant effect
+			// l2base.off() // no relevant effect
+			// a.off() // removes both listeners
+			l2ev.off() // removes only listener 2 (what I'm looking for, but awkward as it is)
+
+			console.log('updating...')
+			a.get('age').put(7)
+
+			console.log('done')
+
+			/* log:
+			1: a.age is now 5 (header)
+			2: a.age is now 5 (profile)
+			updating...
+			1: a.age is now 6 (header)
+			2: a.age is now 6 (profile)
+			removing listener 2
+			updating...
+			1: a.age is now 7 (header)
+			done
+			*/
+			```
+
 	once // like on, but...
 		- cb is called sync if data is cached
 		- async if fetch necessary
